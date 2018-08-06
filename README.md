@@ -19,7 +19,9 @@ Try for example the files fl1_std.wav (string from a Kurzweil K2000) and jung05.
 You can play them via a sample player like complex simpler from the NYSTHI plugin set.
 For your convenience Vocode-O-Matic-example_01.vcv will load the appropriate files.
 Make sure the top simpler loads the fl2.wav file and the bottom one the jung05.wav file.
+There is a screen shot in the res directory that may be of help.
 For whatever reason in my setup often the same file is read into both simplers which does not make much sense.
+After reopening the appropriate file the vocoder sounds as one would expect.
 
 Knobs and Toggle switches
 
