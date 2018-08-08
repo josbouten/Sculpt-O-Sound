@@ -17,10 +17,26 @@
 #define ORIGIN_BOTTOM_LEFT
 
 #define HBASE 130
-//#define HBASE NR_OF_BANDS * LED_HEIGHT + 120
-
 
 #define LED_LIGHT_PARAM 4
+
+void refresh_led_matrix(int lights_offset, int p_cnt[NR_OF_BANDS], int button_value[NR_OF_BANDS][NR_OF_BANDS], bool led_state[1024], std::vector<Light> lights) 
+{
+    for (int i = 0; i < NR_OF_BANDS; i++)     
+    {
+       for (int j = 0; j < NR_OF_BANDS; j++)
+       {
+           led_state[i * NR_OF_BANDS + j] = false;
+           lights[lights_offset + i * NR_OF_BANDS + j].value = false;
+       }
+       for (int j = 0; j < p_cnt[i]; j++)
+       {
+           led_state[i * NR_OF_BANDS + button_value[i][j]] = true;
+           lights[lights_offset + i * NR_OF_BANDS + button_value[i][j]].value = true;
+       }
+    }
+}
+
 struct Vocode_O_Matic_v02 : Module {
 
   enum ParamIds {
@@ -185,23 +201,12 @@ struct Vocode_O_Matic_v02 : Module {
     print_p_cnt(p_cnt);
 #endif
 
-    // refresh LED matrix
-    for (int i = 0; i < NR_OF_BANDS; i++)     
-    {
-       for (int j = 0; j < NR_OF_BANDS; j++)
-       {
-           led_state[i * NR_OF_BANDS + j] = false;
-           lights[lights_offset + i * NR_OF_BANDS + j].value = false;
-       }
-       for (int j = 0; j < p_cnt[i]; j++)
-       {
-           led_state[i * NR_OF_BANDS + button_value[i][j]] = true;
-           lights[lights_offset + i * NR_OF_BANDS + button_value[i][j]].value = true;
-       }
-    }
+    // Refresh LED matrix.
+    refresh_led_matrix(lights_offset, p_cnt, button_value, led_state, lights);
+
     fx_bypass = false;
     blinkPhase = -1.0f;
-    // reset lights 
+    // Reset lights .
     lights[MATRIX_SHIFT_TOGGLE_LIGHT].value = 0.0;
     lights[BYPASS_LIGHT].value = 0.0;
   
@@ -227,7 +232,6 @@ struct Vocode_O_Matic_v02 : Module {
   } 
 };
 
-
 struct LButton : SVGSwitch, MomentarySwitch {
     LButton() {
         addFrame(SVG::load(assetPlugin(plugin, "res/L.svg")));
@@ -243,30 +247,18 @@ void Vocode_O_Matic_v02::onReset() {
   matrix_type_selector = INITIAL_MATRIX_TYPE;
   lcd_matrix_type = matrix_type_selector;
   lcd_matrix_shift_position = 0;
-  choose_matrix(4, button_value, p_cnt); // initialize linear filter coupling.
+  choose_matrix(4, button_value, p_cnt); // Initialize linear filter coupling.
 #ifdef DEBUG
   print_matrix(button_value);
   print_p_cnt(p_cnt);
 #endif
 
-  // refresh LED matrix
-  for (int i = 0; i < NR_OF_BANDS; i++)     
-  {
-      for (int j = 0; j < NR_OF_BANDS; j++)
-      {
-          led_state[i * NR_OF_BANDS + j] = false;
-          lights[lights_offset + i * NR_OF_BANDS + j].value = false;
-      }
-      for (int j = 0; j < p_cnt[i]; j++)
-      {
-          led_state[i * NR_OF_BANDS + button_value[i][j]] = true;
-          lights[lights_offset + i * NR_OF_BANDS + button_value[i][j]].value = true;
-      }
-  }
-
+  // Refresh LED matrix.
+  refresh_led_matrix(lights_offset, p_cnt, button_value, led_state, lights);
   fx_bypass = false;
   blinkPhase = -1.0f;
-  // reset lights 
+
+  // Reset lights.
   lights[MATRIX_SHIFT_TOGGLE_LIGHT].value = 0.0;
   lights[BYPASS_LIGHT].value = 0.0;
 }
@@ -332,24 +324,11 @@ void Vocode_O_Matic_v02::step() {
     blinkPhase -= 1.0f;
     // Shift, but not when in bypass mode.
     if ((not fx_bypass) && matrix_shift_button_pressed) {
-        // shift one step
+        // Shift one step.
         matrix_shift_buttons_to_right(button_value, p_cnt);
 
-        // refresh matrix
-        for (int i = 0; i < NR_OF_BANDS; i++)     
-        {
-            for (int j = 0; j < NR_OF_BANDS; j++)
-            {
-                led_state[i * NR_OF_BANDS + j] = false;
-                lights[lights_offset + i * NR_OF_BANDS + j].value = false;
-            }
-            for (int j = 0; j < p_cnt[i]; j++)
-            {
-                led_state[i * NR_OF_BANDS + button_value[i][j]] = true;
-                lights[lights_offset + i * NR_OF_BANDS + button_value[i][j]].value = true;
-            }
-        }
-        // refresh matrix
+        // Refresh matrix.
+        refresh_led_matrix(lights_offset, p_cnt, button_value, led_state, lights);
 
         lcd_matrix_shift_position += 1;
         if (lcd_matrix_shift_position >= NR_OF_BANDS) 
@@ -376,21 +355,8 @@ void Vocode_O_Matic_v02::step() {
     print_p_cnt(p_cnt);
 #endif
 
-    // refresh LED matrix
-    for (int i = 0; i < NR_OF_BANDS; i++)     
-    {
-        for (int j = 0; j < NR_OF_BANDS; j++)
-        {
-            led_state[i * NR_OF_BANDS + j] = false;
-            lights[lights_offset + i * NR_OF_BANDS + j].value = false;
-        }
-        for (int j = 0; j < p_cnt[i]; j++)
-        {
-            led_state[i * NR_OF_BANDS + button_value[i][j]] = true;
-            lights[lights_offset + i * NR_OF_BANDS + button_value[i][j]].value = true;
-        }
-    }
-    // refresh matrix
+    // Refresh LED matrix.
+    refresh_led_matrix(lights_offset, p_cnt, button_value, led_state, lights);
 
     lcd_matrix_type = matrix_type_selector;
     // We restart the shift counter at 0.
@@ -407,7 +373,7 @@ void Vocode_O_Matic_v02::step() {
   }
 #endif
 
-  // If a matrix button is pressed, adapt the matrix
+  // If a matrix button is pressed, adapt the matrix.
   if (edit_matrix_trigger.process(params[LED_ON_PARAM].value)) 
   {
     edit_matrix_state = !edit_matrix_state ;
@@ -422,7 +388,6 @@ void Vocode_O_Matic_v02::step() {
         {
             wait = 20000;
             led_state[i] = !led_state[i]; 
-            //int index = LED_LIGHT + NR_OF_BANDS * NR_OF_BANDS - i;
             int index = LED_LIGHT + i;
             lights[index].value = !lights[index].value;
             int chosen_row = i / NR_OF_BANDS;
@@ -516,9 +481,9 @@ struct Vocode_O_Matic_v02Widget : ModuleWidget {
     addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
     addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-    // dial for carrier gain
-    // dial for modulator gain
-    // dial for panning 
+    // Dial for carrier gain.
+    // Dial for modulator gain.
+    // Dial for panning.
     addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(10,  47), module, Vocode_O_Matic_v02::CARRIER_GAIN_PARAM, 1.0, 10.0, INITIAL_CARRIER_GAIN));
     addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(40,  47), module, Vocode_O_Matic_v02::MODULATOR_GAIN_PARAM, 1.0, 10.0, INITIAL_MODULATOR_GAIN));
 #ifdef PANNING
@@ -526,32 +491,32 @@ struct Vocode_O_Matic_v02Widget : ModuleWidget {
 #endif
 
     // INTPUTS (SIGNAL AND PARAMS)
-    // input signals
+    // Input signals.
     addInput(Port::create<PJ301MPort>(Vec(10, 180), Port::INPUT, module, Vocode_O_Matic_v02::CARR_INPUT));
     addInput(Port::create<PJ301MPort>(Vec(40, 180), Port::INPUT, module, Vocode_O_Matic_v02::MOD_INPUT));
 
-    // Bypass switch
+    // Bypass switch.
     addParam(ParamWidget::create<LEDBezel>(Vec(12,  90), module, Vocode_O_Matic_v02::BYPASS_SWITCH , 0.0f, 1.0f, 0.0f));
     addChild(ModuleLightWidget::create<LedLight<RedLight>>(Vec(14.2, 92), module, Vocode_O_Matic_v02::BYPASS_LIGHT));
 
-    // Matrix type switch
+    // Matrix type switch.
     addParam(ParamWidget::create<LEDBezel>(Vec(12, 120), module, Vocode_O_Matic_v02::MATRIX_TYPE_TOGGLE_PARAM, 0.0f, 1.0f, 0.0f));
     addChild(ModuleLightWidget::create<LedLight<GreenLight>>(Vec(14.2, 122), module, Vocode_O_Matic_v02::MATRIX_TYPE_TOGGLE_LIGHT));
 
-    // Matrix shift toggle
+    // Matrix shift toggle.
     addParam(ParamWidget::create<LEDBezel>(Vec(12, 150), module, Vocode_O_Matic_v02::MATRIX_SHIFT_TOGGLE_PARAM, 0.0f, 1.0f, 0.0f));
     addChild(ModuleLightWidget::create<LedLight<BlueLight>>(Vec(14.2, 152), module, Vocode_O_Matic_v02::MATRIX_SHIFT_TOGGLE_LIGHT));
 
-    // Matrix type
     // MS DISPLAY                                                                  
+    // Matrix type
     MsDisplayWidget2 *display1 = new MsDisplayWidget2();                            
     display1->box.pos = Vec(40, 121);                                               
     display1->box.size = Vec(30, 20);                                             
     display1->value = &module->lcd_matrix_type;
     addChild(display1);                                                           
 
-    // Shift position
     // MS DISPLAY                                                                  
+    // Shift position
     MsDisplayWidget2 *display2 = new MsDisplayWidget2();                            
     display2->box.pos = Vec(40, 151);                                               
     display2->box.size = Vec(30, 20);                                             
