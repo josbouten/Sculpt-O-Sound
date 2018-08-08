@@ -46,3 +46,5 @@ Since I'm relatively new to C++ programming and the Rack VCV platform I probably
 What I've found is that the vocoder on occasion will only output a DC value, and not produce any other sound at all.
 Restarting the Rack or opening the module once more will often solve this problem. If anyone knows how to handle this properly,
 please let me know.
+
+All filters are based on the series of tutorial papers about Effect Design by Jon Dattorro published in the Journal of the Audio Engineering Society.
