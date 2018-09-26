@@ -3,7 +3,7 @@ RACK_DIR ?= ../..
 
 # Must follow the format in the Naming section of
 # https://vcvrack.com/manual/PluginDevelopmentTutorial.html
-SLUG = Sculpt-O-Sound
+SLUG = Sculpt-O-Sound_-_Vocode-O-Matic
 
 # Must follow the format in the Versioning section of
 # https://vcvrack.com/manual/PluginDevelopmentTutorial.html
