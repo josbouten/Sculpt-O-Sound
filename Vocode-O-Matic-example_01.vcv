@@ -52,11 +52,11 @@
         },
         {
           "paramId": 10,
-          "value": 0.271499991
+          "value": 0.0
         },
         {
           "paramId": 11,
-          "value": 0.728500187
+          "value": 1.0
         },
         {
           "paramId": 12,
@@ -78,7 +78,7 @@
       "data": {
         "nysthi_id": "SIMPLER_TXkH3bA0",
         "m_nysthi_file_id": "./plugins/NYSTHI/cache/SIMPLER_TXkH3bA0_20180420_103722_aK59Zg.wav",
-        "m_original_file_name": "fl2.wav",
+        "m_original_file_name": "fl1_std.wav",
         "m_gated": false
       }
     },
