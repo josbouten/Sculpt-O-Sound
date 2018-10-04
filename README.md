@@ -1,6 +1,10 @@
 # VCV vocoder plugin
 # Copyright: Zaphod B. 2018
 
+![alt text](res/pic_logo_sos.gif)
+
+
+
 Sculpt-O-Sound presents: 
 
 Vocode-O-Matic, v0.2 is a 31 terts band vocoder with editable frequency matrix usable for 44100 Hz sampling frequency only (at the moment).
@@ -17,7 +21,11 @@ Try for example the files fl1_std.wav (string from a Kurzweil K2000) and jung05.
 You can play them via a sample player like complex simpler from the NYSTHI plugin set.
 For your convenience Vocode-O-Matic-example_01.vcv will load the appropriate files.
 Make sure the top simpler loads the fl2.wav file and the bottom one the jung05.wav file.
-There is a screen shot in the res directory that may be of help.
+Have a look at the screen shot below if you need some help.
+
+![alt text](res/Screenshot 2018-10-04 at 19.52.28.png)
+
+
 For whatever reason in my setup often the same file is read into both simplers which does not make much sense.
 After reopening the appropriate file the vocoder sounds as one would expect.
 
