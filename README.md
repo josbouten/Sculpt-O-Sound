@@ -3,8 +3,6 @@
 
 ![alt text](res/pic_logo_sos.gif)
 
-
-
 Sculpt-O-Sound presents: 
 
 Vocode-O-Matic, v0.2 is a 31 terts band vocoder with editable frequency matrix usable for 44100 Hz sampling frequency only (at the moment).
@@ -23,11 +21,9 @@ For your convenience Vocode-O-Matic-example_01.vcv will load the appropriate fil
 Make sure the top simpler loads the fl2.wav file and the bottom one the jung05.wav file.
 Have a look at the screen shot below if you need some help.
 
-![alt text](res/Screenshot 2018-10-04 at 19.52.28.png)
+For reasons unclear to me when using the example setup file often the same file is read into both simplers which does not make much sense. As a remedy read in the audio files explicitely and you'll be fine.
 
-
-For whatever reason in the example setup often the same file is read into both simplers which does not make much sense.
-As a remedy read in the audio files explicitely and you'll be fine.
+![alt text](res/Screenshot_2018-10-04_at_19.52.28.png)
 
 Knobs and Toggle switches
 
