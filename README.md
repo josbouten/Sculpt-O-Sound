@@ -26,8 +26,8 @@ Have a look at the screen shot below if you need some help.
 ![alt text](res/Screenshot 2018-10-04 at 19.52.28.png)
 
 
-For whatever reason in my setup often the same file is read into both simplers which does not make much sense.
-After reopening the appropriate file the vocoder sounds as one would expect.
+For whatever reason in the example setup often the same file is read into both simplers which does not make much sense.
+As a remedy read in the audio files explicitely and you'll be fine.
 
 Knobs and Toggle switches
 
