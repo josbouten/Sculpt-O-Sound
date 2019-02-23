@@ -1,5 +1,6 @@
 # VCV vocoder plugin
 # Copyright: Zaphod B. 2018
+# email: zaphodb42a at gmail dot com.
 
 ![alt text](res/pic_logo_sos.gif)
 
