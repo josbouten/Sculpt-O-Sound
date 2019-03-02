@@ -262,7 +262,7 @@
     {
       "plugin": "Sculpt-O-Sound",
       "version": "0.6.0",
-      "model": "Vocode_O_Matic_v02",
+      "model": "Vocode_O_Matic_v03",
       "pos": [
         15,
         0
