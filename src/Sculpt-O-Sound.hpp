@@ -3,7 +3,7 @@
 #pragma once
 
 // For debug purposes only !
-#define DEBUG
+//#define DEBUG
 
 using namespace rack;
 
