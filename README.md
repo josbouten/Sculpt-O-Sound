@@ -45,12 +45,14 @@ Buttons
 
 The top toggle button when pressed will turn red, this will put the vocode in bypass mode. 
 This will send the modulator and carrier input signals to the left and right outputs respectively.
+If you use the Vocode-O-Matic-example_01.vcv settings file make sure you hear the string sample and the drum loop in bypass mode. If not, reload the samples in the simpler modules.
 
-The second toggle button from the top lets you choose between 5 filter mappings. Number 4 is a linear mapping of the modulator filters
+The second push button from the top lets you choose between 5 filter mappings. Number 4 is a linear mapping of the modulator filters
 against the carrier filters. This is the default at startup. Number 5 is a reverse mapping. 
 Mapping 0, 1, 2, 3 and log mappings. All sound differently. And by toggling switches in the matrix you can change them.
 
-The third button does some matrix magic. It will shift the filter mapping to the right in a slow pace. The 7 segment display will show the position of the matrix. If you press the button again the matrix will stop moving.
+The first push button on the right hand side of the second 7 segment display can be used to shift the moduldation matrix to the right one step. 
+The second putton is a toggle button which allows you to bypass the trigger signals effectively holding the matrix in its position. The 7 segment display will show the position shift of the matrix. 0 is the initial state, 30 means the matrix has shifted but for one step completely to the right (with wrap around).
 
 Known bugs
 

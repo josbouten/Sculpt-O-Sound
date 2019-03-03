@@ -261,11 +261,7 @@
     },
     {
       "plugin": "Sculpt-O-Sound",
-<<<<<<< HEAD
       "version": "0.6.04",
-=======
-      "version": "0.6.0",
->>>>>>> 9533f16f86e46a0839ac23929a94c3b04f88e897
       "model": "Vocode_O_Matic_v03",
       "pos": [
         18,
@@ -4248,7 +4244,7 @@
         "b": 0.278431386,
         "a": 1.0
       },
-      "outputModuleId": 6,
+      "outputModuleId": 0,
       "outputId": 2,
       "inputModuleId": 7,
       "inputId": 2
