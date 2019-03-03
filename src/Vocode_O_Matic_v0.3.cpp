@@ -510,7 +510,6 @@ struct Vocode_O_Matic_v03Widget : ModuleWidget {
     addInput(Port::create<PJ301MPort>(Vec(10, 180), Port::INPUT, module, Vocode_O_Matic_v03::CARR_INPUT));
     addInput(Port::create<PJ301MPort>(Vec(42, 180), Port::INPUT, module, Vocode_O_Matic_v03::MOD_INPUT));
     addInput(Port::create<PJ301MPort>(Vec(78, 148), Port::INPUT, module, Vocode_O_Matic_v03::SHIFT_INPUT));
-
     // Bypass switch.
     addParam(ParamWidget::create<LEDBezel>(Vec(12,  90), module, Vocode_O_Matic_v03::BYPASS_SWITCH , 0.0f, 1.0f, 0.0f));
     addChild(ModuleLightWidget::create<LedLight<RedLight>>(Vec(14.2, 92), module, Vocode_O_Matic_v03::BYPASS_LIGHT));
@@ -541,7 +540,6 @@ struct Vocode_O_Matic_v03Widget : ModuleWidget {
     // Output for filtered signal.
     addOutput(Port::create<PJ301MPort>(Vec(10, 210), Port::OUTPUT, module, Vocode_O_Matic_v03::LEFT_OUTPUT));
     addOutput(Port::create<PJ301MPort>(Vec(42, 210), Port::OUTPUT, module, Vocode_O_Matic_v03::RIGHT_OUTPUT));
-
     // Matrix, origin is bottom left.
     for (int i = 0; i < NR_OF_BANDS; i++) {
         for (int j = 0; j < NR_OF_BANDS; j++) {
