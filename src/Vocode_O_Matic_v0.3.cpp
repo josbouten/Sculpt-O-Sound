@@ -4,7 +4,9 @@
 #include "Sculpt-O-Sound.hpp"
 #include "comp_coeffs.hpp"
 #include "dsp/digital.hpp"
+#include "../deps/SynthDevKit/src/CV.hpp"
 
+ 
 #define INITIAL_CARRIER_GAIN 1.0
 #define INITIAL_MODULATOR_GAIN 1.0
 
@@ -19,6 +21,8 @@
 #define HBASE 130
 
 struct Vocode_O_Matic_v03 : Module {
+  // Define CV trigger a la synthkit for shifting the matrix.
+  SynthDevKit::CV *cv = new SynthDevKit::CV(0.1f);
 
   void refresh_led_matrix(int lights_offset, int p_cnt[NR_OF_BANDS], int button_value[NR_OF_BANDS][NR_OF_BANDS], bool led_state[1024])
   {
@@ -57,6 +61,7 @@ struct Vocode_O_Matic_v03 : Module {
     // input signal
     CARR_INPUT,
     MOD_INPUT, 
+    SHIFT_INPUT,
     NUM_INPUTS
   };
 
@@ -127,6 +132,7 @@ struct Vocode_O_Matic_v03 : Module {
   bool edit_matrix_state = false;
   int wait = 1;
 
+
   int p_cnt[NR_OF_BANDS];
   int button_value[NR_OF_BANDS][NR_OF_BANDS];
   float mod_alpha1[NR_OF_BANDS];
@@ -185,7 +191,7 @@ struct Vocode_O_Matic_v03 : Module {
           ym[i][j] = 0.0;
       }
       ym_env[i][0] = 0.0; // envelope of modulator
-      ym_env[i][1] = 0.0;                                                                                                                                                                                       
+      ym_env[i][1] = 0.0;
     }
     // Initialize the levels and pans.
     initialize_start_levels(start_level);
@@ -333,6 +339,20 @@ void Vocode_O_Matic_v03::step() {
 
   if (matrix_shift_button_pressed) { // We blink only if the button is toggled in the on position.
     lights[MATRIX_SHIFT_TOGGLE_LIGHT].value = (blinkPhase < 0.5f) ? 1.0f : 0.0f;
+  }
+ 
+  float shiftTriggerIn = inputs[SHIFT_INPUT].value;
+  cv->update(shiftTriggerIn);
+  if (cv->newTrigger()) {
+    // toggle the light.
+    lights[MATRIX_SHIFT_TOGGLE_LIGHT].value = (blinkPhase < 0.5f) ? 1.0f : 0.0f;
+    // shift the buttons one step
+    matrix_shift_buttons_to_right(button_value, p_cnt);
+    // refresh the matrix.
+    refresh_led_matrix(lights_offset, p_cnt, button_value, led_state);
+    lcd_matrix_shift_position += 1;
+    if (lcd_matrix_shift_position >= NR_OF_BANDS) 
+        lcd_matrix_shift_position = 0;
   }
   // 
   // If toggle matrix preset button was pressed.
@@ -488,7 +508,8 @@ struct Vocode_O_Matic_v03Widget : ModuleWidget {
     // INTPUTS (SIGNAL AND PARAMS)
     // Input signals.
     addInput(Port::create<PJ301MPort>(Vec(10, 180), Port::INPUT, module, Vocode_O_Matic_v03::CARR_INPUT));
-    addInput(Port::create<PJ301MPort>(Vec(40, 180), Port::INPUT, module, Vocode_O_Matic_v03::MOD_INPUT));
+    addInput(Port::create<PJ301MPort>(Vec(42, 180), Port::INPUT, module, Vocode_O_Matic_v03::MOD_INPUT));
+    addInput(Port::create<PJ301MPort>(Vec(78, 148), Port::INPUT, module, Vocode_O_Matic_v03::SHIFT_INPUT));
 
     // Bypass switch.
     addParam(ParamWidget::create<LEDBezel>(Vec(12,  90), module, Vocode_O_Matic_v03::BYPASS_SWITCH , 0.0f, 1.0f, 0.0f));
@@ -497,7 +518,6 @@ struct Vocode_O_Matic_v03Widget : ModuleWidget {
     // Matrix type switch.
     addParam(ParamWidget::create<LEDBezel>(Vec(12, 120), module, Vocode_O_Matic_v03::MATRIX_TYPE_TOGGLE_PARAM, 0.0f, 1.0f, 0.0f));
     addChild(ModuleLightWidget::create<LedLight<GreenLight>>(Vec(14.2, 122), module, Vocode_O_Matic_v03::MATRIX_TYPE_TOGGLE_LIGHT));
-
     // Matrix shift toggle.
     addParam(ParamWidget::create<LEDBezel>(Vec(12, 150), module, Vocode_O_Matic_v03::MATRIX_SHIFT_TOGGLE_PARAM, 0.0f, 1.0f, 0.0f));
     addChild(ModuleLightWidget::create<LedLight<BlueLight>>(Vec(14.2, 152), module, Vocode_O_Matic_v03::MATRIX_SHIFT_TOGGLE_LIGHT));
@@ -520,7 +540,7 @@ struct Vocode_O_Matic_v03Widget : ModuleWidget {
 
     // Output for filtered signal.
     addOutput(Port::create<PJ301MPort>(Vec(10, 210), Port::OUTPUT, module, Vocode_O_Matic_v03::LEFT_OUTPUT));
-    addOutput(Port::create<PJ301MPort>(Vec(40, 210), Port::OUTPUT, module, Vocode_O_Matic_v03::RIGHT_OUTPUT));
+    addOutput(Port::create<PJ301MPort>(Vec(42, 210), Port::OUTPUT, module, Vocode_O_Matic_v03::RIGHT_OUTPUT));
 
     // Matrix, origin is bottom left.
     for (int i = 0; i < NR_OF_BANDS; i++) {
