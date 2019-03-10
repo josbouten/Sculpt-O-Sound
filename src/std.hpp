@@ -19,8 +19,6 @@
 
 #define MIN_PAN         -0.999 // Right
 #define MAX_PAN          0.999 // Left
-#define INITIAL_PANNING 0.5
-#define MAX_PANNING 1.0
 
 #define CENTER_PAN_VALUE 0.0
 #define INITIAL_PAN   CENTER_PAN_VALUE
@@ -31,7 +29,6 @@
 #define PI 3.1415828
 #define FFSAMP 44100.0
 #define NR_OF_BANDS 31
-#define MAX_PAN 0.999
 #define FALSE 0
 #define TRUE 1
 

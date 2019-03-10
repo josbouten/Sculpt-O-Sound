@@ -30,9 +30,23 @@ void print_matrix(int button_value[NR_OF_BANDS][NR_OF_BANDS])
 {
   for (int i = 0; i < NR_OF_BANDS; i++)     
   {                        
+    printf("%2d, ", i);
     for (int j = 0; j < NR_OF_BANDS; j++)   
     {                      
-       printf("%d ", button_value[i][j]);
+       printf("%2d ", button_value[i][j]);
+    }                      
+    printf("\n"); 
+  } 
+}
+
+void print_matrix(int button_value[NR_OF_BANDS][NR_OF_BANDS], int p_cnt[NR_OF_BANDS]) 
+{
+  for (int i = 0; i < NR_OF_BANDS; i++)     
+  {                        
+    printf("%2d, %2d: ", i, p_cnt[i]);
+    for (int j = 0; j < NR_OF_BANDS; j++)   
+    {                      
+       printf("%2d ", button_value[i][j]);
     }                      
     printf("\n"); 
   } 
@@ -40,8 +54,9 @@ void print_matrix(int button_value[NR_OF_BANDS][NR_OF_BANDS])
 
 void print_p_cnt(int p_cnt[NR_OF_BANDS]) 
 {
+  printf("    ");
   for (int i = 0; i < NR_OF_BANDS; i++) {
-    printf("%d ", p_cnt[i]);
+    printf("%2d ", p_cnt[i]);
   }
   printf(" <--\n");
 }
@@ -184,16 +199,98 @@ void choose_matrix(int filter_coupling_type, int button_value[NR_OF_BANDS][NR_OF
 #endif
 }
 
-void matrix_shift_buttons_to_right(int button_value[NR_OF_BANDS][NR_OF_BANDS], int p_cnt[NR_OF_BANDS])
+void new_matrix_shift_buttons_right(int button_value[NR_OF_BANDS][NR_OF_BANDS], int p_cnt[NR_OF_BANDS])
 {
-  for (int i = 0; i < NR_OF_BANDS; i++)
+  // Save last position p_cnt for wrapping
+  int save_p_cnt = p_cnt[NR_OF_BANDS - 1];
+  int save_bv[NR_OF_BANDS];
+
+  for (int j = 0; j < NR_OF_BANDS; j++)
+  {
+    save_bv[j] = button_value[NR_OF_BANDS - 1][j]; 
+  }
+  for (int j = NR_OF_BANDS - 1; j >= 1; j--) 
+  {
+    p_cnt[j] = p_cnt[j - 1];
+  }
+  p_cnt[0] = save_p_cnt;
+
+  for (int i = NR_OF_BANDS - 1; i >= 1; i--)
   {
     for (int j = 0; j < p_cnt[i]; j++)
     {
-       if (button_value[i][j] < NR_OF_BANDS-1)
-          button_value[i][j]  += 1;
-        else
-          button_value[i][j]  = 0;
+       button_value[i][j] = button_value[i - 1][j];
     }
   }
+  // Wrap saved last column to first.
+  for (int j = 0; j < NR_OF_BANDS; j++)
+  {
+    button_value[0][j] = save_bv[j];
+  }
+}
+
+void matrix_shift_buttons_right(int button_value[NR_OF_BANDS][NR_OF_BANDS], int p_cnt[NR_OF_BANDS])
+{
+    for (int i = 0; i < NR_OF_BANDS; i++) {
+        //for (int j = 0; j < p_cnt[i]; j++) {
+        for (int j = 0; j < p_cnt[i]; j++) {
+            if (button_value[i][j] < NR_OF_BANDS - 1)
+                button_value[i][j] += 1;
+            else { // Wrap around
+                button_value[i][j] = 0;
+            }
+        }
+    }
+}
+
+void matrix_shift_buttons_left(int button_value[NR_OF_BANDS][NR_OF_BANDS], int p_cnt[NR_OF_BANDS])
+{
+    for (int i = 0; i < NR_OF_BANDS; i++) {
+        for (int j = 0; j < p_cnt[i]; j++) {
+            if (button_value[i][j] > 0)
+                button_value[i][j] -= 1;
+            else { // Wrap around
+                button_value[i][j] = NR_OF_BANDS - 1;
+            }
+        }
+    }
+}
+
+
+// HIER KLOPT NIETS VAN !
+void matrix_shift_buttons_up(int button_value[NR_OF_BANDS][NR_OF_BANDS], int p_cnt[NR_OF_BANDS])
+{
+    // Save the lowest row of button values for wrapping.
+    int save_bv[NR_OF_BANDS];
+    for (int j = 0; j < NR_OF_BANDS; j++) {
+       save_bv[j] = button_value[NR_OF_BANDS - 1][j];
+    }
+    for (int i = 1; i < NR_OF_BANDS; i++) {
+        for (int j = 0; j < NR_OF_BANDS ; j++) {
+            button_value[i][j] = button_value[i - 1][j];
+        }
+    }
+    for (int j = 0; j < NR_OF_BANDS; j++) {
+      button_value[0][j] = save_bv[j];
+    }
+    // Shift p_cnt down and wrap around.
+    int save_p_cnt = p_cnt[NR_OF_BANDS - 1];
+    for (int j = NR_OF_BANDS - 1; j > 0; j--) {
+      p_cnt[j] = p_cnt[j - 1];
+    }
+    p_cnt[0] = save_p_cnt;
+}
+
+// HIER KLOPT NIETS VAN !
+void _matrix_shift_buttons_up(int button_value[NR_OF_BANDS][NR_OF_BANDS], int p_cnt[NR_OF_BANDS])
+{
+    for (int i = 0; i < NR_OF_BANDS; i++) {
+        for (int j = 0; j < p_cnt[i]; j++) {
+            if  (button_value[i][j] < NR_OF_BANDS - 1)
+                button_value[i][j] +=1;
+            else { // Wrap around
+                button_value[i][j] = 0;
+            }
+        }
+    }
 }
