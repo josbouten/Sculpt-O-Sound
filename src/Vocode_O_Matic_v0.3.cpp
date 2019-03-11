@@ -356,11 +356,13 @@ void Vocode_O_Matic_v03::step() {
     lights[MATRIX_HOLD_TOGGLE_LIGHT].value = (blinkPhase < 0.5f) ? 1.0f : 0.0f;
   }
 
+  // Hold matrix movement if toggle is pressed.
   if (matrix_hold_button_trig.process(params[MATRIX_HOLD_TOGGLE_PARAM].value))
   {
     matrix_hold_button_pressed = !matrix_hold_button_pressed;
     lights[MATRIX_HOLD_TOGGLE_LIGHT].value = matrix_hold_button_pressed ? 1.00 : 0.0;
   }
+
   // If one step right button was pressed:
   if (matrix_one_step_right_button_trig.process(params[MATRIX_ONE_STEP_RIGHT_PARAM].value))
   {
@@ -372,7 +374,8 @@ void Vocode_O_Matic_v03::step() {
     shift_buttons_right(button_value, p_cnt, led_state, lcd_matrix_shift_position);
   }
 
-  // Shift the matrix if there is a new trigger on the shift right input and the hold button is not pressed and we are not in bypass mode.
+  // Shift the matrix if there is a new trigger on the shift right input and the 
+  // hold button is not pressed and we are not in bypass mode.
   if (not fx_bypass && cv_right->newTrigger() and not matrix_hold_button_pressed) {
     // Shift the buttons one step.
     shift_buttons_right(button_value, p_cnt, led_state, lcd_matrix_shift_position);
@@ -389,13 +392,13 @@ void Vocode_O_Matic_v03::step() {
     shift_buttons_left(button_value, p_cnt, led_state, lcd_matrix_shift_position);
   }
 
-  // Shift the matrix if there is a new trigger on the shift left input and the hold button is not pressed and we are not in bypass mode.
+  // Shift the matrix if there is a new trigger on the shift left input and the 
+  // hold button is not pressed and we are not in bypass mode.
   if (not fx_bypass && cv_left->newTrigger() and not matrix_hold_button_pressed) {
     // Shift the buttons one step.
     shift_buttons_left(button_value, p_cnt, led_state, lcd_matrix_shift_position);
   }
 
-  // 
   // If toggle matrix preset button was pressed.
   if (matrix_type_button_trig.process(params[MATRIX_TYPE_TOGGLE_PARAM].value))
   {
@@ -409,6 +412,7 @@ void Vocode_O_Matic_v03::step() {
     refresh_led_matrix(lights_offset, p_cnt, button_value, led_state);
 
     lcd_matrix_type = matrix_type_selector;
+
     // Restart the shift counter at 0.
     lcd_matrix_shift_position = 0;
   }
@@ -420,11 +424,11 @@ void Vocode_O_Matic_v03::step() {
   {
     set_pan_and_level(start_level, left_pan, right_pan, left_level, right_level, width);
     width_old = width;
-#ifdef DEBUG
-    for (int i = 0; i < NR_OF_BANDS; i++) {
-      printf("%f %f\n", left_level[i], right_level[i]);
-    }
-#endif
+//#ifdef DEBUG
+//    for (int i = 0; i < NR_OF_BANDS; i++) {
+//      printf("%f %f\n", left_level[i], right_level[i]);
+//    }
+//#endif
   }
 #endif
 
