@@ -32,7 +32,7 @@ For reasons unclear to me when using the example setup file often the same file 
 
 If you click the button left of the first 7 segment display, this is the filter mode number, you will select the next modulation mode. Number 5 will invert the filter matrix resulting in the low frequencies of the carrier being modulated by the energy in the high frequencies of the modulator signal, the mid frequencies of the carrier being modulated by the energy in the mid frequencies of the modulator signal and the high frequencies of the carrier being modulated by the energy in the low frequencies of the modulator signal. There are a few more modes. You can cycle through them by repeately clicking the mode button. Each will result in a different modulation topology.
 
-Obviously you can also use the vocoder in a real time setting by connecting the carrier and modulator input to a real time sound source e.g. your audio device (put carrier signal on one channel and modulator signal on the second channel of your audio device's line input) a source in VCV-rack. Note that you can draw whatever modulation topology you like by clicking the toggle switches of the matrix directly.
+Obviously you can also use the vocoder in a real time setting by connecting the carrier and modulator input to a real time sound source e.g. your audio device (put carrier signal on one channel and modulator signal on the second channel of your audio device's line input) instead of to a source in VCV-rack. Note that you can draw whatever modulation topology you like by clicking the toggle switches of the matrix directly.
 
 Knobs and Toggle switches
 
