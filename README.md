@@ -62,3 +62,5 @@ Restarting Rack or opening the module once more will often solve this problem. I
 please let me know.
 
 All filters are based on the series of tutorial papers about Effect Design by Jon Dattorro published in the Journal of the Audio Engineering Society (https://ccrma.stanford.edu/~dattorro/EffectDesignPart1.pdf).
+
+Please let me know if you have used Vocode-O-Matic in your music. I'm very curious to hear how people use it.
