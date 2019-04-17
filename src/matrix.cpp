@@ -6,11 +6,8 @@ void initialize_start_levels(float start_level[NR_OF_BANDS]) {
   for (int i = 0; i < NR_OF_BANDS; i++) { start_level[i] = INITIAL_START_LEVEL; }
 }
 
-
-void initialize_matrix(int button_value[NR_OF_BANDS][NR_OF_BANDS], int p_cnt[NR_OF_BANDS])
-{ 
-  // clear matrix
-  for (int i = 0; i < NR_OF_BANDS; i++)     
+void clear_matrix(int button_value[NR_OF_BANDS][NR_OF_BANDS], int p_cnt[NR_OF_BANDS]) {
+  for (int i = 0; i < NR_OF_BANDS; i++) 
   {                        
     p_cnt[i] = 0;  
     for (int j = 0; j < NR_OF_BANDS; j++)   
@@ -18,6 +15,13 @@ void initialize_matrix(int button_value[NR_OF_BANDS][NR_OF_BANDS], int p_cnt[NR_
        button_value[i][j] = 0;
     }                      
   } 
+}
+
+void initialize_matrix(int button_value[NR_OF_BANDS][NR_OF_BANDS], int p_cnt[NR_OF_BANDS])
+{ 
+  // clear matrix
+  clear_matrix(button_value, p_cnt);
+
   // Prepare linear filter mapping
   for (int i = 0; i < NR_OF_BANDS; i++)
   {
@@ -83,7 +87,7 @@ void refresh_matrix(int button_value[NR_OF_BANDS][NR_OF_BANDS], int p_cnt[NR_OF_
 
 // implement linear, inverse and 4 log filter bindings.
 
-void choose_matrix(int filter_coupling_type, int button_value[NR_OF_BANDS][NR_OF_BANDS], int p_cnt[NR_OF_BANDS]) 
+void choose_matrix(int matrix_mode, int button_value[NR_OF_BANDS][NR_OF_BANDS], int p_cnt[NR_OF_BANDS]) 
 {
   int iindex[] = {
       0, 5,  9, 12, 14, 16, 17, 18, 19, 20, 21, 22, 23, 23, 24, 25, 25, 26,
@@ -97,7 +101,7 @@ void choose_matrix(int filter_coupling_type, int button_value[NR_OF_BANDS][NR_OF
     }
   }
 
-  switch(filter_coupling_type) {
+  switch(matrix_mode) {
       case 0: // log 1
         for (int i = 0; i < NR_OF_BANDS; i++)
         {

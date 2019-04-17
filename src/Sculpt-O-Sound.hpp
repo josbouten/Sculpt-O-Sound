@@ -20,7 +20,7 @@ extern Plugin *plugin;
 
 // Forward-declare each Model, defined in each module source file
 
-extern Model *modelVocode_O_Matic_v03;
+extern Model *modelVocode_O_Matic;
 
 #include "dsp/digital.hpp"
 #include <sstream>

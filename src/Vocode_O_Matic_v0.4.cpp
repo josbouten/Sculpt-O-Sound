@@ -6,11 +6,10 @@
 #include "dsp/digital.hpp"
 #include "../deps/SynthDevKit/src/CV.hpp"
 
- 
 #define INITIAL_CARRIER_GAIN 1.0
 #define INITIAL_MODULATOR_GAIN 1.0
 
-#define PANNING
+//#define PANNING
 
 // Dimensions of matrix of buttons.
 #define LED_WIDTH 10
@@ -22,34 +21,34 @@
 
 #define HBASE 140
 
-struct Vocode_O_Matic_v03 : Module {
+struct Vocode_O_Matic : Module {
 
   // Define CV trigger a la synthkit for shifting the matrix.
   SynthDevKit::CV *cv_right = new SynthDevKit::CV(0.1f);
-  SynthDevKit::CV *cv_left = new SynthDevKit::CV(0.1f);
+  SynthDevKit::CV *cv_left =  new SynthDevKit::CV(0.1f);
 
-  void shift_buttons_right(int button_value[NR_OF_BANDS][NR_OF_BANDS], int p_cnt[NR_OF_BANDS], bool led_state[1024], int lcd_matrix_shift_position) {
-
+  void shift_buttons_right(int button_value[NR_OF_BANDS][NR_OF_BANDS], int p_cnt[NR_OF_BANDS], bool led_state[1024], int *matrix_shift_position) {
     matrix_shift_buttons_right(button_value, p_cnt);
 #ifdef DEBUG
     print_matrix(button_value, p_cnt);
 #endif
     // Refresh the visible matrix.
     refresh_led_matrix(lights_offset, p_cnt, button_value, led_state);
-    lcd_matrix_shift_position += 1;
-    if (lcd_matrix_shift_position >= NR_OF_BANDS) 
-        lcd_matrix_shift_position = 0;
+    *matrix_shift_position += 1;
+    if (*matrix_shift_position >= NR_OF_BANDS) 
+        *matrix_shift_position = 0;
   }
-  void shift_buttons_left(int button_value[NR_OF_BANDS][NR_OF_BANDS], int p_cnt[NR_OF_BANDS], bool led_state[1024], int lcd_matrix_shift_position) {
+
+  void shift_buttons_left(int button_value[NR_OF_BANDS][NR_OF_BANDS], int p_cnt[NR_OF_BANDS], bool led_state[1024], int *matrix_shift_position) {
     matrix_shift_buttons_left(button_value, p_cnt);
 #ifdef DEBUG
     print_matrix(button_value, p_cnt);
 #endif
     // Refresh the visible matrix.
     refresh_led_matrix(lights_offset, p_cnt, button_value, led_state);
-    lcd_matrix_shift_position -= 1;
-    if (lcd_matrix_shift_position < 0) 
-        lcd_matrix_shift_position = NR_OF_BANDS - 1;
+    *matrix_shift_position -= 1;
+    if (*matrix_shift_position < 0) 
+        *matrix_shift_position = NR_OF_BANDS - 1;
   }
 
   void refresh_led_matrix(int lights_offset, int p_cnt[NR_OF_BANDS], int button_value[NR_OF_BANDS][NR_OF_BANDS], bool led_state[1024])
@@ -147,31 +146,29 @@ struct Vocode_O_Matic_v03 : Module {
   double mod_bandwidth = INITIAL_MOD_BW_IN_SEMITONES;
   double fsamp = FFSAMP;
 
-  // Button for by pass on and off.
+  // Button for bypass on and off.
   SchmittTrigger bypass_button_trig;
   bool fx_bypass = false;
   // Button to toggle the filter band coupling type (4 * log)
-  SchmittTrigger matrix_type_button_trig;
-  bool matrix_type_button_pressed = false;
+  SchmittTrigger matrix_mode_button_trig;
+  bool matrix_mode_button_pressed = false;
   // Start with linear coupling of filters.
-  int matrix_type_selector = INITIAL_MATRIX_TYPE;
-  int lcd_matrix_type = matrix_type_selector;
+  int matrix_mode_selector = INITIAL_MATRIX_TYPE;
+  int matrix_mode = matrix_mode_selector;
 
   // What is the shift position of the matrix.
-  int lcd_matrix_shift_position = 0;
+  int matrix_shift_position = 1;
 
   SchmittTrigger matrix_hold_button_trig;
-  SchmittTrigger matrix_one_step_right_button_trig;
-  SchmittTrigger matrix_one_step_left_button_trig;
   bool matrix_hold_button_pressed = false;
+  SchmittTrigger matrix_one_step_right_button_trig;
   bool matrix_one_step_right_button_pressed = false;
+  SchmittTrigger matrix_one_step_left_button_trig;
   bool matrix_one_step_left_button_pressed = false;
-
   SchmittTrigger edit_matrix_trigger;
   bool edit_matrix_state = false;
 
   int wait = 1;
-
   int p_cnt[NR_OF_BANDS];
   int button_value[NR_OF_BANDS][NR_OF_BANDS];
   float mod_alpha1[NR_OF_BANDS];
@@ -190,25 +187,112 @@ struct Vocode_O_Matic_v03 : Module {
   float width = 1.0;
   float width_old = width;
   bool led_state[1024] = {};
+  bool matrix_mode_read_from_settings = false;
   int lights_offset = MOD_MATRIX;
 
   // Some code to read/save state of bypass button.
-  json_t *toJson()override {
+  json_t *toJson() override {
     json_t *rootJm = json_object();
-    json_t *statesJ = json_array();
+
+    // Store bypass setting
     json_t *bypassJ = json_boolean(fx_bypass);
-    json_array_append_new(statesJ, bypassJ);
-    json_object_set_new(rootJm, "as_FxBypass", statesJ);
+    json_object_set_new(rootJm, "fx_bypass", bypassJ);
+
+    // Store setting of matrix_shift_position
+    json_t *matrix_shift_positionJ = json_real(matrix_shift_position);
+    json_object_set_new(rootJm, "matrix_shift_position", matrix_shift_positionJ);
+
+    // Store setting of matrix_mode
+    json_t *matrix_modeJ = json_real(matrix_mode);
+    json_object_set_new(rootJm, "matrix_mode", matrix_modeJ);
+    
+    // Store matrix hold button status
+    json_t *matrix_hold_button_pressedJ = json_boolean(matrix_hold_button_pressed);
+    json_object_set_new(rootJm, "matrix_hold_button_pressed", matrix_hold_button_pressedJ);
+
+    // Store p_cnt
+    json_t *p_cntJ = json_array();
+    for (int i = 0; i < NR_OF_BANDS; i++) {
+       json_array_append_new(p_cntJ, json_real(p_cnt[i]));
+    }
+    json_object_set_new(rootJm, "p_cnt", p_cntJ);
+
+    // Store matrix button values to patch settings.
+    int cnt = 0;
+   	json_t *button_valuesJ = json_array();
+	for (int i = 0; i < NR_OF_BANDS; i++) {
+		for (int j = 0; j < p_cnt[i]; j++) {
+			json_array_append_new(button_valuesJ, json_real(button_value[i][j]));
+            cnt++;
+		}
+    }
+	json_object_set_new(rootJm, "button_values", button_valuesJ);
+    printf("geschreven: %d\n", cnt);
+
     return rootJm;
   }       
           
-  void fromJson(json_t *rootJm)override {
-    json_t *statesJ = json_object_get(rootJm, "as_FxBypass");
-    json_t *bypassJ = json_array_get(statesJ, 0);
-    fx_bypass = !!json_boolean_value(bypassJ);
+  void fromJson(json_t *rootJm) override {
+    // Restore bypass state 
+    json_t *bypassJ = json_object_get(rootJm, "fx_bypass");
+    if (bypassJ) {
+        fx_bypass = json_boolean_value(bypassJ);
+    }
+
+    // Restore matrix shift position
+    json_t *matrix_shift_positionJ = json_object_get(rootJm, "matrix_shift_position");
+    if (matrix_shift_positionJ) {
+        matrix_shift_position = (int) json_real_value(matrix_shift_positionJ);
+    }
+
+    // Restore matrix type 
+    json_t *matrix_modeJ = json_object_get(rootJm, "matrix_mode");
+    if (matrix_modeJ) {
+        matrix_mode = (int) json_real_value(matrix_modeJ);
+    }
+
+    // Restore matrix_hold_button_pressed button status
+    json_t *matrix_hold_button_pressedJ = json_object_get(rootJm, "matrix_hold_button_pressed");
+    if (matrix_hold_button_pressedJ) {
+        matrix_hold_button_pressed = json_boolean_value(matrix_hold_button_pressedJ);
+    }
+
+    // Restore p_cnt
+    json_t *p_cntJ = json_object_get(rootJm, "p_cnt");
+    if (p_cntJ) {
+        for (int i = 0; i < NR_OF_BANDS; i++) {
+            json_t *elementJ = json_array_get(p_cntJ, i);
+            if (elementJ) {
+                p_cnt[i] = (int) json_real_value(elementJ);
+            }
+        }
+    }
+
+    // Restore button_values
+    int cnt = 0;
+    json_t *button_valuesJ = json_object_get(rootJm, "button_values");
+    if (button_valuesJ) {
+        int index = 0;
+        for (int i = 0; i < NR_OF_BANDS; i++) {
+            for (int j = 0; j < p_cnt[i]; j++) {
+                json_t *elementJ = json_array_get(button_valuesJ, index + j);
+                if (elementJ) {
+                    button_value[i][j] = (int) json_real_value(elementJ);
+                    cnt++;
+                    printf("gelezen: %d %d %d\n", index, j, p_cnt[i]);
+                } else {
+                    printf("niet gelezen: %d %d %d\n", index, j, p_cnt[i]);
+                }
+            }
+            index += p_cnt[i];
+        }
+        matrix_mode_read_from_settings = true;
+        refresh_led_matrix(lights_offset, p_cnt, button_value, led_state);
+    }
+    printf("gelezen: %d\n", cnt);
   } 
 
-  Vocode_O_Matic_v03() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+  Vocode_O_Matic() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
 
     // Initialize the filter coefficients.
     comp_all_coeffs(freq, mod_bandwidth, fsamp, mod_alpha1, mod_alpha2, mod_beta);
@@ -219,20 +303,22 @@ struct Vocode_O_Matic_v03 : Module {
      for (int j = 0; j < 3; j++) { 
           ym[i][j] = 0.0;
       }
-      ym_env[i][0] = 0.0; // envelope of modulator
+      ym_env[i][0] = 0.0; // Envelope of modulator.
       ym_env[i][1] = 0.0;
     }
     // Initialize the levels and pans.
     initialize_start_levels(start_level);
     init_pan_and_level(start_level, left_pan, right_pan, left_level, right_level);
-    choose_matrix(4, button_value, p_cnt); // initialize linear filter coupling.
+    if (!matrix_mode_read_from_settings) {
+        printf("NOT NOT\n");
+        choose_matrix(4, button_value, p_cnt); // Initialize linear filter coupling.
+    }
 
     // Refresh LED matrix.
     refresh_led_matrix(lights_offset, p_cnt, button_value, led_state);
 
-    fx_bypass = false;
     blinkPhase = -1.0f;
-    // Reset lights .
+    // Reset lights.
     lights[MATRIX_HOLD_TOGGLE_LIGHT].value = 0.0;
     lights[BYPASS_LIGHT].value = 0.0;
   
@@ -251,21 +337,49 @@ struct LButton : SVGSwitch, MomentarySwitch {
         sw->wrap();
         box.size = sw->box.size;
     }
+
+    void onMouseDown(EventMouseDown &e) override {
+       //if ( rack::windowIsShiftPressed() ) { 
+           //printf("shift pressed\n");
+        //}
+#ifdef DEBUG
+       if (e.button == 1) {
+            printf("Button pressed down\n");
+       } else {
+            printf("Button value %d\n", e.button);
+       }
+#endif
+       SVGSwitch::onMouseDown(e);
+    }
+
+    void onHoverKey(EventHoverKey &e) override {
+        printf("Hovering!\n");
+        EventMouseDown emd;
+        emd.button = 1;
+        SVGSwitch::onMouseDown(emd);
+        SVGSwitch::onHoverKey(e);
+    }
+    
+    void onChange(EventChange &e) override {
+      // Do your own thang.
+      //printf("Button change detected!\n");
+      // Pass event to super class.
+      SVGSwitch::onChange(e);
+    }
 };
 
-void Vocode_O_Matic_v03::onReset() {
-  matrix_type_button_pressed = false;
+void Vocode_O_Matic::onReset() {
+  matrix_mode_button_pressed = false;
   matrix_hold_button_pressed = false;
   matrix_one_step_right_button_pressed = false;
   matrix_one_step_left_button_pressed = false;
-  matrix_type_selector = INITIAL_MATRIX_TYPE;
-  lcd_matrix_type = matrix_type_selector;
-  lcd_matrix_shift_position = 0;
+  matrix_mode_selector = INITIAL_MATRIX_TYPE;
+  matrix_mode = matrix_mode_selector;
+  matrix_shift_position = 0;
   choose_matrix(4, button_value, p_cnt); // Initialize linear filter coupling.
 
   // Refresh LED matrix.
   refresh_led_matrix(lights_offset, p_cnt, button_value, led_state);
-  fx_bypass = false;
   blinkPhase = -1.0f;
   oneStepBlinkPhase = 0.0f;
 
@@ -276,11 +390,22 @@ void Vocode_O_Matic_v03::onReset() {
   params[MODULATOR_GAIN_PARAM].value = INITIAL_MODULATOR_GAIN;
 }
 
-void Vocode_O_Matic_v03::onRandomize() {
-  onReset();
+void Vocode_O_Matic::onRandomize() {
+  int cnt = 3;
+  clear_matrix(button_value, p_cnt);
+  for (int i = 0; i < NR_OF_BANDS; i++) {
+      for (int j = 0; j < cnt; j++) {
+          //int jj = (int) ((float) NR_OF_BANDS * rand() / (RAND_MAX + 1.0));
+          int jj = i / 2 + (int) ((float) NR_OF_BANDS / 2.0 * rand() / (RAND_MAX + 1.0));
+          button_value[i][p_cnt[i]++] = jj;
+      }
+  }
+  refresh_led_matrix(lights_offset, p_cnt, button_value, led_state);
+  params[CARRIER_GAIN_PARAM].value = INITIAL_CARRIER_GAIN;
+  params[MODULATOR_GAIN_PARAM].value = INITIAL_MODULATOR_GAIN;
 }
 
-void Vocode_O_Matic_v03::step() {
+void Vocode_O_Matic::step() {
   // Implement the Vocoder.
 
   float deltaTime = engineGetSampleTime();
@@ -350,8 +475,8 @@ void Vocode_O_Matic_v03::step() {
   if (bypass_button_trig.process(params[BYPASS_SWITCH].value))
   {
     fx_bypass = !fx_bypass;
-    lights[BYPASS_LIGHT].value = fx_bypass ? 1.00 : 0.0;
   }
+  lights[BYPASS_LIGHT].value = fx_bypass ? 1.00 : 0.0;
   if (matrix_hold_button_pressed) { // We blink only if the button is toggled in the on position.
     lights[MATRIX_HOLD_TOGGLE_LIGHT].value = (blinkPhase < 0.5f) ? 1.0f : 0.0f;
   }
@@ -371,14 +496,14 @@ void Vocode_O_Matic_v03::step() {
     // Light up the button;
     lights[MATRIX_ONE_STEP_RIGHT_LIGHT].value = 1.00;
     // Shift the buttons one step.
-    shift_buttons_right(button_value, p_cnt, led_state, lcd_matrix_shift_position);
+    shift_buttons_right(button_value, p_cnt, led_state, &matrix_shift_position);
   }
 
   // Shift the matrix if there is a new trigger on the shift right input and the 
   // hold button is not pressed and we are not in bypass mode.
   if (not fx_bypass && cv_right->newTrigger() and not matrix_hold_button_pressed) {
     // Shift the buttons one step.
-    shift_buttons_right(button_value, p_cnt, led_state, lcd_matrix_shift_position);
+    shift_buttons_right(button_value, p_cnt, led_state, &matrix_shift_position);
   }
 
   // If one step left button was pressed:
@@ -389,32 +514,32 @@ void Vocode_O_Matic_v03::step() {
     // Light up the button;
     lights[MATRIX_ONE_STEP_LEFT_LIGHT].value = 1.00;
     // Shift the buttons one step.
-    shift_buttons_left(button_value, p_cnt, led_state, lcd_matrix_shift_position);
+    shift_buttons_left(button_value, p_cnt, led_state, &matrix_shift_position);
   }
 
   // Shift the matrix if there is a new trigger on the shift left input and the 
   // hold button is not pressed and we are not in bypass mode.
   if (not fx_bypass && cv_left->newTrigger() and not matrix_hold_button_pressed) {
     // Shift the buttons one step.
-    shift_buttons_left(button_value, p_cnt, led_state, lcd_matrix_shift_position);
+    shift_buttons_left(button_value, p_cnt, led_state, &matrix_shift_position);
   }
 
   // If toggle matrix preset button was pressed.
-  if (matrix_type_button_trig.process(params[MATRIX_TYPE_TOGGLE_PARAM].value))
+  if (matrix_mode_button_trig.process(params[MATRIX_TYPE_TOGGLE_PARAM].value))
   {
-    matrix_type_button_pressed = false;
-    lights[MATRIX_TYPE_TOGGLE_PARAM].value = matrix_type_button_pressed ? 1.00 : 0.0;
-    matrix_type_selector++; 
-    if (matrix_type_selector > NR_MATRIX_TYPES - 1) { matrix_type_selector = 0; }
-    choose_matrix(matrix_type_selector, button_value, p_cnt);
+    matrix_mode_button_pressed = false;
+    lights[MATRIX_TYPE_TOGGLE_PARAM].value = matrix_mode_button_pressed ? 1.00 : 0.0;
+    matrix_mode_selector++; 
+    if (matrix_mode_selector > NR_MATRIX_TYPES - 1) { matrix_mode_selector = 0; }
+    choose_matrix(matrix_mode_selector, button_value, p_cnt);
 
     // Refresh LED matrix.
     refresh_led_matrix(lights_offset, p_cnt, button_value, led_state);
 
-    lcd_matrix_type = matrix_type_selector;
+    matrix_mode = matrix_mode_selector;
 
     // Restart the shift counter at 0.
-    lcd_matrix_shift_position = 0;
+    matrix_shift_position = 0;
   }
 
   // Panning
@@ -457,12 +582,12 @@ void Vocode_O_Matic_v03::step() {
                     if (button_value[chosen_row][col] == chosen_col)
                     {
                         button_value[chosen_row][col] = NOT_PRESSED;
-			             // Shift all values from unpressed button 1 position to the left.
+                         // Shift all values from unpressed button 1 position to the left.
                         for (int shift_col = col; shift_col < p_cnt[chosen_row]; shift_col++) {
-				             button_value[chosen_row][shift_col] = button_value[chosen_row][shift_col + 1];
-			            }
+                             button_value[chosen_row][shift_col] = button_value[chosen_row][shift_col + 1];
+                        }
                         p_cnt[chosen_row]--;
-			            break; // As soon as one button is unpressed we are done.
+                        break; // As soon as one button is unpressed we are done.
                     }
                 }
             } 
@@ -509,9 +634,9 @@ void Vocode_O_Matic_v03::step() {
   }
 }
 
-struct Vocode_O_Matic_v03Widget : ModuleWidget {
-  Vocode_O_Matic_v03Widget(Vocode_O_Matic_v03 *module) : ModuleWidget(module) {
-    setPanel(SVG::load(assetPlugin(plugin, "res/Sculpt-O-Sound-_-Vocode_O_Matic_v03.svg")));
+struct Vocode_O_MaticWidget : ModuleWidget {
+  Vocode_O_MaticWidget(Vocode_O_Matic *module) : ModuleWidget(module) {
+    setPanel(SVG::load(assetPlugin(plugin, "res/Sculpt-O-Sound-_-Vocode_O_Matic_v0.4.svg")));
 
     addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
     addChild(Widget::create<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
@@ -522,74 +647,75 @@ struct Vocode_O_Matic_v03Widget : ModuleWidget {
     // Dial for modulator gain.
     // Dial for panning.
     // Note: format is Vec(x-pos, y-pos)
-    addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(10,  47), module, Vocode_O_Matic_v03::CARRIER_GAIN_PARAM, 1.0, 10.0, INITIAL_CARRIER_GAIN));
-    addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(40,  47), module, Vocode_O_Matic_v03::MODULATOR_GAIN_PARAM, 1.0, 10.0, INITIAL_MODULATOR_GAIN));
+    addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(10,  25), module, Vocode_O_Matic::CARRIER_GAIN_PARAM, 1.0, 10.0, INITIAL_CARRIER_GAIN));
+    addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(40,  25), module, Vocode_O_Matic::MODULATOR_GAIN_PARAM, 1.0, 10.0, INITIAL_MODULATOR_GAIN));
 #ifdef PANNING
-    //addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(70,  47), module, Vocode_O_Matic_v03::PANNING_PARAM, 0.0, MAX_PAN, 1.0 / INITIAL_PAN_OFFSET));
-    addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(70,  47), module, Vocode_O_Matic_v03::PANNING_PARAM, 0.0, MAX_PAN, MAX_PAN / 2.0));
+    //addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(70,  47), module, Vocode_O_Matic::PANNING_PARAM, 0.0, MAX_PAN, 1.0 / INITIAL_PAN_OFFSET));
+    addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(70,  25), module, Vocode_O_Matic::PANNING_PARAM, 0.0, MAX_PAN, MAX_PAN / 2.0));
 #endif
 
     // INTPUTS (SIGNAL AND PARAMS)
     // Input signals.
-    addInput(Port::create<PJ301MPort>(Vec(10, 180), Port::INPUT, module, Vocode_O_Matic_v03::CARR_INPUT));
-    addInput(Port::create<PJ301MPort>(Vec(42, 180), Port::INPUT, module, Vocode_O_Matic_v03::MOD_INPUT));
-    addInput(Port::create<PJ301MPort>(Vec(105, 148), Port::INPUT, module, Vocode_O_Matic_v03::SHIFT_RIGHT_INPUT));
-    addInput(Port::create<PJ301MPort>(Vec(105, 120), Port::INPUT, module, Vocode_O_Matic_v03::SHIFT_LEFT_INPUT));
+    addInput(Port::create<PJ301MPort>(Vec(10, 180), Port::INPUT, module, Vocode_O_Matic::CARR_INPUT));
+    addInput(Port::create<PJ301MPort>(Vec(42, 180), Port::INPUT, module, Vocode_O_Matic::MOD_INPUT));
+    addInput(Port::create<PJ301MPort>(Vec(105, 140), Port::INPUT, module, Vocode_O_Matic::SHIFT_RIGHT_INPUT));
+    addInput(Port::create<PJ301MPort>(Vec(105, 103), Port::INPUT, module, Vocode_O_Matic::SHIFT_LEFT_INPUT));
 
     // Bypass switch.
-    addParam(ParamWidget::create<LEDBezel>(Vec(12,  90), module, Vocode_O_Matic_v03::BYPASS_SWITCH , 0.0f, 1.0f, 0.0f));
-    addChild(ModuleLightWidget::create<LedLight<RedLight>>(Vec(14.2, 92), module, Vocode_O_Matic_v03::BYPASS_LIGHT));
+    addParam(ParamWidget::create<LEDBezel>(Vec(12,  66), module, Vocode_O_Matic::BYPASS_SWITCH , 0.0f, 1.0f, 0.0f));
+    addChild(ModuleLightWidget::create<LedLight<RedLight>>(Vec(14.2, 68), module, Vocode_O_Matic::BYPASS_LIGHT));
 
     // Matrix type switch: linear, inverse + 4 * log
-    addParam(ParamWidget::create<LEDBezel>(Vec(12, 120), module, Vocode_O_Matic_v03::MATRIX_TYPE_TOGGLE_PARAM, 0.0f, 1.0f, 0.0f));
-    addChild(ModuleLightWidget::create<LedLight<GreenLight>>(Vec(14.2, 122), module, Vocode_O_Matic_v03::MATRIX_TYPE_TOGGLE_LIGHT));
+    addParam(ParamWidget::create<LEDBezel>(Vec(12, 104), module, Vocode_O_Matic::MATRIX_TYPE_TOGGLE_PARAM, 0.0f, 1.0f, 0.0f));
+    addChild(ModuleLightWidget::create<LedLight<GreenLight>>(Vec(14.2, 106), module, Vocode_O_Matic::MATRIX_TYPE_TOGGLE_LIGHT));
 
     // Push button which shifts the matrix to the right one step at a time.
-    addParam(ParamWidget::create<LEDBezel>(Vec(76, 150), module, Vocode_O_Matic_v03::MATRIX_ONE_STEP_RIGHT_PARAM, 0.0f, 1.0f, 0.0f));
-    addChild(ModuleLightWidget::create<LedLight<GreenLight>>(Vec(78.2, 152), module, Vocode_O_Matic_v03::MATRIX_ONE_STEP_RIGHT_LIGHT));
+    addParam(ParamWidget::create<LEDBezel>(Vec(76, 142), module, Vocode_O_Matic::MATRIX_ONE_STEP_RIGHT_PARAM, 0.0f, 1.0f, 0.0f));
+    addChild(ModuleLightWidget::create<LedLight<GreenLight>>(Vec(78.2, 144), module, Vocode_O_Matic::MATRIX_ONE_STEP_RIGHT_LIGHT));
 
     // Push button which shifts the matrix to the left one step at a time.
-    addParam(ParamWidget::create<LEDBezel>(Vec(76, 120), module, Vocode_O_Matic_v03::MATRIX_ONE_STEP_LEFT_PARAM, 0.0f, 1.0f, 0.0f));
-    addChild(ModuleLightWidget::create<LedLight<GreenLight>>(Vec(78.2, 122), module, Vocode_O_Matic_v03::MATRIX_ONE_STEP_LEFT_LIGHT));
+    addParam(ParamWidget::create<LEDBezel>(Vec(76, 104), module, Vocode_O_Matic::MATRIX_ONE_STEP_LEFT_PARAM, 0.0f, 1.0f, 0.0f));
+    addChild(ModuleLightWidget::create<LedLight<GreenLight>>(Vec(78.2, 106), module, Vocode_O_Matic::MATRIX_ONE_STEP_LEFT_LIGHT));
 
     // Matrix hold toggle.
-    addParam(ParamWidget::create<LEDBezel>(Vec(12, 150), module, Vocode_O_Matic_v03::MATRIX_HOLD_TOGGLE_PARAM, 0.0f, 1.0f, 0.0f));
-    addChild(ModuleLightWidget::create<LedLight<RedLight>>(Vec(14.2, 152), module, Vocode_O_Matic_v03::MATRIX_HOLD_TOGGLE_LIGHT));
+    addParam(ParamWidget::create<LEDBezel>(Vec(12, 142), module, Vocode_O_Matic::MATRIX_HOLD_TOGGLE_PARAM, 0.0f, 1.0f, 0.0f));
+    addChild(ModuleLightWidget::create<LedLight<RedLight>>(Vec(14.2, 144), module, Vocode_O_Matic::MATRIX_HOLD_TOGGLE_LIGHT));
 
     // MS DISPLAY                                                                  
     // Matrix type
     MsDisplayWidget2 *display1 = new MsDisplayWidget2();                            
-    display1->box.pos = Vec(40, 121);                                               
+    display1->box.pos = Vec(38, 105);                                               
     display1->box.size = Vec(30, 20);                                             
-    display1->value = &module->lcd_matrix_type;
+    display1->value = &module->matrix_mode;
     addChild(display1);                                                           
 
     // MS DISPLAY                                                                  
     // Shift position
     MsDisplayWidget2 *display2 = new MsDisplayWidget2();                            
-    display2->box.pos = Vec(40, 151);                                               
+    display2->box.pos = Vec(38, 143);                                               
     display2->box.size = Vec(30, 20);                                             
-    display2->value = &module->lcd_matrix_shift_position;
+    display2->value = &module->matrix_shift_position;
     addChild(display2);                                                           
 
     // Output for filtered signal.
-    addOutput(Port::create<PJ301MPort>(Vec(10, 210), Port::OUTPUT, module, Vocode_O_Matic_v03::LEFT_OUTPUT));
-    addOutput(Port::create<PJ301MPort>(Vec(42, 210), Port::OUTPUT, module, Vocode_O_Matic_v03::RIGHT_OUTPUT));
+    addOutput(Port::create<PJ301MPort>(Vec(10, 219), Port::OUTPUT, module, Vocode_O_Matic::LEFT_OUTPUT));
+    addOutput(Port::create<PJ301MPort>(Vec(42, 219), Port::OUTPUT, module, Vocode_O_Matic::RIGHT_OUTPUT));
+
     // Matrix, origin is bottom left.
     for (int i = 0; i < NR_OF_BANDS; i++) {
         for (int j = 0; j < NR_OF_BANDS; j++) {
             int x = HBASE + j * LED_WIDTH;
             int y = VBASE - i * (LED_HEIGHT + 1);
             int offset = i * NR_OF_BANDS + j;
-            addParam(ParamWidget::create<LButton>(Vec(x, y), module, Vocode_O_Matic_v03::MOD_MATRIX_PARAM + offset, 0.0, 1.0f, 0.0f));
-            addChild(ModuleLightWidget::create<MediumLight<BlueLight>>(Vec(x, y), module, Vocode_O_Matic_v03::MOD_MATRIX + offset));
+            addParam(ParamWidget::create<LButton>(Vec(x, y), module, Vocode_O_Matic::MOD_MATRIX_PARAM + offset, 0.0, 1.0f, 0.0f));
+            addChild(ModuleLightWidget::create<MediumLight<BlueLight>>(Vec(x, y), module, Vocode_O_Matic::MOD_MATRIX + offset));
         }
     }
-  }
-};
 
+  };
+};
 // Specify the Module and ModuleWidget subclass, human-readable
 // author name for categorization per plugin, module slug (should never
 // change), human-readable module name, and any number of tags
 // (found in `include/tags.hpp`) separated by commas.
-Model *modelVocode_O_Matic_v03 = Model::create<Vocode_O_Matic_v03, Vocode_O_Matic_v03Widget>("Sculpt-O-Sound", "Vocode_O_Matic_v03", "Vocode_O_Matic_v03", VOCODER_TAG);
+Model *modelVocode_O_Matic = Model::create<Vocode_O_Matic, Vocode_O_MaticWidget>("Sculpt-O-Sound", "Vocode_O_Matic", "Vocode_O_Matic", VOCODER_TAG);
