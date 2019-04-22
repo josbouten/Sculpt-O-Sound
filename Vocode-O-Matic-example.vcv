@@ -17,7 +17,7 @@
         }
       },
       "pos": [
-        33,
+        29,
         1
       ]
     },
@@ -28,7 +28,7 @@
       "params": [
         {
           "paramId": 0,
-          "value": 1.72399986
+          "value": 0.964999676
         }
       ],
       "data": {
@@ -47,7 +47,7 @@
       "params": [
         {
           "paramId": 0,
-          "value": 1.34200394
+          "value": 0.928004265
         }
       ],
       "data": {
@@ -66,26 +66,7 @@
       "params": [
         {
           "paramId": 0,
-          "value": 0.237999365
-        }
-      ],
-      "data": {
-        "rms_time": 0.00100000005,
-        "peak_time": 1.0
-      },
-      "pos": [
-        23,
-        1
-      ]
-    },
-    {
-      "plugin": "NYSTHI",
-      "version": "0.6.0",
-      "model": "SingleVUMeter",
-      "params": [
-        {
-          "paramId": 0,
-          "value": 0.24700129
+          "value": 0.285999805
         }
       ],
       "data": {
@@ -98,25 +79,44 @@
       ]
     },
     {
+      "plugin": "NYSTHI",
+      "version": "0.6.0",
+      "model": "SingleVUMeter",
+      "params": [
+        {
+          "paramId": 0,
+          "value": 0.278999686
+        }
+      ],
+      "data": {
+        "rms_time": 0.00100000005,
+        "peak_time": 1.0
+      },
+      "pos": [
+        39,
+        1
+      ]
+    },
+    {
       "plugin": "RJModules",
       "version": "0.6.0dev",
       "model": "Noise",
       "params": [
         {
           "paramId": 0,
-          "value": 0.791500032
+          "value": 0.0235000998
         },
         {
           "paramId": 1,
-          "value": 5768.0
+          "value": 5696.0
         },
         {
           "paramId": 2,
-          "value": 7489.92041
+          "value": 5995.54492
         },
         {
           "paramId": 3,
-          "value": 1.69100034
+          "value": 1.61000061
         }
       ],
       "pos": [
@@ -131,19 +131,19 @@
       "params": [
         {
           "paramId": 0,
-          "value": 0.81099999
+          "value": 0.0
         },
         {
           "paramId": 1,
-          "value": 6596.0
+          "value": 6104.0
         },
         {
           "paramId": 2,
-          "value": 7545.71094
+          "value": 6362.16699
         },
         {
           "paramId": 3,
-          "value": 2.0
+          "value": 1.59199905
         }
       ],
       "pos": [
@@ -152,98 +152,17 @@
       ]
     },
     {
-      "plugin": "NYSTHI",
-      "version": "0.6.0",
-      "model": "complexSimpler",
-      "params": [
-        {
-          "paramId": 6,
-          "value": 0.0
-        },
-        {
-          "paramId": 0,
-          "value": 1.0
-        },
-        {
-          "paramId": 1,
-          "value": 0.0
-        },
-        {
-          "paramId": 2,
-          "value": 0.0
-        },
-        {
-          "paramId": 3,
-          "value": 0.0
-        },
-        {
-          "paramId": 4,
-          "value": 1.0
-        },
-        {
-          "paramId": 5,
-          "value": 0.0
-        },
-        {
-          "paramId": 8,
-          "value": 0.0
-        },
-        {
-          "paramId": 9,
-          "value": 0.0
-        },
-        {
-          "paramId": 7,
-          "value": 1.0
-        },
-        {
-          "paramId": 10,
-          "value": 0.0
-        },
-        {
-          "paramId": 11,
-          "value": 1.0
-        },
-        {
-          "paramId": 12,
-          "value": 2.0
-        },
-        {
-          "paramId": 15,
-          "value": 0.0
-        },
-        {
-          "paramId": 13,
-          "value": 0.0
-        },
-        {
-          "paramId": 14,
-          "value": 0.0
-        }
-      ],
-      "data": {
-        "nysthi_id": "SIMPLER_nMtrZuLu",
-        "m_nysthi_file_id": "./plugins/NYSTHI/cache/SIMPLER_nMtrZuLu_20190421_175056_86LsCt.wav",
-        "m_original_file_name": "",
-        "m_gated": false
-      },
-      "pos": [
-        14,
-        1
-      ]
-    },
-    {
       "plugin": "Sculpt-O-Sound",
-      "version": "0.6.05",
+      "version": "0.6.4",
       "model": "Vocode_O_Matic",
       "params": [
         {
           "paramId": 6,
-          "value": 4.26358604
+          "value": 2.52549982
         },
         {
           "paramId": 7,
-          "value": 9.91433334
+          "value": 2.13399935
         },
         {
           "paramId": 1,
@@ -4236,167 +4155,116 @@
       ],
       "data": {
         "fx_bypass": false,
-        "matrix_shift_position": 0.0,
-        "matrix_mode": 4.0,
-        "matrix_hold_button_pressed": true,
+        "matrix_shift_position": 9.0,
+        "matrix_mode": 1.0,
+        "matrix_hold_button_pressed": false,
         "p_cnt": [
-          3.0,
-          3.0,
-          3.0,
-          3.0,
-          3.0,
-          3.0,
-          3.0,
-          3.0,
-          3.0,
-          3.0,
-          3.0,
-          3.0,
-          3.0,
-          3.0,
-          3.0,
-          3.0,
-          3.0,
-          3.0,
-          3.0,
-          3.0,
-          3.0,
-          3.0,
-          3.0,
-          3.0,
-          3.0,
-          3.0,
-          3.0,
-          3.0,
-          3.0,
-          3.0,
-          3.0
-        ],
-        "button_values": [
-          0.0,
-          14.0,
-          0.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
           2.0,
           1.0,
-          5.0,
-          13.0,
-          15.0,
-          4.0,
-          9.0,
-          5.0,
-          4.0,
-          4.0,
           2.0,
-          4.0,
-          11.0,
-          14.0,
+          2.0,
+          2.0,
           3.0,
-          18.0,
-          11.0,
-          13.0,
-          5.0,
-          10.0,
-          13.0,
-          12.0,
-          11.0,
+          3.0,
+          4.0
+        ],
+        "button_values": [
           8.0,
-          12.0,
-          12.0,
-          5.0,
-          12.0,
-          5.0,
-          19.0,
-          17.0,
-          17.0,
-          12.0,
-          15.0,
-          20.0,
-          16.0,
-          9.0,
+          8.0,
+          8.0,
+          8.0,
+          7.0,
+          7.0,
+          7.0,
+          7.0,
           6.0,
           6.0,
-          11.0,
-          9.0,
-          20.0,
-          9.0,
-          21.0,
-          21.0,
-          16.0,
-          19.0,
-          14.0,
-          23.0,
-          14.0,
-          13.0,
-          20.0,
-          20.0,
-          12.0,
-          18.0,
-          13.0,
-          18.0,
-          20.0,
-          13.0,
-          12.0,
-          14.0,
-          20.0,
-          22.0,
-          16.0,
-          21.0,
-          15.0,
-          13.0,
-          11.0,
-          15.0,
-          25.0,
-          18.0,
-          26.0,
-          12.0,
-          25.0,
-          23.0,
-          23.0,
-          26.0,
-          21.0,
-          18.0,
-          24.0,
-          16.0,
+          5.0,
+          5.0,
+          5.0,
+          4.0,
+          4.0,
+          3.0,
+          3.0,
+          2.0,
+          1.0,
+          0.0,
+          30.0,
           29.0,
+          28.0,
+          26.0,
+          27.0,
           25.0,
-          18.0,
-          20.0,
-          28.0,
+          23.0,
+          24.0,
+          21.0,
           22.0,
-          28.0,
+          19.0,
+          20.0,
+          16.0,
+          17.0,
+          18.0,
+          13.0,
+          14.0,
           15.0,
-          17.0
+          9.0,
+          10.0,
+          11.0,
+          12.0
         ],
         "mute_output": [
           false,
           false,
           false,
           false,
-          true,
-          false,
-          true,
-          true,
-          true,
-          false,
-          true,
-          true,
-          true,
           false,
           false,
           false,
           false,
-          true,
-          false,
-          true,
-          true,
-          true,
-          true,
           false,
           false,
           false,
-          true,
           false,
-          true,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
           false,
           false
         ]
@@ -4404,6 +4272,45 @@
       "pos": [
         14,
         0
+      ]
+    },
+    {
+      "plugin": "Fundamental",
+      "version": "0.6.2",
+      "model": "LFO",
+      "params": [
+        {
+          "paramId": 0,
+          "value": 1.0
+        },
+        {
+          "paramId": 1,
+          "value": 1.0
+        },
+        {
+          "paramId": 2,
+          "value": 1.14400184
+        },
+        {
+          "paramId": 3,
+          "value": 0.0
+        },
+        {
+          "paramId": 5,
+          "value": 0.5
+        },
+        {
+          "paramId": 4,
+          "value": 0.0
+        },
+        {
+          "paramId": 6,
+          "value": 0.0
+        }
+      ],
+      "pos": [
+        14,
+        1
       ]
     }
   ],
@@ -4413,14 +4320,14 @@
       "outputModuleId": 3,
       "outputId": 0,
       "inputModuleId": 0,
-      "inputId": 0
+      "inputId": 1
     },
     {
       "color": "#0986ad",
       "outputModuleId": 4,
       "outputId": 0,
       "inputModuleId": 0,
-      "inputId": 1
+      "inputId": 0
     },
     {
       "color": "#0986ad",
@@ -4440,28 +4347,28 @@
       "color": "#c9b70e",
       "outputModuleId": 2,
       "outputId": 0,
-      "inputModuleId": 8,
+      "inputModuleId": 7,
       "inputId": 1
     },
     {
       "color": "#c91847",
       "outputModuleId": 1,
       "outputId": 0,
-      "inputModuleId": 8,
-      "inputId": 0
-    },
-    {
-      "color": "#0c8e15",
-      "outputModuleId": 8,
-      "outputId": 0,
-      "inputModuleId": 3,
+      "inputModuleId": 7,
       "inputId": 0
     },
     {
       "color": "#0986ad",
-      "outputModuleId": 8,
+      "outputModuleId": 7,
       "outputId": 1,
       "inputModuleId": 4,
+      "inputId": 0
+    },
+    {
+      "color": "#c9b70e",
+      "outputModuleId": 7,
+      "outputId": 0,
+      "inputModuleId": 3,
       "inputId": 0
     }
   ]

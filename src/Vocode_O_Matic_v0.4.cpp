@@ -9,7 +9,7 @@
 #define INITIAL_CARRIER_GAIN 1.0
 #define INITIAL_MODULATOR_GAIN 1.0
 
-//#define PANNING
+#define PANNING
 
 // Dimensions of matrix of buttons.
 #define LED_WIDTH 10
