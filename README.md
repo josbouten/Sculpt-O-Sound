@@ -38,12 +38,6 @@ The filter matrix consists of toggle switches, so you can make your own coupling
 Mind you, no attenuation is done, so if you combine a lot of modulator bands with one carrier filter, the output of the filter
 may exceed the maximum sample value (voltage) allowed resulting in distortion. 
 
-Bypass button
-=============
-The bypass toggle button when pressed will turn red, this will put the vocode in bypass mode. 
-This will send the modulator and carrier input signals to the left and right outputs respectively.
-If you use the Vocode-O-Matic-example.vcv settings file make sure you hear the string sample and the drum loop in bypass mode. If not, reload the samples in the simpler modules.
-
 Matrix mode button
 ==================
 The mode toggle button lets you choose between 5 filter mappings. Number 4 is a linear mapping of the modulator filters
@@ -57,6 +51,16 @@ The shift L and shift R buttons allow you to manually shift the matrix one step 
 Hold button
 ===========
 The hold button will stop the effect of the pulse to the inputs, effectively holding the matrix in its position. The 7 segment display will show the position shift of the matrix. 0 is the initial state, 30 means the matrix has shifted completely to the right (with wrap around).
+
+Mute buttons
+============
+On the right hand side of the filter matrix for every frequency band of the carrier a mute buttons is shown. By default no band is muted (lights are green). If you toggle a button the light will go out and the corresponding carrier signal will not be added to the output signal.
+
+Bypass button
+=============
+The bypass toggle button when pressed will turn red, this will put the vocode in bypass mode. 
+This will send the modulator and carrier input signals to the left and right outputs respectively.
+If you use the Vocode-O-Matic-example.vcv settings file make sure you hear the string sample and the drum loop in bypass mode. If not, reload the samples in the simpler modules.
 
 Sources
 =======
