@@ -14,9 +14,13 @@ Vocode-O-Matic, v0.4 is a 31 terts band vocoder with editable frequency matrix u
 The vocoder has 31 terts band filters for the carrier and modulator inputs.
 To get an interesting result, start by using a pad like sound with a big bandwidth as a carrier and
 a rhythm loop as a modulator. You should hear the pad play the rhythm.
-The vocoding effect heavily depends on which modulator band's enery envelope modulates which carrier band's amplitude. 
-In the modulation matrix you can choose the modulation you want by pressing the toggle switches.
+
+Signal flow
+===========
+The modulator signal is fed into the matrix from the bottom of the matrix anddevided into 31 frequency bands. So each column corresponds to a band of the modulator. The carrier signal is fed into the matrix from the left. So each row corresponds to a frequency band or the carrier. Buttons pressed in the matrix will allow the corresponding column's modulator band energy to modulate the corresponding row's carrier band signal. All modulated carrier signals are summed and send to 2 outputs. The sum of the modulated even bands is send to the Left output, the sum of the modulated odd bands to the Right output.
+
 The frequency is lowest at the lower left side of the matrix. Bands more to the right or up are higher in frequency.
+
 To make it easy for users Vocode-O-Matic comes with 5 presets. Mode 4 is the linear mode (default), 5 is inverse, and 0, 1, 2 and 3 are variants of a logaritmic coupling between the filter bands (see also "Buttons" below). The chosen modulation will be saved in the patch file. You can also choose to save the settings as a preset.
 
 Inputs
@@ -27,7 +31,7 @@ The Shift R trigger input will shift the matrix in the opposite direction.
 
 Outputs
 =======
-There is a Left and a Right output. The vocoder produces a semi stereo signal although the input signals are mono. This is done by sending the summed effect of the odd modulator channels and the even modulator channels on the carrier to different outputs.
+There is a Left and a Right output. The vocoder produces a semi stereo signal although the input signals are mono. This is done by sending the summed effect of the odd modulator channels and the even modulator channels on the carrier to the left and right outputs respectively.
 
 Knobs
 =====
@@ -55,11 +59,11 @@ The hold button will stop the effect of the pulse to the inputs, effectively hol
 
 Mute buttons
 ============
-On the right hand side of the filter matrix for every frequency band of the carrier a mute buttons is shown. By default no band is muted (lights are green). If you toggle a button the light will go out and the corresponding carrier signal will not be added to the output signal.
+On the right hand side of the filter matrix for every frequency band of the carrier a mute buttons is shown. By default all outputs are active i.e. no band is muted (lights are green). If you toggle a button the light will go out and the corresponding carrier signal will not be added to the output signal.
 
 Bypass button
 =============
-The bypass toggle button when pressed will turn red, this will put the vocode in bypass mode. 
+The bypass toggle button when pressed will turn red, this will put the vocoder in bypass mode. 
 This will send the modulator and carrier input signals to the left and right outputs respectively.
 If you use the Vocode-O-Matic-example.vcv settings file make sure you hear the string sample and the drum loop in bypass mode. If not, reload the samples in the simpler modules.
 
