@@ -14,9 +14,10 @@ Vocode-O-Matic, v0.4 is a 31 terts band vocoder with editable frequency matrix u
 The vocoder has 31 terts band filters for the carrier and modulator inputs.
 To get an interesting result, start by using a pad like sound with a big bandwidth as a carrier and
 a rhythm loop as a modulator. You should hear the pad play the rhythm.
-The vocoding effect heavily depends on the link of the filter bands. I.e. which modulator band is modulating which carrier band.
-In the modulation matrix you can choose this by pressing the toggle switches.
-To make it easy for users Vocode-O-Matic comes with 5 presets. Mode 4 is the linear mode (default), 5 is inverse, and 0, 1, 2 and 3 are variants of a logaritmic coupling between the filter bands (see also "Buttons" below).
+The vocoding effect heavily depends on which modulator band's enery envelope modulates which carrier band's amplitude. 
+In the modulation matrix you can choose the modulation you want by pressing the toggle switches.
+The frequency is lowest at the lower left side of the matrix. Bands more to the right or up are higher in frequency.
+To make it easy for users Vocode-O-Matic comes with 5 presets. Mode 4 is the linear mode (default), 5 is inverse, and 0, 1, 2 and 3 are variants of a logaritmic coupling between the filter bands (see also "Buttons" below). The chosen modulation will be saved in the patch file. You can also choose to save the settings as a preset.
 
 Inputs
 ======
