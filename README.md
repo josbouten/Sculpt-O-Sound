@@ -71,8 +71,6 @@ Sources
 =======
 All filters are based on the series of tutorial papers about Effect Design by Jon Dattorro published in the Journal of the Audio Engineering Society (https://ccrma.stanford.edu/~dattorro/EffectDesignPart1.pdf).
 
-Please let me know if you have used Vocode-O-Matic in your music (send me a link or a mp3 file). I'm very curious to hear how people use it.
-
 Example
 =======
 
