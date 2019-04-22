@@ -7,7 +7,7 @@ SLUG = Sculpt-O-Sound
 
 # Must follow the format in the Versioning section of
 # https://vcvrack.com/manual/PluginDevelopmentTutorial.html
-VERSION = 0.6.05
+VERSION = 0.6.4
 
 # FLAGS will be passed to both the C and C++ compiler
 FLAGS +=

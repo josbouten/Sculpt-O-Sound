@@ -3,7 +3,7 @@
 #pragma once
 
 // For debug purposes only !
-#define DEBUG
+//#define DEBUG
 
 using namespace rack;
 
@@ -20,7 +20,7 @@ extern Plugin *plugin;
 
 // Forward-declare each Model, defined in each module source file
 
-extern Model *modelVocode_O_Matic_v03;
+extern Model *modelVocode_O_Matic;
 
 #include "dsp/digital.hpp"
 #include <sstream>

@@ -11,7 +11,7 @@ void init(rack::Plugin *p) {
     p->manual = "https://hithub.com/josbouten/Sculpt-O-Sound/README.md";
 
 	// Add all Models defined throughout the plugin
-	p->addModel(modelVocode_O_Matic_v03);
+	p->addModel(modelVocode_O_Matic);
 
 	// Any other plugin initialization may go here.
 	// As an alternative, consider lazy-loading assets and lookup tables when your module is created to reduce startup times of Rack.

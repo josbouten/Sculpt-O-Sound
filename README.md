@@ -7,60 +7,93 @@
 
 Sculpt-O-Sound presents: 
 
-Vocode-O-Matic, v0.3 is a 31 terts band vocoder with editable frequency matrix usable for 44100 Hz sampling frequency only (at the moment).
+Vocode-O-Matic, v0.4 is a 31 terts band vocoder with editable frequency matrix usable for 44100 Hz sampling frequency only (at the moment).
+
+![alt text](res/Screenshot_2019-04-22_at_14.21.37.png)
 
 The vocoder has 31 terts band filters for the carrier and modulator inputs.
-The carrier input is the top left of the connectors, the modulator the top right.
-The L and R outputs are immediately below the inputs.
 To get an interesting result, start by using a pad like sound with a big bandwidth as a carrier and
 a rhythm loop as a modulator. You should hear the pad play the rhythm.
-The vocoding effect heavily depends on the link of the filter bands. I.e. which modulator band is modulating which carrier band.
-In the modulation matrix you can choose this by toggling the link between the bands.
-Vocode-O-Matic comes with 5 presets. Mode 4 is the linear mode (default), 5 is inverse, and 0, 1, 2 and 3 are variants of a logaritmic coupling between the filter bands (see also "Buttons" below).
 
-Example
+Signal flow
+===========
+The modulator signal is fed into the matrix from the bottom of the matrix anddevided into 31 frequency bands. So each column corresponds to a band of the modulator. The carrier signal is fed into the matrix from the left. So each row corresponds to a frequency band or the carrier. Buttons pressed in the matrix will allow the corresponding column's modulator band energy to modulate the corresponding row's carrier band signal. All modulated carrier signals are summed and send to 2 outputs. The sum of the modulated even bands is send to the Left output, the sum of the modulated odd bands to the Right output.
 
-Try for example the files fl1_std.wav (string from a Kurzweil K2000) and jung05.wav (a jungle loop from some sample kit).
-You can play them via a sample player like complex simpler from the NYSTHI plugin set.
-For your convenience Vocode-O-Matic-example_01.vcv will load the appropriate files.
-Make sure the top simpler loads the fl2.wav file and the bottom one the jung05.wav file.
-Have a look at the screen shot below if you need some help.
+The frequency is lowest at the lower left side of the matrix. Bands more to the right or up are higher in frequency.
 
-![alt text](res/Screenshot_2019-03-04_at_22.18.05.png)
+To make it easy for users Vocode-O-Matic comes with 5 presets. Mode 4 is the linear mode (default), 5 is inverse, and 0, 1, 2 and 3 are variants of a logaritmic coupling between the filter bands (see also "Buttons" below). The chosen modulation will be saved in the patch file. You can also choose to save the settings as a preset.
 
-For reasons unclear to me when using the example setup file often the same file is read into both simplers which does not make much sense. As a remedy read in the audio files explicitely and you'll be fine. In the patch click on the trigger button left of the 'start' input on both Simplers. The files should be played as loops then. The vocoder will be in linear mode which is numbered 4. As a result the energy in the low frequency bands of the modulator will modulate the energy in the low frequency bands of the carrier. The energy in the mid frequency bands of the modulator will modulate the energy in the mid frequency bands of the carrier and the energy in the high frequency bands of the modulator will modulate the energy in the high frequency bands of the carrier. You'll hear the summed signal from all frequency bands. To get some stereo effect the even and odd bands are summed up separately and panned. The sum effect will be that you will hear a string section play in the rhythm of the beat loop.
+Inputs
+======
+Obviously there is an input for the carrier signal and one for the modulator signal.
+A trigger puls to the Shift L input will shift the buttons of the matrix one position to the left with wrap around.
+The Shift R trigger input will shift the matrix in the opposite direction.
 
-If you click the button left of the first 7 segment display, this is the filter mode number, you will select the next modulation mode. Number 5 will invert the filter matrix resulting in the low frequencies of the carrier being modulated by the energy in the high frequencies of the modulator signal, the mid frequencies of the carrier being modulated by the energy in the mid frequencies of the modulator signal and the high frequencies of the carrier being modulated by the energy in the low frequencies of the modulator signal. There are a few more modes. You can cycle through them by repeately clicking the mode button. Each will result in a different modulation topology.
+Outputs
+=======
+There is a Left and a Right output. The vocoder produces a semi stereo signal although the input signals are mono. This is done by sending the summed effect of the odd modulator channels and the even modulator channels on the carrier to the left and right outputs respectively.
 
-Obviously you can also use the vocoder in a real time setting by connecting the carrier and modulator input to a real time sound source e.g. your audio device (put carrier signal on one channel and modulator signal on the second channel of your audio device's line input) a source in VCV-rack. Note that you can draw whatever modulation topology you like by clicking the toggle switches of the matrix directly.
+Knobs
+=====
+The rotary knobs on top of the rack element are gain buttons for the carrier and modulator input signals.
 
-Knobs and Toggle switches
-
-The knobs on top of the rack element are attenuators for the carrier and modulator input signals.
+Matrix buttons
+==============
 The filter matrix consists of toggle switches, so you can make your own coupling between modulator and carrier filters.
 Mind you, no attenuation is done, so if you combine a lot of modulator bands with one carrier filter, the output of the filter
 may exceed the maximum sample value (voltage) allowed resulting in distortion. 
 
-Buttons
+Matrix mode button
+==================
+The mode toggle button lets you choose between 5 filter mappings. Number 4 is a linear mapping of the modulator filters
+against the carrier filters. This is the default at startup. Number 5 is a inverse mapping. 
+Mapping 0, 1, 2, 3 are log mappings. All sound differently. And by toggling switches in the matrix you can change them.
 
-The top toggle button when pressed will turn red, this will put the vocode in bypass mode. 
+Shift L R buttons
+=================
+The shift L and shift R buttons allow you to manually shift the matrix one step left and right respectively. The display will show the shift position. The inputs next to these buttons will do the same if a pulse signal is fed to them.
+
+Hold button
+===========
+The hold button will stop the effect of the pulse to the inputs, effectively holding the matrix in its position. The 7 segment display will show the position shift of the matrix. 0 is the initial state, 30 means the matrix has shifted completely to the right (with wrap around).
+
+Mute buttons
+============
+On the right hand side of the filter matrix for every frequency band of the carrier a mute buttons is shown. By default all outputs are active i.e. no band is muted (lights are green). If you toggle a button the light will go out and the corresponding carrier signal will not be added to the output signal.
+
+Bypass button
+=============
+The bypass toggle button when pressed will turn red, this will put the vocoder in bypass mode. 
 This will send the modulator and carrier input signals to the left and right outputs respectively.
-If you use the Vocode-O-Matic-example_01.vcv settings file make sure you hear the string sample and the drum loop in bypass mode. If not, reload the samples in the simpler modules.
+If you use the Vocode-O-Matic-example.vcv settings file make sure you hear the string sample and the drum loop in bypass mode. If not, reload the samples in the simpler modules.
 
-The second push button from the top lets you choose between 5 filter mappings. Number 4 is a linear mapping of the modulator filters
-against the carrier filters. This is the default at startup. Number 5 is a reverse mapping. 
-Mapping 0, 1, 2, 3 and log mappings. All sound differently. And by toggling switches in the matrix you can change them.
+Sources
+=======
+All filters are based on the series of tutorial papers about Effect Design by Jon Dattorro published in the Journal of the Audio Engineering Society (https://ccrma.stanford.edu/~dattorro/EffectDesignPart1.pdf).
 
-The first push button on the right hand side of the second 7 segment display can be used to shift the moduldation matrix to the right one step. 
-The second putton is a toggle button which allows you to bypass the trigger signals effectively holding the matrix in its position. The 7 segment display will show the position shift of the matrix. 0 is the initial state, 30 means the matrix has shifted but for one step completely to the right (with wrap around).
+Please let me know if you have used Vocode-O-Matic in your music (send me a link or a mp3 file). I'm very curious to hear how people use it.
+
+Example
+=======
+
+Try for example the files fl1_std.wav (string from a Kurzweil K2000) and jung05.wav (a jungle loop from some sample kit).
+You can play them via a sample player like complex simpler from the NYSTHI plugin set.
+Make sure the carrier simpler loads the fl2.wav file and the modulator simpler the jung05.wav file.
 
 Known bugs
-
+==========
 Since I'm relatively new to C++ programming and the Rack VCV platform I probably have not initialized all elements properly.
 What I've found is that the vocoder on occasion will only output a DC value, and not produce any other sound at all.
 Restarting Rack or opening the module once more will often solve this problem. If anyone knows how to handle this properly,
 please let me know.
 
-All filters are based on the series of tutorial papers about Effect Design by Jon Dattorro published in the Journal of the Audio Engineering Society (https://ccrma.stanford.edu/~dattorro/EffectDesignPart1.pdf).
+Request
+=======
+Please let me know if you have used Vocode-O-Matic in your music (send me a link or a mp3 file). I'm very curious to hear how people use it.
 
-Please let me know if you have used Vocode-O-Matic in your music. I'm very curious to hear how people use it.
+Changelog
+=========
+v0.4 
+    - internal state and parameter settings are saved.
+    - outputs can be muted
+    - added text to the front panel
