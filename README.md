@@ -9,7 +9,7 @@ Sculpt-O-Sound presents:
 
 Vocode-O-Matic, v0.4 is a 31 terts band vocoder with editable frequency matrix usable for 44100 Hz sampling frequency only (at the moment).
 
-![alt text](res/Screenshot_2019-04-22_at_14.21.37.png)
+![alt text](res/Screen_dump_Vocode-O-Matic-v0.4_01.png)
 
 The vocoder has 31 terts band filters for the carrier and modulator inputs.
 To get an interesting result, start by using a pad like sound with a big bandwidth as a carrier and
