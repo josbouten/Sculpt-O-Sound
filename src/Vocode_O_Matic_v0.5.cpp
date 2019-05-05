@@ -5,11 +5,8 @@
 #include "lbutton.hpp"
 #include "../deps/SynthDevKit/src/CV.hpp"
 #include "pan_and_level.hpp"
+#include "sliders.hpp"
 
-#define INITIAL_CARRIER_GAIN 1.0
-#define INITIAL_MODULATOR_GAIN 1.0
-
-//#define PANNING
 
 // Dimensions of matrix of buttons.
 #define LED_WIDTH 10
@@ -276,6 +273,39 @@ void Vocode_O_Matic::step() {
       refresh = false;
   }
 #endif
+
+  if (wait_attack_release_time == 0) {
+    // Handle envelope attack time sliders 
+    wait_attack_release_time = 20000;
+    bool change = false;
+    for (int i = 0; i < NR_OF_BANDS; i++) {
+        if (params[ATTACK_TIME_PARAM_00 + i].value != envelope_attack_time[i]) {
+            envelope_attack_time[i] = params[ATTACK_TIME_PARAM_00 + i].value;
+            change = true;
+        }
+    }
+    if (change) {
+        // compute factors here.
+        comp_attack_times(envelope_attack_time);
+        comp_attack_factors(envelope_attack_factor, envelope_attack_time);
+    }
+
+    // Handle envelope release time sliders.
+    change = false;
+    for (int i = 0; i < NR_OF_BANDS; i++) {
+        if (params[RELEASE_TIME_PARAM_00 + i].value != envelope_release_time[i]) {
+            envelope_release_time[i] = params[RELEASE_TIME_PARAM_00 + i].value;
+            change = true;
+        }
+    }
+    if (change) {
+        // compute factors here.
+        comp_release_times(envelope_release_time);
+        comp_release_factors(envelope_release_factor, envelope_release_time);
+    }
+  } else {
+    wait_attack_release_time -= 1;
+  }
     
   if (fx_bypass) {
     outputs[LEFT_OUTPUT].value = inputs[CARR_INPUT].value * params[CARRIER_GAIN_PARAM].value;
@@ -315,11 +345,11 @@ void Vocode_O_Matic::step() {
   }
 }
 
-struct Vocode_O_MaticWidget : ModuleWidget {
+struct Vocode_O_MaticWidget : ModuleWidget, Vocode_O_Matic {
   Vocode_O_MaticWidget(Vocode_O_Matic *module) : ModuleWidget(module) {
 
     // Set background.
-    setPanel(SVG::load(assetPlugin(plugin, "res/Sculpt-O-Sound-_-Vocode_O_Matic_v0.4.svg")));
+    setPanel(SVG::load(assetPlugin(plugin, "res/Sculpt-O-Sound-_-Vocode_O_Matic_v0.5.svg")));
 
     // Add some screws.
     addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
@@ -401,6 +431,20 @@ struct Vocode_O_MaticWidget : ModuleWidget {
             addParam(ParamWidget::create<LButton>(Vec(x, y), module, Vocode_O_Matic::MUTE_OUTPUT_PARAM_00 + offset, 0.0, 1.0f, 0.0f));
             addChild(ModuleLightWidget::create<MediumLight<GreenLight>>(Vec(x, y), module, Vocode_O_Matic::MUTE_OUTPUT_LIGHT_00 + offset));
     }
+
+    // Add 4 rows of sliders for 
+    int sliders_x_offset = 480;
+    for (int i = 0; i < NR_OF_BANDS; i++) {
+        // envelope release time,
+        addParam(ParamWidget::create<Slider02_10x15>(Vec(sliders_x_offset + i * 12,  10), module, Vocode_O_Matic::RELEASE_TIME_PARAM_00, min_envelope_release_time[i], max_envelope_release_time[i], INITIAL_RELEASE_TIME));
+        // envelope attack time,
+        addParam(ParamWidget::create<Slider02_10x15>(Vec(sliders_x_offset + i * 12,  100), module, Vocode_O_Matic::ATTACK_TIME_PARAM_00, min_envelope_attack_time[i], max_envelope_attack_time[i], INITIAL_ATTACK_TIME));
+        // level and
+        addParam(ParamWidget::create<Slider02_10x15>(Vec(sliders_x_offset + i * 12, 190), module, Vocode_O_Matic::LEVEL_PARAM_00, MIN_LEVEL, MAX_LEVEL, INITIAL_LEVEL));
+        // panning and
+        addParam(ParamWidget::create<Slider02_10x15>(Vec(sliders_x_offset + i * 12, 280), module, Vocode_O_Matic::PAN_PARAM_00, MIN_PAN, MAX_PAN, INITIAL_PAN));
+    }
+
   };
 };
 

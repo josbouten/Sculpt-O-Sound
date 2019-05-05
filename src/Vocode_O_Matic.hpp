@@ -6,9 +6,9 @@
 
 struct Vocode_O_Matic : Module {
 
-  // Define CV trigger a la synthkit for shifting the matrix.
-  SynthDevKit::CV *cv_right = new SynthDevKit::CV(0.1f);
-  SynthDevKit::CV *cv_left =  new SynthDevKit::CV(0.1f);
+    // Define CV trigger a la synthkit for shifting the matrix.
+    SynthDevKit::CV *cv_right = new SynthDevKit::CV(0.1f);
+    SynthDevKit::CV *cv_left =  new SynthDevKit::CV(0.1f);
 
   void refresh_led_matrix(int lights_offset, int p_cnt[NR_OF_BANDS], int button_value[NR_OF_BANDS][NR_OF_BANDS], bool led_state[1024])
   {
@@ -85,7 +85,6 @@ struct Vocode_O_Matic : Module {
     MATRIX_ONE_STEP_LEFT_PARAM,
     CARRIER_GAIN_PARAM,
     MODULATOR_GAIN_PARAM,
-    PANNING_PARAM,
     MUTE_OUTPUT_PARAM_00,
     MUTE_OUTPUT_PARAM_01,
     MUTE_OUTPUT_PARAM_02,
@@ -117,6 +116,130 @@ struct Vocode_O_Matic : Module {
     MUTE_OUTPUT_PARAM_28,
     MUTE_OUTPUT_PARAM_29,
     MUTE_OUTPUT_PARAM_30,
+    ATTACK_TIME_PARAM_00,
+    ATTACK_TIME_PARAM_01,
+    ATTACK_TIME_PARAM_02,
+    ATTACK_TIME_PARAM_03,
+    ATTACK_TIME_PARAM_04,
+    ATTACK_TIME_PARAM_05,
+    ATTACK_TIME_PARAM_06,
+    ATTACK_TIME_PARAM_07,
+    ATTACK_TIME_PARAM_08,
+    ATTACK_TIME_PARAM_09,
+    ATTACK_TIME_PARAM_10,
+    ATTACK_TIME_PARAM_11,
+    ATTACK_TIME_PARAM_12,
+    ATTACK_TIME_PARAM_13,
+    ATTACK_TIME_PARAM_14,
+    ATTACK_TIME_PARAM_15,
+    ATTACK_TIME_PARAM_16,
+    ATTACK_TIME_PARAM_17,
+    ATTACK_TIME_PARAM_18,
+    ATTACK_TIME_PARAM_19,
+    ATTACK_TIME_PARAM_20,
+    ATTACK_TIME_PARAM_21,
+    ATTACK_TIME_PARAM_22,
+    ATTACK_TIME_PARAM_23,
+    ATTACK_TIME_PARAM_24,
+    ATTACK_TIME_PARAM_25,
+    ATTACK_TIME_PARAM_26,
+    ATTACK_TIME_PARAM_27,
+    ATTACK_TIME_PARAM_28,
+    ATTACK_TIME_PARAM_29,
+    ATTACK_TIME_PARAM_30,
+    RELEASE_TIME_PARAM_00,
+    RELEASE_TIME_PARAM_01,
+    RELEASE_TIME_PARAM_02,
+    RELEASE_TIME_PARAM_03,
+    RELEASE_TIME_PARAM_04,
+    RELEASE_TIME_PARAM_05,
+    RELEASE_TIME_PARAM_06,
+    RELEASE_TIME_PARAM_07,
+    RELEASE_TIME_PARAM_08,
+    RELEASE_TIME_PARAM_09,
+    RELEASE_TIME_PARAM_10,
+    RELEASE_TIME_PARAM_11,
+    RELEASE_TIME_PARAM_12,
+    RELEASE_TIME_PARAM_13,
+    RELEASE_TIME_PARAM_14,
+    RELEASE_TIME_PARAM_15,
+    RELEASE_TIME_PARAM_16,
+    RELEASE_TIME_PARAM_17,
+    RELEASE_TIME_PARAM_18,
+    RELEASE_TIME_PARAM_19,
+    RELEASE_TIME_PARAM_20,
+    RELEASE_TIME_PARAM_21,
+    RELEASE_TIME_PARAM_22,
+    RELEASE_TIME_PARAM_23,
+    RELEASE_TIME_PARAM_24,
+    RELEASE_TIME_PARAM_25,
+    RELEASE_TIME_PARAM_26,
+    RELEASE_TIME_PARAM_27,
+    RELEASE_TIME_PARAM_28,
+    RELEASE_TIME_PARAM_29,
+    RELEASE_TIME_PARAM_30,
+    LEVEL_PARAM_00,
+    LEVEL_PARAM_01,
+    LEVEL_PARAM_02,
+    LEVEL_PARAM_03,
+    LEVEL_PARAM_04,
+    LEVEL_PARAM_05,
+    LEVEL_PARAM_06,
+    LEVEL_PARAM_07,
+    LEVEL_PARAM_08,
+    LEVEL_PARAM_09,
+    LEVEL_PARAM_10,
+    LEVEL_PARAM_11,
+    LEVEL_PARAM_12,
+    LEVEL_PARAM_13,
+    LEVEL_PARAM_14,
+    LEVEL_PARAM_15,
+    LEVEL_PARAM_16,
+    LEVEL_PARAM_17,
+    LEVEL_PARAM_18,
+    LEVEL_PARAM_19,
+    LEVEL_PARAM_20,
+    LEVEL_PARAM_21,
+    LEVEL_PARAM_22,
+    LEVEL_PARAM_23,
+    LEVEL_PARAM_24,
+    LEVEL_PARAM_25,
+    LEVEL_PARAM_26,
+    LEVEL_PARAM_27,
+    LEVEL_PARAM_28,
+    LEVEL_PARAM_29,
+    LEVEL_PARAM_30,
+    PAN_PARAM_00,
+    PAN_PARAM_01,
+    PAN_PARAM_02,
+    PAN_PARAM_03,
+    PAN_PARAM_04,
+    PAN_PARAM_05,
+    PAN_PARAM_06,
+    PAN_PARAM_07,
+    PAN_PARAM_08,
+    PAN_PARAM_09,
+    PAN_PARAM_10,
+    PAN_PARAM_11,
+    PAN_PARAM_12,
+    PAN_PARAM_13,
+    PAN_PARAM_14,
+    PAN_PARAM_15,
+    PAN_PARAM_16,
+    PAN_PARAM_17,
+    PAN_PARAM_18,
+    PAN_PARAM_19,
+    PAN_PARAM_20,
+    PAN_PARAM_21,
+    PAN_PARAM_22,
+    PAN_PARAM_23,
+    PAN_PARAM_24,
+    PAN_PARAM_25,
+    PAN_PARAM_26,
+    PAN_PARAM_27,
+    PAN_PARAM_28,
+    PAN_PARAM_29,
+    PAN_PARAM_30,
     MOD_MATRIX_PARAM,
     NUM_PARAMS = MOD_MATRIX_PARAM + NR_OF_BANDS * NR_OF_BANDS 
   };
@@ -236,6 +359,7 @@ struct Vocode_O_Matic : Module {
 
   int wait = 1;
   int wait2 = 1;
+  int wait_attack_release_time = 1;
   int p_cnt[NR_OF_BANDS];
   int button_value[NR_OF_BANDS][NR_OF_BANDS];
   bool mute_output[NR_OF_BANDS]; 
@@ -247,14 +371,22 @@ struct Vocode_O_Matic : Module {
   float carr_beta[NR_OF_BANDS];
   float left_pan[NR_OF_BANDS];
   float right_pan[NR_OF_BANDS];
-  float left_level[NR_OF_BANDS];
-  float right_level[NR_OF_BANDS];
+  float left_level[NR_OF_BANDS]; // output
+  float right_level[NR_OF_BANDS]; // output
   float start_level[NR_OF_BANDS];
-  float envelope_attack_time[NR_OF_BANDS], envelope_release_time[NR_OF_BANDS]; 
-  float envelope_attack_factor[NR_OF_BANDS], envelope_release_factor[NR_OF_BANDS]; 
+  float level[NR_OF_BANDS]; // slider
+  float pan[NR_OF_BANDS]; // slider
+  float envelope_attack_time[NR_OF_BANDS];
+  float envelope_release_time[NR_OF_BANDS]; 
+  float envelope_attack_factor[NR_OF_BANDS];
+  float envelope_release_factor[NR_OF_BANDS]; 
+  float min_envelope_attack_time[NR_OF_BANDS];
+  float max_envelope_attack_time[NR_OF_BANDS];
+  float min_envelope_release_time[NR_OF_BANDS];
+  float max_envelope_release_time[NR_OF_BANDS];
   float width = 1.0;
   float width_old = width;
-  bool led_state[1024] = {};
+  bool led_state[NR_OF_BANDS * NR_OF_BANDS] = {};
   bool mute_output_led_state[NR_OF_BANDS] = {};
   bool matrix_mode_read_from_settings = false;
   int lights_offset = MOD_MATRIX;
@@ -305,6 +437,33 @@ struct Vocode_O_Matic : Module {
     }
     json_object_set_new(rootJm, "mute_output", mute_outputJ);
 
+    // Store envelope release time slider values
+    json_t *envelope_release_timeJ = json_array();
+    for (int i = 0; i < NR_OF_BANDS; i++) {
+       json_array_append_new(envelope_release_timeJ, json_real(envelope_release_time[i]));
+    }
+    json_object_set_new(rootJm, "envelope_release", envelope_release_timeJ);
+
+    // Store envelope attack time slider values
+    json_t *envelope_attack_timeJ = json_array();
+    for (int i = 0; i < NR_OF_BANDS; i++) {
+       json_array_append_new(envelope_attack_timeJ, json_real(envelope_attack_time[i]));
+    }
+    json_object_set_new(rootJm, "envelope_attack", envelope_attack_timeJ);
+
+    // Store level slider values
+    json_t *levelJ = json_array();
+    for (int i = 0; i < NR_OF_BANDS; i++) {
+       json_array_append_new(levelJ, json_real(level[i]));
+    }
+    json_object_set_new(rootJm, "level", levelJ);
+
+    // Store pan slider values
+    json_t *panJ = json_array();
+    for (int i = 0; i < NR_OF_BANDS; i++) {
+       json_array_append_new(panJ, json_real(pan[i]));
+    }
+    json_object_set_new(rootJm, "pan", panJ);
     return rootJm;
   }       
           
@@ -379,6 +538,50 @@ struct Vocode_O_Matic : Module {
         refresh_mute_output_leds(mute_output_lights_offset, mute_output);
     }
 
+    // Restore envelope attack time slider
+    json_t *envelope_attack_timeJ = json_object_get(rootJm, "envelope_attack_time");
+    if (envelope_attack_timeJ) {
+        for (int i = 0; i < NR_OF_BANDS; i++) {
+            json_t *elementJ = json_array_get(envelope_attack_timeJ, i);
+            if (elementJ) {
+                envelope_attack_time[i] = json_boolean_value(elementJ);
+            }
+        }
+    }
+
+    // Restore envelope release time slider
+    json_t *envelope_release_timeJ = json_object_get(rootJm, "envelope_release_time");
+    if (envelope_release_timeJ) {
+        for (int i = 0; i < NR_OF_BANDS; i++) {
+            json_t *elementJ = json_array_get(envelope_release_timeJ, i);
+            if (elementJ) {
+                envelope_release_time[i] = json_boolean_value(elementJ);
+            }
+        }
+    }
+
+    // Restore level slider
+    json_t *levelJ = json_object_get(rootJm, "level");
+    if (levelJ) {
+        for (int i = 0; i < NR_OF_BANDS; i++) {
+            json_t *elementJ = json_array_get(levelJ, i);
+            if (elementJ) {
+                level[i] = json_boolean_value(elementJ);
+            }
+        }
+    }
+
+    // Restore envelope pan slider
+    json_t *panJ = json_object_get(rootJm, "pan");
+    if (panJ) {
+        for (int i = 0; i < NR_OF_BANDS; i++) {
+            json_t *elementJ = json_array_get(panJ, i);
+            if (elementJ) {
+                pan[i] = json_boolean_value(elementJ);
+            }
+        }
+    }
+
   } 
 
   Vocode_O_Matic() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
@@ -389,11 +592,11 @@ struct Vocode_O_Matic : Module {
   
     // Initialize all filter taps. 
     for (int i = 0; i < NR_OF_BANDS; i++) {
-     for (int j = 0; j < 3; j++) { 
-          ym[i][j] = 0.0;
-      }
-      ym_env[i][0] = 0.0; // Envelope of modulator.
-      ym_env[i][1] = 0.0;
+        for (int j = 0; j < 3; j++) { 
+            ym[i][j] = 0.0;
+        }
+        ym_env[i][0] = 0.0; // Envelope of modulator.
+        ym_env[i][1] = 0.0;
     }
     // Initialize the levels and pans.
     initialize_start_levels(start_level);
@@ -417,8 +620,9 @@ struct Vocode_O_Matic : Module {
   
     comp_attack_times(envelope_attack_time); 
     comp_attack_factors(envelope_attack_factor, envelope_attack_time);
-  
     comp_release_times(envelope_release_time); 
     comp_release_factors(envelope_release_factor, envelope_release_time);
+    comp_attack_and_release_time_ranges(min_envelope_attack_time, max_envelope_attack_time,
+                                        min_envelope_release_time, max_envelope_release_time);
   } 
 };
