@@ -321,13 +321,13 @@ struct Vocode_O_Matic : Module {
     // Restore matrix shift position
     json_t *matrix_shift_positionJ = json_object_get(rootJm, "matrix_shift_position");
     if (matrix_shift_positionJ) {
-        matrix_shift_position = (int) json_real_value(matrix_shift_positionJ);
+        matrix_shift_position = (int) json_number_value(matrix_shift_positionJ);
     }
 
     // Restore matrix type 
     json_t *matrix_modeJ = json_object_get(rootJm, "matrix_mode");
     if (matrix_modeJ) {
-        matrix_mode = (int) json_real_value(matrix_modeJ);
+        matrix_mode = (int) json_number_value(matrix_modeJ);
     }
 
     // Restore matrix_hold_button_pressed button status
@@ -342,7 +342,7 @@ struct Vocode_O_Matic : Module {
         for (int i = 0; i < NR_OF_BANDS; i++) {
             json_t *elementJ = json_array_get(p_cntJ, i);
             if (elementJ) {
-                p_cnt[i] = (int) json_real_value(elementJ);
+                p_cnt[i] = (int) json_number_value(elementJ);
             }
         }
     }
@@ -356,7 +356,7 @@ struct Vocode_O_Matic : Module {
             for (int j = 0; j < p_cnt[i]; j++) {
                 json_t *elementJ = json_array_get(button_valuesJ, index + j);
                 if (elementJ) {
-                    button_value[i][j] = (int) json_real_value(elementJ);
+                    button_value[i][j] = (int) json_number_value(elementJ);
                     cnt++;
                 } else {
                 }
