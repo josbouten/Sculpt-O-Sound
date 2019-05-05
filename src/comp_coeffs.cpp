@@ -47,18 +47,46 @@ void print_all_coeffs(float alpha1[], float alpha2[], float beta[]) {
   }
 }
 
+float comp_release_time(int freqIndex)
+{
+  int freq[] = {0, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160, 200, 250,
+               315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500,
+               3150, 4000, 5000, 6300, 8000, 10000,
+               12500, 16000, 20000, 22025};
+  double f_c = ((float) freq[freqIndex + 1] + (float) freq[freqIndex]) / 2.0;
+  float release_time;
+  // Make bands above band UPPER_SMOOTHING_BAND sound less harsh.
+  if (freqIndex > UPPER_SMOOTHING_BAND)
+    release_time = SMOOTHING_FACTOR * (2 * PI / f_c) * INITIAL_ENVELOPE_RELEASE_TEMPERATURE;
+  else
+    release_time = (2 * PI / f_c) * INITIAL_ENVELOPE_RELEASE_TEMPERATURE;
+  return(release_time);
+}
+
 void comp_release_times(float release_time[NR_OF_BANDS])
-{ // Compute release times for the envelope followers for the respective frequency bands.
+{
   int i;
-  double f_c;
   for (i = 0; i < NR_OF_BANDS; i++)
   {
-    f_c = ((float) freq[i+1] + (float) freq[i]) / 2.0;
-    // Make bands above band UPPER_SMOOTHING_BAND sound less harsh.
-    if (i > UPPER_SMOOTHING_BAND)
-      release_time[i] = SMOOTHING_FACTOR * (2 * PI / f_c) * INITIAL_ENVELOPE_RELEASE_TEMPERATURE;
-    else
-      release_time[i] = (2 * PI / f_c) * INITIAL_ENVELOPE_RELEASE_TEMPERATURE;
+    release_time[i] = comp_release_time(i);
+  }
+}
+
+float comp_attack_time(int freqIndex)
+{
+  int freq[] = {0, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160, 200, 250,
+               315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500,
+               3150, 4000, 5000, 6300, 8000, 10000,
+               12500, 16000, 20000, 22025};
+  float f_c = ((float) freq[freqIndex + 1] + (float) freq[freqIndex]) / 2.0;
+  return (2 * PI / f_c) * INITIAL_ENVELOPE_ATTACK_TEMPERATURE;
+}
+
+void comp_attack_times(float attack_time[NR_OF_BANDS])
+{
+  for (int freqIndex = 0; freqIndex < NR_OF_BANDS; freqIndex++)
+  {
+    attack_time[freqIndex] = comp_attack_time(freqIndex);
   }
 }
 
@@ -69,35 +97,30 @@ void print_array(float times[NR_OF_BANDS]) {
   printf("\n");
 }
 
-void comp_attack_times(float attack_time[NR_OF_BANDS])
-{ // Compute attack times for the envelope followers for the respective frequency bands.
-  int i;
-  double f_c;
-  for (i = 0; i < NR_OF_BANDS; i++)
-  {
-    f_c = ((float) freq[i+1] + (float) freq[i]) / 2.0;
-    attack_time[i]  = (2 * PI / f_c) * INITIAL_ENVELOPE_ATTACK_TEMPERATURE;
-  }
+float comp_attack_factor(float envelope_attack_time) {
+    return(exp(-1.0 / (FFSAMP * envelope_attack_time)));
 }
 
 void comp_attack_factors(float envelope_attack_factor[NR_OF_BANDS], float envelope_attack_time[NR_OF_BANDS])
 {
-  int i;
-  for (i = 0; i < NR_OF_BANDS; i++)
+  for (int freqIndex = 0; freqIndex < NR_OF_BANDS; freqIndex++)
   {
-    envelope_attack_factor[i]  = exp(-1.0 / (FFSAMP * envelope_attack_time[i]));
+    envelope_attack_factor[freqIndex] = comp_attack_factor(envelope_attack_time[freqIndex]);
   }
 }
 
+float comp_release_factor(float envelope_release_time) {
+    return(exp(-1.0 / (FFSAMP * envelope_release_time)));
+}
+
 void comp_release_factors(float envelope_release_factor[NR_OF_BANDS], float envelope_release_time[NR_OF_BANDS])
-{     
+{
   int i;
   for (i = 0; i < NR_OF_BANDS; i++)
-  {   
-    envelope_release_factor[i]  = exp(-1.0 / (FFSAMP * envelope_release_time[i]));
-  }            
-}  
-
+  {
+    envelope_release_factor[i]  = comp_release_factor(envelope_release_time[i]);
+  }
+}
 
 void comp_attack_time_ranges(float attack_time_lower_range[NR_OF_BANDS], float attack_time_upper_range[NR_OF_BANDS])
 {
