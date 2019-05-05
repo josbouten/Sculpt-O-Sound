@@ -17,9 +17,6 @@
 #define UPPER_ENVELOPE_RELEASE_TEMPERATURE 100
 #define ENVELOPE_TEMPERATURE 10
 
-#define MIN_PAN         -0.999 // Right
-#define MAX_PAN          0.999 // Left
-
 #define CENTER_PAN_VALUE 0.0
 #define INITIAL_PAN   CENTER_PAN_VALUE
 #define INITIAL_PAN_OFFSET ((MAX_PAN - MIN_PAN) / 5)
@@ -32,4 +29,14 @@
 #define FALSE 0
 #define TRUE 1
 
+#define INITIAL_CARRIER_GAIN 1.0
+#define INITIAL_MODULATOR_GAIN 1.0
+#define INITIAL_ATTACK_TIME 1 // ms
+#define INITIAL_RELEASE_TIME 1 // ms
+
+#define MAX_SHORT 32767
+
+float fl_max(float, float);
+float fl_min(float, float);
+float fl_abs(float);
 #endif
