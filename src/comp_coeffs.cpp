@@ -97,3 +97,47 @@ void comp_release_factors(float envelope_release_factor[NR_OF_BANDS], float enve
     envelope_release_factor[i]  = exp(-1.0 / (FFSAMP * envelope_release_time[i]));
   }            
 }  
+
+
+void comp_attack_time_ranges(float attack_time_lower_range[NR_OF_BANDS], float attack_time_upper_range[NR_OF_BANDS])
+{
+  int freq[] = {0, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160, 200, 250,
+               315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500,
+               3150, 4000, 5000, 6300, 8000, 10000,
+               12500, 16000, 20000, 22025};
+  int i;
+  double f_c;
+  for (i = 0; i < NR_OF_BANDS; i++)
+  {
+    f_c = ((float) freq[i+1] + (float) freq[i]) / 2.0;
+    attack_time_lower_range[i]   = (2.0 * PI / f_c) * LOWER_ENVELOPE_ATTACK_TEMPERATURE;
+    attack_time_upper_range[i]   = (2.0 * PI / f_c)  * UPPER_ENVELOPE_ATTACK_TEMPERATURE;
+  }
+}
+
+void comp_release_time_ranges(float release_time_lower_range[NR_OF_BANDS], float release_time_upper_range[NR_OF_BANDS])
+{
+  int freq[] = {0, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160, 200, 250,
+               315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500,
+               3150, 4000, 5000, 6300, 8000, 10000,
+               12500, 16000, 20000, 22025};
+  int i;
+  double f_c;
+  for (i = 0; i < NR_OF_BANDS; i++)
+  {
+    f_c = ((float) freq[i+1] + (float) freq[i]) / 2.0;
+    release_time_lower_range[i] = (2.0 * PI / f_c)  * LOWER_ENVELOPE_RELEASE_TEMPERATURE;
+    // Make bands above band UPPER_SMOOTHING_BAND sound less harsh.
+    if (i > UPPER_SMOOTHING_BAND)
+        release_time_upper_range[i] = SMOOTHING_FACTOR * (2.0 * PI / f_c)  * UPPER_ENVELOPE_RELEASE_TEMPERATURE;
+    else
+        release_time_upper_range[i] = (2.0 * PI / f_c)  * UPPER_ENVELOPE_RELEASE_TEMPERATURE;
+  }
+}
+
+void comp_attack_and_release_time_ranges(float attack_time_lower_range[NR_OF_BANDS], float attack_time_upper_range[NR_OF_BANDS],
+        float release_time_lower_range[NR_OF_BANDS], float release_time_upper_range[NR_OF_BANDS])
+{
+  comp_attack_time_ranges(attack_time_lower_range, attack_time_upper_range);
+  comp_release_time_ranges(release_time_lower_range, release_time_upper_range);
+}

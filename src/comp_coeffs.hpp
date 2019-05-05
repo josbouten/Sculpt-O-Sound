@@ -22,4 +22,6 @@ void print_array(float elements[NR_OF_BANDS]);
 void comp_attack_factors(float envelope_attack_factor[NR_OF_BANDS], float envelope_attack_time[NR_OF_BANDS]);
 void comp_release_factors(float envelope_release_factor[NR_OF_BANDS], float envelope_release_time[NR_OF_BANDS]);
 
+void comp_attack_and_release_time_ranges(float min_attack_time[NR_OF_BANDS], float max_attack_time[NR_OF_BANDS], float min_release_time[NR_OF_BANDS], float max_release_time[NR_OF_BANDS]);
+
 #endif
