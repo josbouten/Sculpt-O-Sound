@@ -2,10 +2,6 @@
 #include <stdio.h>
 #include "matrix.hpp"
 
-void initialize_start_levels(float start_level[NR_OF_BANDS]) {
-  for (int i = 0; i < NR_OF_BANDS; i++) { start_level[i] = INITIAL_START_LEVEL; }
-}
-
 void clear_matrix(int button_value[NR_OF_BANDS][NR_OF_BANDS], int p_cnt[NR_OF_BANDS]) {
   for (int i = 0; i < NR_OF_BANDS; i++) 
   {                        
