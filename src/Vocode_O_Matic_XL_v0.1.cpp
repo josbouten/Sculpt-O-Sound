@@ -1,7 +1,7 @@
+#include "Sculpt-O-Sound.hpp"
 #include "std.hpp"
 #include "matrix.hpp"
-#include "Vocode_O_Matic-XL.hpp"
-#include "Sculpt-O-Sound.hpp"
+#include "Vocode_O_Matic_XL.hpp"
 #include "lbutton.hpp"
 #include "../deps/SynthDevKit/src/CV.hpp"
 #include "pan_and_level.hpp"
@@ -372,8 +372,8 @@ void Vocode_O_Matic_XL::step() {
   }
 }
 
-struct Vocode_O_MaticWidget : ModuleWidget, Vocode_O_Matic_XL {
-  Vocode_O_MaticWidget(Vocode_O_Matic_XL *module) : ModuleWidget(module) {
+struct Vocode_O_Matic_XL_Widget : ModuleWidget, Vocode_O_Matic_XL {
+  Vocode_O_Matic_XL_Widget(Vocode_O_Matic_XL *module) : ModuleWidget(module) {
 
     // Set background.
     setPanel(SVG::load(assetPlugin(plugin, "res/Sculpt-O-Sound-_-Vocode_O_Matic_v0.5.svg")));
@@ -493,4 +493,4 @@ struct Vocode_O_MaticWidget : ModuleWidget, Vocode_O_Matic_XL {
 // author name for categorization per plugin, module slug (should never
 // change), human-readable module name, and any number of tags
 // (found in `include/tags.hpp`) separated by commas.
-Model *modelVocode_O_Matic_XL = Model::create<Vocode_O_Matic_XL, Vocode_O_MaticWidget>("Sculpt-O-Sound", "Vocode_O_Matic_XL", "Vocode_O_Matic_XL", VOCODER_TAG);
+Model *modelVocode_O_Matic_XL = Model::create<Vocode_O_Matic_XL, Vocode_O_Matic_XL_Widget>("Sculpt-O-Sound", "Vocode_O_Matic_XL", "Vocode_O_Matic_XL", VOCODER_TAG);
