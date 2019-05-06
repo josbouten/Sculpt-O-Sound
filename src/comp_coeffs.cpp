@@ -47,7 +47,7 @@ void print_all_coeffs(float alpha1[], float alpha2[], float beta[]) {
   }
 }
 
-float comp_release_time(int freqIndex)
+float init_release_time(int freqIndex)
 {
   int freq[] = {0, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160, 200, 250,
                315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500,
@@ -63,16 +63,16 @@ float comp_release_time(int freqIndex)
   return(release_time);
 }
 
-void comp_release_times(float release_time[NR_OF_BANDS])
+void init_release_times(float release_time[NR_OF_BANDS])
 {
   int i;
   for (i = 0; i < NR_OF_BANDS; i++)
   {
-    release_time[i] = comp_release_time(i);
+    release_time[i] = init_release_time(i);
   }
 }
 
-float comp_attack_time(int freqIndex)
+float init_attack_time(int freqIndex)
 {
   int freq[] = {0, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160, 200, 250,
                315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500,
@@ -82,11 +82,11 @@ float comp_attack_time(int freqIndex)
   return (2 * PI / f_c) * INITIAL_ENVELOPE_ATTACK_TEMPERATURE;
 }
 
-void comp_attack_times(float attack_time[NR_OF_BANDS])
+void init_attack_times(float attack_time[NR_OF_BANDS])
 {
   for (int freqIndex = 0; freqIndex < NR_OF_BANDS; freqIndex++)
   {
-    attack_time[freqIndex] = comp_attack_time(freqIndex);
+    attack_time[freqIndex] = init_attack_time(freqIndex);
   }
 }
 

@@ -1,9 +1,11 @@
 #pragma once
+using namespace std;
 
 //-----------------------------------------------------
 // Sliders
 //
 //-----------------------------------------------------
+
 struct MySlider_01 : SVGFader 
 {
 	MySlider_01() 
@@ -39,17 +41,41 @@ struct Slider02_10x15 : SVGFader
         handle->svg = SVG::load(assetPlugin(plugin,"res/mschack/mschack_Slider02_10x15.svg"));
 		handle->wrap();
 	}
+
+    enum Type {
+        ATTACK_TIME,
+        RELEASE_TIME,
+        LEVEL,
+        PAN
+    };
+
+    //vector <string> typeName;
+    //typeName.push_back("attack");
+    //typeName.push_back("release");
+    //typeName.push_back("pan");
+    //typeName.push_back("level");
 };
 
-struct Slider02_10x15WithId : Slider02_10x15 
+struct SliderWithId: Slider02_10x15 
 {
-    int sliderId;
-	Slider02_10x15 thisSlider = Slider02_10x15();
+    int id;
+    Type type;
 
-	Slider02_10x15WithId(int id) 
-    {
-        sliderId = id;
-	    Slider02_10x15();
+    void onChange(EventChange &e) override {
+      // Do your own thang.
+      printf("Slider change detected for type %d slider with number: %d\n", type, id);
+      //printf("Slider change detected for %s slider %d\n", typeName[(int)type], id);
+      // Pass event to super class.
+      SVGFader::onChange(e);
     }
+
+    void onHoverKey(EventHoverKey &e) override {
+        printf("Hovering above %d, %d!\n", id, type);
+        EventMouseDown emd;
+        emd.button = 1;
+        SVGFader::onMouseDown(emd);
+        SVGFader::onHoverKey(e);
+    }
+
 };
 

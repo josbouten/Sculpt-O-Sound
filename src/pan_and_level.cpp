@@ -33,13 +33,13 @@ float min_equal_loudness_value(void)
   return(mi);
 }
 
-void initialize_start_levels(float start_level[NR_OF_BANDS]) {
+void initialize_levels(float level[NR_OF_BANDS]) {
     for (int i = 0; i < NR_OF_BANDS; i++) {
-        start_level[i] = INITIAL_LEVEL;
+        level[i] = INITIAL_LEVEL;
     }
 }
 
-void init_pan_and_level(float startLevel[NR_OF_BANDS], float left_pan[NR_OF_BANDS], float right_pan[NR_OF_BANDS], float left_level[NR_OF_BANDS], float right_level[NR_OF_BANDS]) {
+void init_pan_and_level(float level[NR_OF_BANDS], float left_pan[NR_OF_BANDS], float right_pan[NR_OF_BANDS], float left_level[NR_OF_BANDS], float right_level[NR_OF_BANDS]) {
     for (int i = 0; i < NR_OF_BANDS; i++) {
         if ((i % 2) != 0) {
             left_pan[i] = INITIAL_PAN + INITIAL_PAN_OFFSET;
@@ -49,7 +49,7 @@ void init_pan_and_level(float startLevel[NR_OF_BANDS], float left_pan[NR_OF_BAND
             left_pan[i] = 0.0;
             right_pan[i] = INITIAL_PAN + INITIAL_PAN_OFFSET;
         }
-       float p = pow(10, startLevel[i] / 20);
+       float p = pow(10, level[i] / 20);
        left_level[i] =  left_pan[i] * p;
        right_level[i] = right_pan[i] * p;
    }

@@ -3,8 +3,10 @@
 #include "dsp/digital.hpp"
 #include "Sculpt-O-Sound.hpp"
 #include "comp_coeffs.hpp"
+#include "sliders.hpp"
+#include "pan_and_level.hpp"
 
-struct Vocode_O_Matic : Module {
+struct Vocode_O_Matic_XL : Module {
 
     // Define CV trigger a la synthkit for shifting the matrix.
     SynthDevKit::CV *cv_right = new SynthDevKit::CV(0.1f);
@@ -359,7 +361,7 @@ struct Vocode_O_Matic : Module {
 
   int wait = 1;
   int wait2 = 1;
-  int wait_attack_release_time = 1;
+  int wait_all_sliders = 1;
   int p_cnt[NR_OF_BANDS];
   int button_value[NR_OF_BANDS][NR_OF_BANDS];
   bool mute_output[NR_OF_BANDS]; 
@@ -373,9 +375,8 @@ struct Vocode_O_Matic : Module {
   float right_pan[NR_OF_BANDS];
   float left_level[NR_OF_BANDS]; // output
   float right_level[NR_OF_BANDS]; // output
-  float start_level[NR_OF_BANDS];
-  float level[NR_OF_BANDS]; // slider
-  float pan[NR_OF_BANDS]; // slider
+  float slider_level[NR_OF_BANDS]; // slider
+  float slider_pan[NR_OF_BANDS]; // slider
   float envelope_attack_time[NR_OF_BANDS];
   float envelope_release_time[NR_OF_BANDS]; 
   float envelope_attack_factor[NR_OF_BANDS];
@@ -391,6 +392,11 @@ struct Vocode_O_Matic : Module {
   bool matrix_mode_read_from_settings = false;
   int lights_offset = MOD_MATRIX;
   int mute_output_lights_offset = MUTE_OUTPUT_LIGHT_00;
+  // Sliders
+  SliderWithId *release_time_slider[NR_OF_BANDS]; 
+  SliderWithId *attack_time_slider[NR_OF_BANDS]; 
+  SliderWithId *pan_slider[NR_OF_BANDS]; 
+  SliderWithId *level_slider[NR_OF_BANDS]; 
 
   // Some code to read/save state of bypass button.
   json_t *toJson() override {
@@ -454,14 +460,14 @@ struct Vocode_O_Matic : Module {
     // Store level slider values
     json_t *levelJ = json_array();
     for (int i = 0; i < NR_OF_BANDS; i++) {
-       json_array_append_new(levelJ, json_real(level[i]));
+       json_array_append_new(levelJ, json_real(slider_level[i]));
     }
     json_object_set_new(rootJm, "level", levelJ);
 
     // Store pan slider values
     json_t *panJ = json_array();
     for (int i = 0; i < NR_OF_BANDS; i++) {
-       json_array_append_new(panJ, json_real(pan[i]));
+       json_array_append_new(panJ, json_real(slider_pan[i]));
     }
     json_object_set_new(rootJm, "pan", panJ);
     return rootJm;
@@ -566,7 +572,7 @@ struct Vocode_O_Matic : Module {
         for (int i = 0; i < NR_OF_BANDS; i++) {
             json_t *elementJ = json_array_get(levelJ, i);
             if (elementJ) {
-                level[i] = json_boolean_value(elementJ);
+                slider_level[i] = json_boolean_value(elementJ);
             }
         }
     }
@@ -577,14 +583,14 @@ struct Vocode_O_Matic : Module {
         for (int i = 0; i < NR_OF_BANDS; i++) {
             json_t *elementJ = json_array_get(panJ, i);
             if (elementJ) {
-                pan[i] = json_boolean_value(elementJ);
+                slider_pan[i] = json_boolean_value(elementJ);
             }
         }
     }
 
   } 
 
-  Vocode_O_Matic() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+  Vocode_O_Matic_XL() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
 
     // Initialize the filter coefficients.
     comp_all_coeffs(freq, mod_bandwidth, fsamp, mod_alpha1, mod_alpha2, mod_beta);
@@ -599,8 +605,8 @@ struct Vocode_O_Matic : Module {
         ym_env[i][1] = 0.0;
     }
     // Initialize the levels and pans.
-    initialize_start_levels(start_level);
-    init_pan_and_level(start_level, left_pan, right_pan, left_level, right_level);
+    initialize_levels(slider_level);
+    init_pan_and_level(slider_level, left_pan, right_pan, left_level, right_level);
     if (!matrix_mode_read_from_settings) {
         choose_matrix(4, button_value, p_cnt); // Initialize linear filter coupling.
         initialize_mute_output(mute_output); // initialize all mute buttons (to be not pressed).
@@ -618,9 +624,9 @@ struct Vocode_O_Matic : Module {
     lights[MATRIX_HOLD_TOGGLE_LIGHT].value = 0.0;
     lights[BYPASS_LIGHT].value = 0.0;
   
-    comp_attack_times(envelope_attack_time); 
+    init_attack_times(envelope_attack_time); 
     comp_attack_factors(envelope_attack_factor, envelope_attack_time);
-    comp_release_times(envelope_release_time); 
+    init_release_times(envelope_release_time); 
     comp_release_factors(envelope_release_factor, envelope_release_time);
     comp_attack_and_release_time_ranges(min_envelope_attack_time, max_envelope_attack_time,
                                         min_envelope_release_time, max_envelope_release_time);

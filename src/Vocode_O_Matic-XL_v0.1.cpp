@@ -1,6 +1,6 @@
 #include "std.hpp"
 #include "matrix.hpp"
-#include "Vocode_O_Matic.hpp"
+#include "Vocode_O_Matic-XL.hpp"
 #include "Sculpt-O-Sound.hpp"
 #include "lbutton.hpp"
 #include "../deps/SynthDevKit/src/CV.hpp"
@@ -13,12 +13,11 @@
 #define LED_HEIGHT 10
 
 #define VBASE NR_OF_BANDS * LED_HEIGHT + 40
-
 #define ORIGIN_BOTTOM_LEFT
-
 #define HBASE 140
+#define SLIDERS_X_OFFSET 480
 
-void Vocode_O_Matic::onReset() {
+void Vocode_O_Matic_XL::onReset() {
   matrix_mode_button_pressed = false;
   matrix_hold_button_pressed = false;
   matrix_one_step_right_button_pressed = false;
@@ -47,12 +46,17 @@ void Vocode_O_Matic::onReset() {
   lights[MATRIX_HOLD_TOGGLE_LIGHT].value = 0.0;
   lights[BYPASS_LIGHT].value = 0.0;
 
-  // Set gain to initial value.
+  // Set gain to initial value. Note: this does not work!
   //params[CARRIER_GAIN_PARAM].value = INITIAL_CARRIER_GAIN;
   //params[MODULATOR_GAIN_PARAM].value = INITIAL_MODULATOR_GAIN;
+
+  init_attack_times(envelope_attack_time);
+  comp_attack_factors(envelope_attack_factor, envelope_attack_time);
+  init_release_times(envelope_release_time);
+  comp_release_factors(envelope_release_factor, envelope_release_time);
 }
 
-void Vocode_O_Matic::onRandomize() {
+void Vocode_O_Matic_XL::onRandomize() {
   int cnt = 3;
   clear_matrix(button_value, p_cnt);
   for (int i = 0; i < NR_OF_BANDS; i++) {
@@ -82,7 +86,7 @@ void Vocode_O_Matic::onRandomize() {
   params[MODULATOR_GAIN_PARAM].value = INITIAL_MODULATOR_GAIN;
 }
 
-void Vocode_O_Matic::step() {
+void Vocode_O_Matic_XL::step() {
   // Do da vocoding thang.
   float deltaTime = engineGetSampleTime();
   float oneStepDeltaTime = engineGetSampleTime();
@@ -217,7 +221,7 @@ void Vocode_O_Matic::step() {
 #ifdef PANNING
   width = params[PANNING_PARAM].value;
   if (width != width_old) {
-    set_pan_and_level(start_level, left_pan, right_pan, left_level, right_level, width);
+    set_pan_and_level(slider_level, left_pan, right_pan, left_level, right_level, width);
     width_old = width;
   }
 #endif
@@ -274,9 +278,10 @@ void Vocode_O_Matic::step() {
   }
 #endif
 
-  if (wait_attack_release_time == 0) {
-    // Handle envelope attack time sliders 
-    wait_attack_release_time = 20000;
+  // Process changes in sliders for envelope attack time, envelope release time, pan and level values
+  if (wait_all_sliders == 0) {
+    // Handle envelope attack time sliders changes.
+    wait_all_sliders = 20000;
     bool change = false;
     for (int i = 0; i < NR_OF_BANDS; i++) {
         if (params[ATTACK_TIME_PARAM_00 + i].value != envelope_attack_time[i]) {
@@ -286,11 +291,10 @@ void Vocode_O_Matic::step() {
     }
     if (change) {
         // compute factors here.
-        comp_attack_times(envelope_attack_time);
         comp_attack_factors(envelope_attack_factor, envelope_attack_time);
     }
 
-    // Handle envelope release time sliders.
+    // Handle envelope release time sliders changes.
     change = false;
     for (int i = 0; i < NR_OF_BANDS; i++) {
         if (params[RELEASE_TIME_PARAM_00 + i].value != envelope_release_time[i]) {
@@ -300,11 +304,34 @@ void Vocode_O_Matic::step() {
     }
     if (change) {
         // compute factors here.
-        comp_release_times(envelope_release_time);
         comp_release_factors(envelope_release_factor, envelope_release_time);
     }
+ 
+    // Handle pan slider changes here.
+    change = false;
+    for (int i = 0; i < NR_OF_BANDS; i++) {
+        if (params[PAN_PARAM_00 + i].value != slider_pan[i]) {
+            slider_pan[i] = params[PAN_PARAM_00 + i].value;
+            change = true;
+        }
+    }
+
+    // ToDo: how to implement the pan slider values ???
+
+    // Handle level slider changes here.
+    for (int i = 0; i < NR_OF_BANDS; i++) {
+        if (params[LEVEL_PARAM_00 + i].value != slider_level[i]) {
+            slider_level[i] = params[LEVEL_PARAM_00 + i].value;
+            change = true;
+        }
+    }
+    if (change) {
+        int width = 1;
+        set_pan_and_level(slider_level, left_pan, right_pan, left_level, right_level, width);
+    }
+    
   } else {
-    wait_attack_release_time -= 1;
+    wait_all_sliders -= 1;
   }
     
   if (fx_bypass) {
@@ -345,8 +372,8 @@ void Vocode_O_Matic::step() {
   }
 }
 
-struct Vocode_O_MaticWidget : ModuleWidget, Vocode_O_Matic {
-  Vocode_O_MaticWidget(Vocode_O_Matic *module) : ModuleWidget(module) {
+struct Vocode_O_MaticWidget : ModuleWidget, Vocode_O_Matic_XL {
+  Vocode_O_MaticWidget(Vocode_O_Matic_XL *module) : ModuleWidget(module) {
 
     // Set background.
     setPanel(SVG::load(assetPlugin(plugin, "res/Sculpt-O-Sound-_-Vocode_O_Matic_v0.5.svg")));
@@ -361,39 +388,39 @@ struct Vocode_O_MaticWidget : ModuleWidget, Vocode_O_Matic {
     // Dial for modulator gain.
     // Dial for panning.
     // Note: format is Vec(x-pos, y-pos)
-    addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(10,  25), module, Vocode_O_Matic::CARRIER_GAIN_PARAM, 1.0, 10.0, INITIAL_CARRIER_GAIN));
-    addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(40,  25), module, Vocode_O_Matic::MODULATOR_GAIN_PARAM, 1.0, 10.0, INITIAL_MODULATOR_GAIN));
+    addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(10,  25), module, Vocode_O_Matic_XL::CARRIER_GAIN_PARAM, 1.0, MAX_CARRIER_GAIN, INITIAL_CARRIER_GAIN));
+    addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(40,  25), module, Vocode_O_Matic_XL::MODULATOR_GAIN_PARAM, 1.0, MAX_MODULATOR_GAIN, INITIAL_MODULATOR_GAIN));
 #ifdef PANNING
-    //addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(70,  47), module, Vocode_O_Matic::PANNING_PARAM, 0.0, MAX_PAN, 1.0 / INITIAL_PAN_OFFSET));
-    addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(70,  25), module, Vocode_O_Matic::PANNING_PARAM, 0.5, MAX_PAN, 1.0 / INITIAL_PAN_OFFSET));
+    //addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(70,  47), module, Vocode_O_Matic_XL::PANNING_PARAM, 0.0, MAX_PAN, 1.0 / INITIAL_PAN_OFFSET));
+    addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(70,  25), module, Vocode_O_Matic_XL::PANNING_PARAM, 0.5, MAX_PAN, 1.0 / INITIAL_PAN_OFFSET));
 #endif
 
     // INTPUTS (SIGNAL AND PARAMS)
     // Carrier, modulator and shift left and right Input signals.
-    addInput(Port::create<PJ301MPort>(Vec(10, 180), Port::INPUT, module, Vocode_O_Matic::CARR_INPUT));
-    addInput(Port::create<PJ301MPort>(Vec(42, 180), Port::INPUT, module, Vocode_O_Matic::MOD_INPUT));
-    addInput(Port::create<PJ301MPort>(Vec(105, 140), Port::INPUT, module, Vocode_O_Matic::SHIFT_RIGHT_INPUT));
-    addInput(Port::create<PJ301MPort>(Vec(105, 103), Port::INPUT, module, Vocode_O_Matic::SHIFT_LEFT_INPUT));
+    addInput(Port::create<PJ301MPort>(Vec(10, 180), Port::INPUT, module, Vocode_O_Matic_XL::CARR_INPUT));
+    addInput(Port::create<PJ301MPort>(Vec(42, 180), Port::INPUT, module, Vocode_O_Matic_XL::MOD_INPUT));
+    addInput(Port::create<PJ301MPort>(Vec(105, 140), Port::INPUT, module, Vocode_O_Matic_XL::SHIFT_RIGHT_INPUT));
+    addInput(Port::create<PJ301MPort>(Vec(105, 103), Port::INPUT, module, Vocode_O_Matic_XL::SHIFT_LEFT_INPUT));
 
     // Bypass switch.
-    addParam(ParamWidget::create<LEDBezel>(Vec(12,  66), module, Vocode_O_Matic::BYPASS_SWITCH , 0.0f, 1.0f, 0.0f));
-    addChild(ModuleLightWidget::create<LedLight<RedLight>>(Vec(14.2, 68), module, Vocode_O_Matic::BYPASS_LIGHT));
+    addParam(ParamWidget::create<LEDBezel>(Vec(12,  66), module, Vocode_O_Matic_XL::BYPASS_SWITCH , 0.0f, 1.0f, 0.0f));
+    addChild(ModuleLightWidget::create<LedLight<RedLight>>(Vec(14.2, 68), module, Vocode_O_Matic_XL::BYPASS_LIGHT));
 
     // Matrix type switch: linear, inverse + 4 * log
-    addParam(ParamWidget::create<LEDBezel>(Vec(12, 104), module, Vocode_O_Matic::MATRIX_MODE_TOGGLE_PARAM, 0.0f, 1.0f, 0.0f));
-    addChild(ModuleLightWidget::create<LedLight<GreenLight>>(Vec(14.2, 106), module, Vocode_O_Matic::MATRIX_MODE_TOGGLE_LIGHT));
+    addParam(ParamWidget::create<LEDBezel>(Vec(12, 104), module, Vocode_O_Matic_XL::MATRIX_MODE_TOGGLE_PARAM, 0.0f, 1.0f, 0.0f));
+    addChild(ModuleLightWidget::create<LedLight<GreenLight>>(Vec(14.2, 106), module, Vocode_O_Matic_XL::MATRIX_MODE_TOGGLE_LIGHT));
 
     // Push button which shifts the matrix to the right one step at a time.
-    addParam(ParamWidget::create<LEDBezel>(Vec(76, 142), module, Vocode_O_Matic::MATRIX_ONE_STEP_RIGHT_PARAM, 0.0f, 1.0f, 0.0f));
-    addChild(ModuleLightWidget::create<LedLight<GreenLight>>(Vec(78.2, 144), module, Vocode_O_Matic::MATRIX_ONE_STEP_RIGHT_LIGHT));
+    addParam(ParamWidget::create<LEDBezel>(Vec(76, 142), module, Vocode_O_Matic_XL::MATRIX_ONE_STEP_RIGHT_PARAM, 0.0f, 1.0f, 0.0f));
+    addChild(ModuleLightWidget::create<LedLight<GreenLight>>(Vec(78.2, 144), module, Vocode_O_Matic_XL::MATRIX_ONE_STEP_RIGHT_LIGHT));
 
     // Push button which shifts the matrix to the left one step at a time.
-    addParam(ParamWidget::create<LEDBezel>(Vec(76, 104), module, Vocode_O_Matic::MATRIX_ONE_STEP_LEFT_PARAM, 0.0f, 1.0f, 0.0f));
-    addChild(ModuleLightWidget::create<LedLight<GreenLight>>(Vec(78.2, 106), module, Vocode_O_Matic::MATRIX_ONE_STEP_LEFT_LIGHT));
+    addParam(ParamWidget::create<LEDBezel>(Vec(76, 104), module, Vocode_O_Matic_XL::MATRIX_ONE_STEP_LEFT_PARAM, 0.0f, 1.0f, 0.0f));
+    addChild(ModuleLightWidget::create<LedLight<GreenLight>>(Vec(78.2, 106), module, Vocode_O_Matic_XL::MATRIX_ONE_STEP_LEFT_LIGHT));
 
     // Matrix shift hold toggle.
-    addParam(ParamWidget::create<LEDBezel>(Vec(12, 142), module, Vocode_O_Matic::MATRIX_HOLD_TOGGLE_PARAM, 0.0f, 1.0f, 0.0f));
-    addChild(ModuleLightWidget::create<LedLight<RedLight>>(Vec(14.2, 144), module, Vocode_O_Matic::MATRIX_HOLD_TOGGLE_LIGHT));
+    addParam(ParamWidget::create<LEDBezel>(Vec(12, 142), module, Vocode_O_Matic_XL::MATRIX_HOLD_TOGGLE_PARAM, 0.0f, 1.0f, 0.0f));
+    addChild(ModuleLightWidget::create<LedLight<RedLight>>(Vec(14.2, 144), module, Vocode_O_Matic_XL::MATRIX_HOLD_TOGGLE_LIGHT));
 
     // Matrix Mode Display
     MsDisplayWidget2 *matrix_mode_display = new MsDisplayWidget2();                            
@@ -410,8 +437,8 @@ struct Vocode_O_MaticWidget : ModuleWidget, Vocode_O_Matic {
     addChild(matrix_shift_position_display);                                                           
 
     // Output of vocoded signal.
-    addOutput(Port::create<PJ301MPort>(Vec(10, 219), Port::OUTPUT, module, Vocode_O_Matic::LEFT_OUTPUT));
-    addOutput(Port::create<PJ301MPort>(Vec(42, 219), Port::OUTPUT, module, Vocode_O_Matic::RIGHT_OUTPUT));
+    addOutput(Port::create<PJ301MPort>(Vec(10, 219), Port::OUTPUT, module, Vocode_O_Matic_XL::LEFT_OUTPUT));
+    addOutput(Port::create<PJ301MPort>(Vec(42, 219), Port::OUTPUT, module, Vocode_O_Matic_XL::RIGHT_OUTPUT));
 
     // Matrix, origin is bottom left.
     for (int i = 0; i < NR_OF_BANDS; i++) {
@@ -419,8 +446,8 @@ struct Vocode_O_MaticWidget : ModuleWidget, Vocode_O_Matic {
             int x = HBASE + j * LED_WIDTH - 0.20 * LED_WIDTH;
             int y = VBASE - i * (LED_HEIGHT + 1);
             int offset = i * NR_OF_BANDS + j;
-            addParam(ParamWidget::create<LButton>(Vec(x, y), module, Vocode_O_Matic::MOD_MATRIX_PARAM + offset, 0.0, 1.0f, 0.0f));
-            addChild(ModuleLightWidget::create<MediumLight<BlueLight>>(Vec(x, y), module, Vocode_O_Matic::MOD_MATRIX + offset));
+            addParam(ParamWidget::create<LButton>(Vec(x, y), module, Vocode_O_Matic_XL::MOD_MATRIX_PARAM + offset, 0.0, 1.0f, 0.0f));
+            addChild(ModuleLightWidget::create<MediumLight<BlueLight>>(Vec(x, y), module, Vocode_O_Matic_XL::MOD_MATRIX + offset));
         }
     }
     // Mute output buttons to the left of the matrix.
@@ -428,23 +455,37 @@ struct Vocode_O_MaticWidget : ModuleWidget, Vocode_O_Matic {
     for (int i = 0; i < NR_OF_BANDS; i++) {
             int y = VBASE - i * (LED_HEIGHT + 1);
             int offset = i; // * NR_OF_BANDS;
-            addParam(ParamWidget::create<LButton>(Vec(x, y), module, Vocode_O_Matic::MUTE_OUTPUT_PARAM_00 + offset, 0.0, 1.0f, 0.0f));
-            addChild(ModuleLightWidget::create<MediumLight<GreenLight>>(Vec(x, y), module, Vocode_O_Matic::MUTE_OUTPUT_LIGHT_00 + offset));
+            addParam(ParamWidget::create<LButton>(Vec(x, y), module, Vocode_O_Matic_XL::MUTE_OUTPUT_PARAM_00 + offset, 0.0, 1.0f, 0.0f));
+            addChild(ModuleLightWidget::create<MediumLight<GreenLight>>(Vec(x, y), module, Vocode_O_Matic_XL::MUTE_OUTPUT_LIGHT_00 + offset));
     }
 
     // Add 4 rows of sliders for 
-    int sliders_x_offset = 480;
     for (int i = 0; i < NR_OF_BANDS; i++) {
-        // envelope release time,
-        addParam(ParamWidget::create<Slider02_10x15>(Vec(sliders_x_offset + i * 12,  10), module, Vocode_O_Matic::RELEASE_TIME_PARAM_00, min_envelope_release_time[i], max_envelope_release_time[i], INITIAL_RELEASE_TIME));
         // envelope attack time,
-        addParam(ParamWidget::create<Slider02_10x15>(Vec(sliders_x_offset + i * 12,  100), module, Vocode_O_Matic::ATTACK_TIME_PARAM_00, min_envelope_attack_time[i], max_envelope_attack_time[i], INITIAL_ATTACK_TIME));
-        // level and
-        addParam(ParamWidget::create<Slider02_10x15>(Vec(sliders_x_offset + i * 12, 190), module, Vocode_O_Matic::LEVEL_PARAM_00, MIN_LEVEL, MAX_LEVEL, INITIAL_LEVEL));
-        // panning and
-        addParam(ParamWidget::create<Slider02_10x15>(Vec(sliders_x_offset + i * 12, 280), module, Vocode_O_Matic::PAN_PARAM_00, MIN_PAN, MAX_PAN, INITIAL_PAN));
-    }
+        attack_time_slider[i] = ParamWidget::create<SliderWithId>(Vec(SLIDERS_X_OFFSET + i * 12,  10), module, Vocode_O_Matic_XL::ATTACK_TIME_PARAM_00 + i, min_envelope_attack_time[i], max_envelope_attack_time[i], INITIAL_ATTACK_TIME);
+        attack_time_slider[i] ->id = i;
+        attack_time_slider[i] ->type = SliderWithId::ATTACK_TIME;
+        addParam(attack_time_slider[i]);
 
+        // envelope release time,
+        release_time_slider[i] = ParamWidget::create<SliderWithId>(Vec(SLIDERS_X_OFFSET + i * 12,  100), module, Vocode_O_Matic_XL::RELEASE_TIME_PARAM_00 + i, min_envelope_release_time[i], max_envelope_release_time[i], INITIAL_RELEASE_TIME);
+        release_time_slider[i]->id = i;
+        release_time_slider[i]->type = SliderWithId::RELEASE_TIME;
+        addParam(release_time_slider[i]);
+
+        // level and
+        level_slider[i] = ParamWidget::create<SliderWithId>(Vec(SLIDERS_X_OFFSET + i * 12, 190), module, Vocode_O_Matic_XL::LEVEL_PARAM_00 + i, MIN_LEVEL, MAX_LEVEL, INITIAL_LEVEL);
+        level_slider[i]->id = i;
+        level_slider[i]->type = SliderWithId::LEVEL;
+        addParam(level_slider[i]);
+
+        // panning.
+        pan_slider[i] = ParamWidget::create<SliderWithId>(Vec(SLIDERS_X_OFFSET + i * 12, 280), module, Vocode_O_Matic_XL::PAN_PARAM_00 + i, MIN_PAN, MAX_PAN, INITIAL_PAN);
+        pan_slider[i]->id = i;
+        pan_slider[i]->type = SliderWithId::PAN;
+        addParam(pan_slider[i]);
+    }
+  //printf("param: %f %d %d\n", params[LEVEL_PARAM_00 + 5].value, params[LEVEL_PARAM_00 + 5]->id, params[LEVEL_PARAM_00 + 5]->type);
   };
 };
 
@@ -452,4 +493,4 @@ struct Vocode_O_MaticWidget : ModuleWidget, Vocode_O_Matic {
 // author name for categorization per plugin, module slug (should never
 // change), human-readable module name, and any number of tags
 // (found in `include/tags.hpp`) separated by commas.
-Model *modelVocode_O_Matic = Model::create<Vocode_O_Matic, Vocode_O_MaticWidget>("Sculpt-O-Sound", "Vocode_O_Matic", "Vocode_O_Matic", VOCODER_TAG);
+Model *modelVocode_O_Matic_XL = Model::create<Vocode_O_Matic_XL, Vocode_O_MaticWidget>("Sculpt-O-Sound", "Vocode_O_Matic_XL", "Vocode_O_Matic_XL", VOCODER_TAG);

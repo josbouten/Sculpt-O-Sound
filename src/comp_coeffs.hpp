@@ -14,8 +14,8 @@ void print_all_coeffs(float alpha1[], float alpha2[], float beta[]);
 
 void init_pan_and_level(float startLevel[NR_OF_BANDS], float left_pan[NR_OF_BANDS], float right_pan[NR_OF_BANDS], float left_level[NR_OF_BANDS], float right_level[NR_OF_BANDS]);
 
-void comp_release_times(float release_time[NR_OF_BANDS]);
-void comp_attack_times(float attack_time[NR_OF_BANDS]);
+void init_release_times(float release_time[NR_OF_BANDS]);
+void init_attack_times(float attack_time[NR_OF_BANDS]);
 void print_times(const std::string s, float times[NR_OF_BANDS]);
 void print_array(float elements[NR_OF_BANDS]);
 
