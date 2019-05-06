@@ -6,8 +6,6 @@
 #define NR_MATRIX_MODES 6 //lin,inv,4*log
 #define INITIAL_MATRIX_MODE 4
 
-void initialize_start_levels(float start_level[NR_OF_BANDS]);
-
 void initialize_matrix(int button_value[NR_OF_BANDS][NR_OF_BANDS], int p_cnt[NR_OF_BANDS]);
 
 void clear_matrix(int button_value[NR_OF_BANDS][NR_OF_BANDS], int p_cnt[NR_OF_BANDS]);
