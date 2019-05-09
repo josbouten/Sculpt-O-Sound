@@ -235,8 +235,8 @@ struct Vocode_O_Matic : Module {
 
   SchmittTrigger mute_output_trig;
 
-  int wait = 1;
-  int wait2 = 1;
+  int wait = 0;
+  int wait2 = 0;
   int p_cnt[NR_OF_BANDS];
   int button_value[NR_OF_BANDS][NR_OF_BANDS];
   bool mute_output[NR_OF_BANDS]; 

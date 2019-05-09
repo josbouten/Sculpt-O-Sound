@@ -7,6 +7,7 @@
 #include "pan_and_level.hpp"
 #include "sliders.hpp"
 
+// Vocode_O_Matic_XL
 
 // Dimensions of matrix of buttons.
 #define LED_WIDTH 10
@@ -18,6 +19,7 @@
 #define SLIDERS_X_OFFSET 480
 
 void Vocode_O_Matic_XL::onReset() {
+  // Initialize essential variables and show leds.
   matrix_mode_button_pressed = false;
   matrix_hold_button_pressed = false;
   matrix_one_step_right_button_pressed = false;
@@ -51,12 +53,19 @@ void Vocode_O_Matic_XL::onReset() {
   //params[MODULATOR_GAIN_PARAM].value = INITIAL_MODULATOR_GAIN;
 
   init_attack_times(envelope_attack_time);
-  comp_attack_factors(envelope_attack_factor, envelope_attack_time);
   init_release_times(envelope_release_time);
+  for (int i = 0; i < NR_OF_BANDS; i++) {
+    params[ATTACK_TIME_PARAM_00 + i].value = envelope_attack_time[i];
+    params[RELEASE_TIME_PARAM_00 + i].value = envelope_attack_time[i];
+  }
+  comp_attack_factors(envelope_attack_factor, envelope_attack_time);
   comp_release_factors(envelope_release_factor, envelope_release_time);
 }
 
 void Vocode_O_Matic_XL::onRandomize() {
+  // All buttons are of type params[] and will be randomly pressed.
+  // Therefore copy their value to button_values and their number
+  // for each band to p_cnt.
   int cnt = 3;
   clear_matrix(button_value, p_cnt);
   for (int i = 0; i < NR_OF_BANDS; i++) {
@@ -65,9 +74,10 @@ void Vocode_O_Matic_XL::onRandomize() {
           button_value[i][p_cnt[i]++] = jj;
       }
   }
+  // Show the lights corresponding to the matrix
   refresh_led_matrix(lights_offset, p_cnt, button_value, led_state);
 
-  // Set mute output buttons to not mute.
+  // Set some mute output buttons to mute.
   for (int i = 0; i < NR_OF_BANDS; i++) {
     if ((rand() / (RAND_MAX + 1.0)) > 0.5) {
         mute_output[i] = false;
@@ -77,17 +87,44 @@ void Vocode_O_Matic_XL::onRandomize() {
         lights[MUTE_OUTPUT_LIGHT_00 + i].value = 0.0;
     }
   }
-
   // Show mute led values.
   refresh_mute_output_leds(MUTE_OUTPUT_LIGHT_00, mute_output);
 
-  // Set gain to initial value.
+  // Set gain to initial value. This will not work. The param values are set
+  // in the library where they can not be reached?
   params[CARRIER_GAIN_PARAM].value = INITIAL_CARRIER_GAIN;
   params[MODULATOR_GAIN_PARAM].value = INITIAL_MODULATOR_GAIN;
 }
 
 void Vocode_O_Matic_XL::step() {
-  // Do da vocoding thang.
+  static int only_once = 1;
+  if (only_once == 1) {
+    init_attack_times(envelope_attack_time);
+    init_release_times(envelope_release_time);
+    for (int i = 0; i < NR_OF_BANDS; i++) {
+        params[ATTACK_TIME_PARAM_00 + i].value = envelope_attack_time[i];
+        params[RELEASE_TIME_PARAM_00 + i].value = envelope_attack_time[i];
+    }
+    comp_attack_factors(envelope_attack_factor, envelope_attack_time);
+    comp_release_factors(envelope_release_factor, envelope_release_time);
+    only_once = 0;
+    printf("attack_time   :"); print_array(envelope_attack_time);
+    printf("release_time  :"); print_array(envelope_release_time);
+    printf("attack_factor :"); print_array(envelope_attack_factor);
+    printf("release_factor:"); print_array(envelope_release_factor);
+    printf("left_pan      :"); print_array(left_pan);
+    printf("right_pan     :"); print_array(right_pan);
+    printf("left_level    :"); print_array(left_level);
+    printf("right_level   :"); print_array(right_level);
+    printf("mod_alpha1    :"); print_array(mod_alpha1);
+    printf("mod_alpha2    :"); print_array(mod_alpha2);
+    printf("mod_beta      :"); print_array(mod_beta);
+    printf("carr_alpha1   :"); print_array(carr_alpha1);
+    printf("carr_alpha2   :"); print_array(carr_alpha2);
+    printf("carr_beta     :"); print_array(carr_beta);
+  }
+  // Do da vocoding thang,
+  // while checking all buttons, dials and sliders.
   float deltaTime = engineGetSampleTime();
   float oneStepDeltaTime = engineGetSampleTime();
   bool refresh = false;
@@ -111,7 +148,7 @@ void Vocode_O_Matic_XL::step() {
     //
     ym[i][0] = mod_alpha1[i] * (xm[0] - xm[2] - mod_alpha2[i] * ym[i][1] - mod_beta[i] * ym[i][2]);
     // 
-    // Shift filter taps.
+    // Shift modulator filter taps.
     ym[i][2] = ym[i][1]; ym[i][1] = ym[i][0];
 
     //  
@@ -132,7 +169,7 @@ void Vocode_O_Matic_XL::step() {
 
   // Shift modulator input taps.
   xm[2] = xm[1]; xm[1] = xm[0];
-  // 
+   
   // Shift carrier input taps.
   xc[2] = xc[1]; xc[1] = xc[0];
 
@@ -228,6 +265,7 @@ void Vocode_O_Matic_XL::step() {
 
   // Handle the matrix button presses every half second ( assumption Fsamp = 44100 Hz ).
   if (wait == 0) {
+    //wait = 20000;
     for (int i = 0; i < NR_OF_BANDS * NR_OF_BANDS; i++) {
         if (params[MOD_MATRIX_PARAM + i].value) {
             wait = 20000;
@@ -258,18 +296,18 @@ void Vocode_O_Matic_XL::step() {
   } else wait -= 1;
 
   // Handle mute buttons every half second.
-  for (int i = 0; i <NR_OF_BANDS; i++) {
+  if (wait2 == 0) {
+    //wait2 = 20000;
+    for (int i = 0; i <NR_OF_BANDS; i++) {
       if (mute_output_trig.process(params[MUTE_OUTPUT_PARAM_00 + i].value)) {
-          if (wait2 == 0) {
-              wait2 = 20000;
-              mute_output[i] = !mute_output[i];
-              lights[MUTE_OUTPUT_LIGHT_00 + i].value = 1.0 - lights[MUTE_OUTPUT_LIGHT_00 + i].value;
-              refresh = true;
-          } else {
-              wait2 -= 1;
-          }
+         wait2 = 20000;
+         mute_output[i] = !mute_output[i];
+         lights[MUTE_OUTPUT_LIGHT_00 + i].value = 1.0 - lights[MUTE_OUTPUT_LIGHT_00 + i].value;
+         refresh = true;
       }
-  }
+    }
+  } else wait2 -= 1;
+
 #ifdef DEBUG
   if (refresh) {
       print_mute_buttons(mute_output);
@@ -292,6 +330,10 @@ void Vocode_O_Matic_XL::step() {
     if (change) {
         // compute factors here.
         comp_attack_factors(envelope_attack_factor, envelope_attack_time);
+        printf("attack time:");
+        print_array(envelope_attack_time);
+        printf("attack factor:");
+        print_array(envelope_attack_factor);
     }
 
     // Handle envelope release time sliders changes.
@@ -305,6 +347,10 @@ void Vocode_O_Matic_XL::step() {
     if (change) {
         // compute factors here.
         comp_release_factors(envelope_release_factor, envelope_release_time);
+        printf("release time:");
+        print_array(envelope_release_time);
+        printf("release factor:");
+        print_array(envelope_release_factor);
     }
  
     // Handle pan slider changes here.
@@ -376,7 +422,7 @@ struct Vocode_O_Matic_XL_Widget : ModuleWidget, Vocode_O_Matic_XL {
   Vocode_O_Matic_XL_Widget(Vocode_O_Matic_XL *module) : ModuleWidget(module) {
 
     // Set background.
-    setPanel(SVG::load(assetPlugin(plugin, "res/Sculpt-O-Sound-_-Vocode_O_Matic_v0.5.svg")));
+    setPanel(SVG::load(assetPlugin(plugin, "res/Sculpt-O-Sound-_-Vocode_O_Matic_XL_v0.1.svg")));
 
     // Add some screws.
     addChild(Widget::create<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
@@ -485,7 +531,6 @@ struct Vocode_O_Matic_XL_Widget : ModuleWidget, Vocode_O_Matic_XL {
         pan_slider[i]->type = SliderWithId::PAN;
         addParam(pan_slider[i]);
     }
-  //printf("param: %f %d %d\n", params[LEVEL_PARAM_00 + 5].value, params[LEVEL_PARAM_00 + 5]->id, params[LEVEL_PARAM_00 + 5]->type);
   };
 };
 

@@ -347,16 +347,21 @@ struct Vocode_O_Matic_XL : Module {
   int matrix_mode_selector = INITIAL_MATRIX_MODE;
   int matrix_mode = matrix_mode_selector;
 
-  // What is the shift position of the matrix.
+  // Keep track of the shift position of the matrix.
   int matrix_shift_position = 1;
 
+  // Button to control triggering of matrix movement
   SchmittTrigger matrix_hold_button_trig;
   bool matrix_hold_button_pressed = false;
+  // Button to step matrix on step to the right.
   SchmittTrigger matrix_one_step_right_button_trig;
   bool matrix_one_step_right_button_pressed = false;
+  // Button to step matrix on step to the left.
   SchmittTrigger matrix_one_step_left_button_trig;
   bool matrix_one_step_left_button_pressed = false;
 
+  // Carrier channels can be muted.
+  // Detect that the buttons are pressed using this SchmittTrigger
   SchmittTrigger mute_output_trig;
 
   int wait = 1;
@@ -392,6 +397,7 @@ struct Vocode_O_Matic_XL : Module {
   bool matrix_mode_read_from_settings = false;
   int lights_offset = MOD_MATRIX;
   int mute_output_lights_offset = MUTE_OUTPUT_LIGHT_00;
+
   // Sliders
   SliderWithId *release_time_slider[NR_OF_BANDS]; 
   SliderWithId *attack_time_slider[NR_OF_BANDS]; 
@@ -623,7 +629,8 @@ struct Vocode_O_Matic_XL : Module {
     // Reset lights.
     lights[MATRIX_HOLD_TOGGLE_LIGHT].value = 0.0;
     lights[BYPASS_LIGHT].value = 0.0;
-  
+ 
+    // Init the envelope follower's variables. 
     init_attack_times(envelope_attack_time); 
     comp_attack_factors(envelope_attack_factor, envelope_attack_time);
     init_release_times(envelope_release_time); 
