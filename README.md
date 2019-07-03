@@ -73,10 +73,10 @@ All filters are based on the series of tutorial papers about Effect Design by Jo
 
 Example
 =======
-
 Try for example the files fl1_std.wav (string from a Kurzweil K2000) and jung05.wav (a jungle loop from some sample kit).
 You can play them via a sample player like complex simpler from the NYSTHI plugin set.
 Make sure the carrier simpler loads the fl2.wav file and the modulator simpler the jung05.wav file.
+I posted a video on youtube which demonstrates this. You can find it here: https://www.youtube.com/watch?v=u_tcVmCJ_R8
 
 Known bugs
 ==========
