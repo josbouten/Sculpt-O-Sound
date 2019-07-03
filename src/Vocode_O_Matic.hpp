@@ -1,6 +1,5 @@
 #include "std.hpp"
 #include "../deps/SynthDevKit/src/CV.hpp"
-#include "dsp/digital.hpp"
 #include "Sculpt-O-Sound.hpp"
 #include "comp_coeffs.hpp"
 
@@ -188,7 +187,7 @@ struct Vocode_O_Matic : Module {
   void step() override;
 
   // For more advanced Module features, read Rack's engine.hpp header file
-  // - toJson, fromJson: serialization of internal data
+  // - dataToJson, dataFromJson: serialization of internal data
   // - onSampleRateChange: event triggered by a change of sample rate
   // - onReset, onRandomize, onCreate, onDelete: implements special behavior when user clicks these from the context menu
 
@@ -261,7 +260,7 @@ struct Vocode_O_Matic : Module {
   int mute_output_lights_offset = MUTE_OUTPUT_LIGHT_00;
 
   // Some code to read/save state of bypass button.
-  json_t *toJson() override {
+  json_t *dataToJson() override {
     json_t *rootJm = json_object();
 
     // Store bypass setting
@@ -308,7 +307,7 @@ struct Vocode_O_Matic : Module {
     return rootJm;
   }       
           
-  void fromJson(json_t *rootJm) override {
+  void dataFromJson(json_t *rootJm) override {
 
 
     // Restore bypass state 
@@ -381,7 +380,8 @@ struct Vocode_O_Matic : Module {
 
   } 
 
-  Vocode_O_Matic() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+  Vocode_O_Matic() {
+		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
     // Initialize the filter coefficients.
     comp_all_coeffs(freq, mod_bandwidth, fsamp, mod_alpha1, mod_alpha2, mod_beta);

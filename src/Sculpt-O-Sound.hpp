@@ -16,13 +16,12 @@ struct LedLight : BASE {
 };
 
 // Forward-declare the Plugin, defined in Template.cpp
-extern Plugin *plugin;
+extern Plugin *pluginInstance;
 
 // Forward-declare each Model, defined in each module source file
 
 extern Model *modelVocode_O_Matic;
 
-#include "dsp/digital.hpp"
 #include <sstream>
 #include <iomanip>
 
@@ -32,7 +31,7 @@ struct MsDisplayWidget : TransparentWidget {
   std::shared_ptr<Font> font;
     
   MsDisplayWidget() {
-    font = Font::load(assetPlugin(plugin, "res/Segment7Standard.ttf"));
+    font = Font::load(assetPlugin(pluginInstance, "res/Segment7Standard.ttf"));
   };
     
   void draw(NVGcontext *vg) override
@@ -78,7 +77,7 @@ struct MsDisplayWidget1 : TransparentWidget {
   std::shared_ptr<Font> font;
     
   MsDisplayWidget1() {
-    font = Font::load(assetPlugin(plugin, "res/Segment7Standard.ttf"));
+    font = Font::load(assetPlugin(pluginInstance, "res/Segment7Standard.ttf"));
   };
     
   void draw(NVGcontext *vg) override
@@ -123,7 +122,7 @@ struct MsDisplayWidget2 : TransparentWidget {
   std::shared_ptr<Font> font;
     
   MsDisplayWidget2() {
-    font = Font::load(assetPlugin(plugin, "res/Segment7Standard.ttf"));
+    font = Font::load(assetPlugin(pluginInstance, "res/Segment7Standard.ttf"));
   };
     
   void draw(NVGcontext *vg) override

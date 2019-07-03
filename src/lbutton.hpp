@@ -1,8 +1,8 @@
 
 struct LButton : SVGSwitch, MomentarySwitch {
     LButton() {
-        addFrame(SVG::load(assetPlugin(plugin, "res/L.svg")));
-        addFrame(SVG::load(assetPlugin(plugin, "res/Ldown.svg")));
+        addFrame(SVG::load(assetPlugin(pluginInstance, "res/L.svg")));
+        addFrame(SVG::load(assetPlugin(pluginInstance, "res/Ldown.svg")));
         sw->wrap();
         box.size = sw->box.size;
     }
