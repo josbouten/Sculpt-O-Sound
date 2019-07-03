@@ -7,7 +7,8 @@
 
 Sculpt-O-Sound presents: 
 
-Vocode-O-Matic, v0.4 is a 31 terts band vocoder with editable frequency matrix usable for 44100 Hz sampling frequency only (at the moment).
+Vocode-O-Matic, v0.4 is a 31 terts band vocoder with editable frequency matrix for Rack v0.6x.
+Its use is restricted to 44100 Hz sampling frequency at the moment.
 
 ![alt text](res/Screen_dump_Vocode-O-Matic-v0.4_01.png)
 
@@ -87,11 +88,13 @@ please let me know.
 
 Request
 =======
-Please let me know if you have used Vocode-O-Matic in your music (send me a link or a mp3 file). I'm very curious to hear how people use it.
+Please let me know if you have used Vocode-O-Matic in your music (send me a link or an mp3 file). I'm very curious to hear how people use it.
 
 Changelog
 =========
-v0.4 
+v0.4: 
     - internal state and parameter settings are saved.
+
     - outputs can be muted
+
     - added text to the front panel
