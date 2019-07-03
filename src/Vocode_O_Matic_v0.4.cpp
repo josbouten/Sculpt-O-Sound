@@ -408,4 +408,4 @@ struct Vocode_O_MaticWidget : ModuleWidget {
 // author name for categorization per plugin, module slug (should never
 // change), human-readable module name, and any number of tags
 // (found in `include/tags.hpp`) separated by commas.
-Model *modelVocode_O_Matic = Model::create<Vocode_O_Matic, Vocode_O_MaticWidget>("Sculpt-O-Sound", "Vocode_O_Matic", "Vocode_O_Matic", VOCODER_TAG);
+Model *modelVocode_O_Matic = Model::create<Vocode_O_Matic, Vocode_O_MaticWidget>("Vocode_O_Matic");
