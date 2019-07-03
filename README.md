@@ -92,7 +92,8 @@ Please let me know if you have used Vocode-O-Matic in your music (send me a link
 
 Changelog
 =========
-v0.4: 
+v0.4 
+    
     - internal state and parameter settings are saved.
 
     - outputs can be muted
