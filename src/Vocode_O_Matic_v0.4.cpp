@@ -390,7 +390,7 @@ struct Vocode_O_MaticWidget : ModuleWidget {
             int x = HBASE + j * LED_WIDTH - 0.20 * LED_WIDTH;
             int y = VBASE - i * (LED_HEIGHT + 1);
             int offset = i * NR_OF_BANDS + j;
-            addParam(createParam<LButton>(Vec(x, y), module, Vocode_O_Matic::MOD_MATRIX_PARAM + offset, 0.0, 1.0f, 0.0f));
+            //addParam(createParam<LButton>(Vec(x, y), module, Vocode_O_Matic::MOD_MATRIX_PARAM + offset, 0.0, 1.0f, 0.0f));
             addChild(createLight<MediumLight<BlueLight>>(Vec(x, y), module, Vocode_O_Matic::MOD_MATRIX + offset));
         }
     }
@@ -399,7 +399,7 @@ struct Vocode_O_MaticWidget : ModuleWidget {
     for (int i = 0; i < NR_OF_BANDS; i++) {
             int y = VBASE - i * (LED_HEIGHT + 1);
             int offset = i; // * NR_OF_BANDS;
-            addParam(createParam<LButton>(Vec(x, y), module, Vocode_O_Matic::MUTE_OUTPUT_PARAM_00 + offset, 0.0, 1.0f, 0.0f));
+            //addParam(createParam<LButton>(Vec(x, y), module, Vocode_O_Matic::MUTE_OUTPUT_PARAM_00 + offset, 0.0, 1.0f, 0.0f));
             addChild(createLight<MediumLight<GreenLight>>(Vec(x, y), module, Vocode_O_Matic::MUTE_OUTPUT_LIGHT_00 + offset));
     }
   };

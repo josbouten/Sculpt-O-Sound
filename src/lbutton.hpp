@@ -1,4 +1,4 @@
-
+/*
 struct LButton : SVGSwitch, MomentarySwitch {
     LButton() {
         addFrame(SVG::load(assetPlugin(pluginInstance, "res/L.svg")));
@@ -36,4 +36,5 @@ struct LButton : SVGSwitch, MomentarySwitch {
       SVGSwitch::onChange(e);
     }
 };
+*/
 

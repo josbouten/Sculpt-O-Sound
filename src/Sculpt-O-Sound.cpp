@@ -5,8 +5,6 @@ Plugin *pluginInstance;
 
 void init(rack::Plugin *p) {
 	pluginInstance = p;
-    p->website = "https://hithub.com/josbouten/Sculpt-O-Sound";
-    p->manual = "https://hithub.com/josbouten/Sculpt-O-Sound/README.md";
 
 	// Add all Models defined throughout the pluginInstance
 	p->addModel(modelVocode_O_Matic);

@@ -1,0 +1,15 @@
+{
+  "slug": "Sculpt-O-Sound",
+  "name": "Vocode-O-Matic",
+  "version": "1.0.0",
+  "license": "proprietary",
+  "brand": "Sculpt-O-Sound",
+  "author": "Zaphod B",
+  "authorEmail": "zaphodb42a@gmail.com",
+  "authorUrl": "https://soundcloud.com/zaphodb42",
+  "pluginUrl": "https://github.com/josbouten/Sculpt-O-Sound",
+  "manualUrl": "https://github.com/josbouten/Sculpt-O-Sound",
+  "sourceUrl": "https://github.com/josbouten/Sculpt-O-Sound",
+  "donateUrl": "",
+  "modules": []
+}
