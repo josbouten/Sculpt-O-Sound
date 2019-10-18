@@ -90,7 +90,7 @@ void Vocode_O_Matic::step() {
   float deltaTime = engineGetSampleTime();
   float oneStepDeltaTime = engineGetSampleTime();
   bool refresh = false;
-             
+
   xc[0] = inputs[CARR_INPUT].value * params[CARRIER_GAIN_PARAM].value;
   xm[0] = inputs[MOD_INPUT].value * params[MODULATOR_GAIN_PARAM].value;
   float smoothing_factor = 1.0;
@@ -98,10 +98,10 @@ void Vocode_O_Matic::step() {
   for (int i = 0; i < NR_OF_BANDS; i++) {
     //
     // CARRIER
-    //  
+    //
     // Direct Form I topology is used for filtering. Direct Form II would in this case cost as many multiplications and shifts.
     yc[i][0] = carr_alpha1[i] * (xc[0] - xc[2] - carr_alpha2[i] * yc[i][1] - carr_beta[i] * yc[i][2]);
-    //  
+    //
     // Shift all carrier filter taps.
     yc[i][2] = yc[i][1]; yc[i][1] = yc[i][0];
 
@@ -109,11 +109,11 @@ void Vocode_O_Matic::step() {
     // MODULATOR
     //
     ym[i][0] = mod_alpha1[i] * (xm[0] - xm[2] - mod_alpha2[i] * ym[i][1] - mod_beta[i] * ym[i][2]);
-    // 
+    //
     // Shift filter taps.
     ym[i][2] = ym[i][1]; ym[i][1] = ym[i][0];
 
-    //  
+    //
     // Compute input for envelope for this band.
     // Use only positive values so that energy levels are zero or positive.
     xm_env = fabs(ym[i][0]);
@@ -131,13 +131,13 @@ void Vocode_O_Matic::step() {
 
   // Shift modulator input taps.
   xm[2] = xm[1]; xm[1] = xm[0];
-  // 
+  //
   // Shift carrier input taps.
   xc[2] = xc[1]; xc[1] = xc[0];
 
   // Blink light at 2Hz.
   blinkPhase += deltaTime;
-  if (blinkPhase >= 1.0f) 
+  if (blinkPhase >= 1.0f)
     blinkPhase -= 1.0f;
   oneStepBlinkPhase += oneStepDeltaTime;
   if (oneStepBlinkPhase >= 0.1f) { // light will be on for a very short time.
@@ -145,7 +145,7 @@ void Vocode_O_Matic::step() {
     lights[MATRIX_ONE_STEP_LEFT_LIGHT].value = 0.0f;
   }
 
-  // Process trigger signal on matrix shift input. 
+  // Process trigger signal on matrix shift input.
   float shiftRightTriggerIn = inputs[SHIFT_RIGHT_INPUT].value;
   cv_right->update(shiftRightTriggerIn);
   float shiftLeftTriggerIn = inputs[SHIFT_LEFT_INPUT].value;
@@ -177,7 +177,7 @@ void Vocode_O_Matic::step() {
     shift_buttons_right(button_value, p_cnt, led_state, &matrix_shift_position);
   }
 
-  // Shift the matrix if there is a new trigger on the shift right input and the 
+  // Shift the matrix if there is a new trigger on the shift right input and the
   // hold button is not pressed and we are not in bypass mode.
   if (not fx_bypass && cv_right->newTrigger() and not matrix_hold_button_pressed) {
     // Shift the buttons one step.
@@ -194,7 +194,7 @@ void Vocode_O_Matic::step() {
     shift_buttons_left(button_value, p_cnt, led_state, &matrix_shift_position);
   }
 
-  // Shift the matrix if there is a new trigger on the shift left input and the 
+  // Shift the matrix if there is a new trigger on the shift left input and the
   // hold button is not pressed and we are not in bypass mode.
   if (not fx_bypass && cv_left->newTrigger() and not matrix_hold_button_pressed) {
     // Shift the buttons one step.
@@ -205,7 +205,7 @@ void Vocode_O_Matic::step() {
   if (matrix_mode_button_trig.process(params[MATRIX_MODE_TOGGLE_PARAM].value)) {
     matrix_mode_button_pressed = false;
     lights[MATRIX_MODE_TOGGLE_PARAM].value = matrix_mode_button_pressed ? 1.00 : 0.0;
-    matrix_mode++; 
+    matrix_mode++;
     if (matrix_mode > NR_MATRIX_MODES - 1) { matrix_mode = 0; }
     choose_matrix(matrix_mode, button_value, p_cnt);
 
@@ -230,7 +230,7 @@ void Vocode_O_Matic::step() {
     for (int i = 0; i < NR_OF_BANDS * NR_OF_BANDS; i++) {
         if (params[MOD_MATRIX_PARAM + i].value) {
             wait = 20000;
-            led_state[i] = !led_state[i]; 
+            led_state[i] = !led_state[i];
             int index = MOD_MATRIX + i;
             lights[index].value = !lights[index].value;
             int chosen_row = i / NR_OF_BANDS;
@@ -247,7 +247,7 @@ void Vocode_O_Matic::step() {
                         break; // As soon as one button is unpressed we are done.
                     }
                 }
-            } 
+            }
             else {
                 button_value[chosen_row][p_cnt[chosen_row]] = chosen_col;
                 p_cnt[chosen_row]++;
@@ -276,21 +276,21 @@ void Vocode_O_Matic::step() {
       refresh = false;
   }
 #endif
-    
+
   if (fx_bypass) {
     outputs[LEFT_OUTPUT].value = inputs[CARR_INPUT].value * params[CARRIER_GAIN_PARAM].value;
     outputs[RIGHT_OUTPUT].value = inputs[MOD_INPUT].value * params[MODULATOR_GAIN_PARAM].value;
-  } 
-  else 
+  }
+  else
   {
     // Initialize output signal.
     outputs[RIGHT_OUTPUT].value = 0.0;
     outputs[LEFT_OUTPUT].value = 0.0;
-    // The output is the sum of all carrier band signals multiplied by all 
+    // The output is the sum of all carrier band signals multiplied by all
     // envelope outputs for that band (unless a carrier band is muted).
 
     for (int i = NR_OF_BANDS -1; i >= 0; i--)
-    {  
+    {
       for (int j = 0; j < p_cnt[i]; j++)
       {
         int ind = button_value[i][j];
@@ -367,18 +367,22 @@ struct Vocode_O_MaticWidget : ModuleWidget {
     addChild(createLight<LedLight<RedLight>>(Vec(14.2, 144), module, Vocode_O_Matic::MATRIX_HOLD_TOGGLE_LIGHT));
 
     // Matrix Mode Display
-    MsDisplayWidget2 *matrix_mode_display = new MsDisplayWidget2();                            
-    matrix_mode_display->box.pos = Vec(38, 105);                                               
-    matrix_mode_display->box.size = Vec(30, 20);                                             
-    matrix_mode_display->value = &module->matrix_mode;
-    addChild(matrix_mode_display);                                                           
+    MsDisplayWidget2 *matrix_mode_display = new MsDisplayWidget2();
+    matrix_mode_display->box.pos = Vec(38, 105);
+    matrix_mode_display->box.size = Vec(30, 20);
+    if (module) {
+      matrix_mode_display->value = &module->matrix_mode;
+    }
+    addChild(matrix_mode_display);
 
-    // Matrix Shift Position Display 
-    MsDisplayWidget2 *matrix_shift_position_display = new MsDisplayWidget2();           
+    // Matrix Shift Position Display
+    MsDisplayWidget2 *matrix_shift_position_display = new MsDisplayWidget2();
     matrix_shift_position_display->box.pos = Vec(38, 143);
-    matrix_shift_position_display->box.size = Vec(30, 20);                                             
-    matrix_shift_position_display->value = &module->matrix_shift_position;
-    addChild(matrix_shift_position_display);                                                           
+    matrix_shift_position_display->box.size = Vec(30, 20);
+    if (module) {
+      matrix_shift_position_display->value = &module->matrix_shift_position;
+    }
+    addChild(matrix_shift_position_display);
 
     // Output of vocoded signal.
     addOutput(createPort<PJ301MPort>(Vec(10, 219), PortWidget::OUTPUT, module, Vocode_O_Matic::LEFT_OUTPUT));
