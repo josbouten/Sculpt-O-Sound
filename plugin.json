@@ -11,5 +11,15 @@
   "manualUrl": "https://github.com/josbouten/Sculpt-O-Sound",
   "sourceUrl": "https://github.com/josbouten/Sculpt-O-Sound",
   "donateUrl": "",
-  "modules": []
+  "modules": [
+    {
+      "slug": "Vocode_O_Matic",
+      "name": "Vocode-O-Matic",
+      "description": "Vocode-O-Matic from Sculpt-O-Sound",
+      "tags": [
+        "Effect"
+      ]
+    }
+
+  ]
 }
