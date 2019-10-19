@@ -1,4 +1,4 @@
-#include "rack0.hpp"
+#include "rack.hpp"
 
 #pragma once
 
@@ -31,7 +31,7 @@ struct MsDisplayWidget : TransparentWidget {
   std::shared_ptr<Font> font;
 
   MsDisplayWidget() {
-    font = Font::load(assetPlugin(pluginInstance, "res/Segment7Standard.ttf"));
+    font = APP->window->loadFont(asset::plugin(pluginInstance, "res/Segment7Standard.ttf"));
   };
 
   void draw(NVGcontext *vg) override
@@ -79,7 +79,7 @@ struct MsDisplayWidget1 : TransparentWidget {
   std::shared_ptr<Font> font;
 
   MsDisplayWidget1() {
-    font = Font::load(assetPlugin(pluginInstance, "res/Segment7Standard.ttf"));
+    font = APP->window->loadFont(asset::plugin(pluginInstance, "res/Segment7Standard.ttf"));
   };
 
   void draw(NVGcontext *vg) override
@@ -127,7 +127,7 @@ struct MsDisplayWidget2 : TransparentWidget {
 
   MsDisplayWidget2() {
     value = nullptr;
-    font = Font::load(assetPlugin(pluginInstance, "res/Segment7Standard.ttf"));
+    font = APP->window->loadFont(asset::plugin(pluginInstance, "res/Segment7Standard.ttf"));
   };
 
   void draw(const DrawArgs &args) override

@@ -5,9 +5,6 @@
 #include "../deps/SynthDevKit/src/CV.hpp"
 #include "pan_and_level.hpp"
 
-#define INITIAL_CARRIER_GAIN 1.0
-#define INITIAL_MODULATOR_GAIN 1.0
-
 //#define PANNING
 
 // Dimensions of matrix of buttons.
@@ -36,7 +33,7 @@ void Vocode_O_Matic::onReset() {
   // Set mute output buttons to not mute.
   for (int i = 0; i < NR_OF_BANDS; i++) {
     mute_output[i] = false;
-    params[MUTE_OUTPUT_PARAM_00 + i].value = 0.0;
+    params[MUTE_OUTPUT_PARAM_00 + i].setValue(0.0);
     lights[MUTE_OUTPUT_LIGHT_00 + i].value = 1.0;
   }
   // Show mute led values.
@@ -80,18 +77,18 @@ void Vocode_O_Matic::onRandomize() {
   refresh_mute_output_leds(MUTE_OUTPUT_LIGHT_00, mute_output);
 
   // Set gain to initial value.
-  params[CARRIER_GAIN_PARAM].value = INITIAL_CARRIER_GAIN;
-  params[MODULATOR_GAIN_PARAM].value = INITIAL_MODULATOR_GAIN;
+  params[CARRIER_GAIN_PARAM].setValue(INITIAL_CARRIER_GAIN);
+  params[MODULATOR_GAIN_PARAM].setValue(INITIAL_MODULATOR_GAIN);
 }
 
-void Vocode_O_Matic::step() {
+void Vocode_O_Matic::process(const ProcessArgs &args) {
   // Do da vocoding thang.
-  float deltaTime = engineGetSampleTime();
-  float oneStepDeltaTime = engineGetSampleTime();
+  float deltaTime = args.sampleTime;
+  float oneStepDeltaTime = args.sampleTime;
   bool refresh = false;
 
-  xc[0] = inputs[CARR_INPUT].value * params[CARRIER_GAIN_PARAM].value;
-  xm[0] = inputs[MOD_INPUT].value * params[MODULATOR_GAIN_PARAM].value;
+  xc[0] = inputs[CARR_INPUT].getVoltage() * params[CARRIER_GAIN_PARAM].getValue();
+  xm[0] = inputs[MOD_INPUT].getVoltage() * params[MODULATOR_GAIN_PARAM].getValue();
   float smoothing_factor = 1.0;
 
   for (int i = 0; i < NR_OF_BANDS; i++) {
@@ -145,14 +142,14 @@ void Vocode_O_Matic::step() {
   }
 
   // Process trigger signal on matrix shift input.
-  float shiftRightTriggerIn = inputs[SHIFT_RIGHT_INPUT].value;
+  float shiftRightTriggerIn = inputs[SHIFT_RIGHT_INPUT].getVoltage();
   cv_right->update(shiftRightTriggerIn);
-  float shiftLeftTriggerIn = inputs[SHIFT_LEFT_INPUT].value;
+  float shiftLeftTriggerIn = inputs[SHIFT_LEFT_INPUT].getVoltage();
   cv_left->update(shiftLeftTriggerIn);
 
   // Handling of buttons and / or lights.
   // If bypass button was pressed:
-  if (bypass_button_trig.process(params[BYPASS_SWITCH].value)) {
+  if (bypass_button_trig.process(params[BYPASS_SWITCH].getValue())) {
     fx_bypass = !fx_bypass;
   }
   lights[BYPASS_LIGHT].value = fx_bypass ? 1.00 : 0.0;
@@ -161,13 +158,13 @@ void Vocode_O_Matic::step() {
   }
 
   // Hold matrix movement if toggle is pressed.
-  if (matrix_hold_button_trig.process(params[MATRIX_HOLD_TOGGLE_PARAM].value)) {
+  if (matrix_hold_button_trig.process(params[MATRIX_HOLD_TOGGLE_PARAM].getValue())) {
     matrix_hold_button_pressed = !matrix_hold_button_pressed;
     lights[MATRIX_HOLD_TOGGLE_LIGHT].value = matrix_hold_button_pressed ? 1.00 : 0.0;
   }
 
   // If one step right button was pressed:
-  if (matrix_one_step_right_button_trig.process(params[MATRIX_ONE_STEP_RIGHT_PARAM].value)) {
+  if (matrix_one_step_right_button_trig.process(params[MATRIX_ONE_STEP_RIGHT_PARAM].getValue())) {
     // Start a new blink period.
     oneStepBlinkPhase = 0.0f;
     // Light up the button;
@@ -184,7 +181,7 @@ void Vocode_O_Matic::step() {
   }
 
   // If one step left button was pressed:
-  if (matrix_one_step_left_button_trig.process(params[MATRIX_ONE_STEP_LEFT_PARAM].value)) {
+  if (matrix_one_step_left_button_trig.process(params[MATRIX_ONE_STEP_LEFT_PARAM].getValue())) {
     // Start a new blink period.
     oneStepBlinkPhase = 0.0f;
     // Light up the button;
@@ -201,7 +198,7 @@ void Vocode_O_Matic::step() {
   }
 
   // If toggle matrix preset button was pressed.
-  if (matrix_mode_button_trig.process(params[MATRIX_MODE_TOGGLE_PARAM].value)) {
+  if (matrix_mode_button_trig.process(params[MATRIX_MODE_TOGGLE_PARAM].getValue())) {
     matrix_mode_button_pressed = false;
     lights[MATRIX_MODE_TOGGLE_PARAM].value = matrix_mode_button_pressed ? 1.00 : 0.0;
     matrix_mode++;
@@ -217,7 +214,7 @@ void Vocode_O_Matic::step() {
 
   // Panning
 #ifdef PANNING
-  width = params[PANNING_PARAM].value;
+  width = params[PANNING_PARAM].getValue();
   if (width != width_old) {
     set_pan_and_level(start_level, left_pan, right_pan, left_level, right_level, width);
     width_old = width;
@@ -227,7 +224,7 @@ void Vocode_O_Matic::step() {
   // Handle the matrix button presses every half second ( assumption Fsamp = 44100 Hz ).
   if (wait == 0) {
     for (int i = 0; i < NR_OF_BANDS * NR_OF_BANDS; i++) {
-        if (params[MOD_MATRIX_PARAM + i].value) {
+        if (params[MOD_MATRIX_PARAM + i].getValue()) {
             wait = 20000;
             led_state[i] = !led_state[i];
             int index = MOD_MATRIX + i;
@@ -257,7 +254,7 @@ void Vocode_O_Matic::step() {
 
   // Handle mute buttons every half second.
   for (int i = 0; i <NR_OF_BANDS; i++) {
-      if (mute_output_trig.process(params[MUTE_OUTPUT_PARAM_00 + i].value)) {
+      if (mute_output_trig.process(params[MUTE_OUTPUT_PARAM_00 + i].getValue())) {
           if (wait2 == 0) {
               wait2 = 20000;
               mute_output[i] = !mute_output[i];
@@ -277,14 +274,14 @@ void Vocode_O_Matic::step() {
 #endif
 
   if (fx_bypass) {
-    outputs[LEFT_OUTPUT].value = inputs[CARR_INPUT].value * params[CARRIER_GAIN_PARAM].value;
-    outputs[RIGHT_OUTPUT].value = inputs[MOD_INPUT].value * params[MODULATOR_GAIN_PARAM].value;
+    outputs[LEFT_OUTPUT].setVoltage(inputs[CARR_INPUT].getVoltage() * params[CARRIER_GAIN_PARAM].getValue());
+    outputs[RIGHT_OUTPUT].setVoltage(inputs[MOD_INPUT].getVoltage() * params[MODULATOR_GAIN_PARAM].getValue());
   }
   else
   {
     // Initialize output signal.
-    outputs[RIGHT_OUTPUT].value = 0.0;
-    outputs[LEFT_OUTPUT].value = 0.0;
+    outputs[RIGHT_OUTPUT].setVoltage(0.0);
+    outputs[LEFT_OUTPUT].setVoltage(0.0);
     // The output is the sum of all carrier band signals multiplied by all
     // envelope outputs for that band (unless a carrier band is muted).
 
@@ -302,12 +299,12 @@ void Vocode_O_Matic::step() {
             // Left channel.
             float fl_tmp = fl_tmp0 * left_level[i];
             // Compute output value of signal ( superposition )
-            outputs[LEFT_OUTPUT].value += fl_tmp;
+            outputs[LEFT_OUTPUT].setVoltage(outputs[LEFT_OUTPUT].getVoltage() + fl_tmp);
             //
             // Right channel.
             fl_tmp = fl_tmp0 * right_level[i];
             // Compute output value of signal ( superposition )
-            outputs[RIGHT_OUTPUT].value += fl_tmp;
+            outputs[RIGHT_OUTPUT].setVoltage(outputs[RIGHT_OUTPUT].getVoltage() + fl_tmp);
         }
       }
     }
@@ -319,7 +316,7 @@ struct Vocode_O_MaticWidget : ModuleWidget {
 		setModule(module);
 
     // Set background.
-    setPanel(SVG::load(assetPlugin(pluginInstance, "res/Sculpt-O-Sound-_-Vocode_O_Matic_v0.4.svg")));
+    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Sculpt-O-Sound-_-Vocode_O_Matic_v0.4.svg")));
 
     // Add some screws.
     addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
@@ -331,38 +328,38 @@ struct Vocode_O_MaticWidget : ModuleWidget {
     // Dial for modulator gain.
     // Dial for panning.
     // Note: format is Vec(x-pos, y-pos)
-    addParam(createParam<RoundSmallBlackKnob>(Vec(10,  25), module, Vocode_O_Matic::CARRIER_GAIN_PARAM, 1.0, 10.0, INITIAL_CARRIER_GAIN));
-    addParam(createParam<RoundSmallBlackKnob>(Vec(40,  25), module, Vocode_O_Matic::MODULATOR_GAIN_PARAM, 1.0, 10.0, INITIAL_MODULATOR_GAIN));
+    addParam(createParam<RoundSmallBlackKnob>(Vec(10,  25), module, Vocode_O_Matic::CARRIER_GAIN_PARAM));
+    addParam(createParam<RoundSmallBlackKnob>(Vec(40,  25), module, Vocode_O_Matic::MODULATOR_GAIN_PARAM));
 #ifdef PANNING
     //addParam(createParam<RoundSmallBlackKnob>(Vec(70,  47), module, Vocode_O_Matic::PANNING_PARAM, 0.0, MAX_PAN, 1.0 / INITIAL_PAN_OFFSET));
-    addParam(createParam<RoundSmallBlackKnob>(Vec(70,  25), module, Vocode_O_Matic::PANNING_PARAM, 0.5, MAX_PAN, 1.0 / INITIAL_PAN_OFFSET));
+    addParam(createParam<RoundSmallBlackKnob>(Vec(70,  25), module, Vocode_O_Matic::PANNING_PARAM));
 #endif
 
     // INTPUTS (SIGNAL AND PARAMS)
     // Carrier, modulator and shift left and right Input signals.
-    addInput(createPort<PJ301MPort>(Vec(10, 180), PortWidget::INPUT, module, Vocode_O_Matic::CARR_INPUT));
-    addInput(createPort<PJ301MPort>(Vec(42, 180), PortWidget::INPUT, module, Vocode_O_Matic::MOD_INPUT));
-    addInput(createPort<PJ301MPort>(Vec(105, 140), PortWidget::INPUT, module, Vocode_O_Matic::SHIFT_RIGHT_INPUT));
-    addInput(createPort<PJ301MPort>(Vec(105, 103), PortWidget::INPUT, module, Vocode_O_Matic::SHIFT_LEFT_INPUT));
+    addInput(createInput<PJ301MPort>(Vec(10, 180), module, Vocode_O_Matic::CARR_INPUT));
+    addInput(createInput<PJ301MPort>(Vec(42, 180), module, Vocode_O_Matic::MOD_INPUT));
+    addInput(createInput<PJ301MPort>(Vec(105, 140), module, Vocode_O_Matic::SHIFT_RIGHT_INPUT));
+    addInput(createInput<PJ301MPort>(Vec(105, 103), module, Vocode_O_Matic::SHIFT_LEFT_INPUT));
 
     // Bypass switch.
-    addParam(createParam<LEDBezel>(Vec(12,  66), module, Vocode_O_Matic::BYPASS_SWITCH , 0.0f, 1.0f, 0.0f));
+    addParam(createParam<LEDBezel>(Vec(12,  66), module, Vocode_O_Matic::BYPASS_SWITCH));
     addChild(createLight<LedLight<RedLight>>(Vec(14.2, 68), module, Vocode_O_Matic::BYPASS_LIGHT));
 
     // Matrix type switch: linear, inverse + 4 * log
-    addParam(createParam<LEDBezel>(Vec(12, 104), module, Vocode_O_Matic::MATRIX_MODE_TOGGLE_PARAM, 0.0f, 1.0f, 0.0f));
+    addParam(createParam<LEDBezel>(Vec(12, 104), module, Vocode_O_Matic::MATRIX_MODE_TOGGLE_PARAM));
     addChild(createLight<LedLight<GreenLight>>(Vec(14.2, 106), module, Vocode_O_Matic::MATRIX_MODE_TOGGLE_LIGHT));
 
     // Push button which shifts the matrix to the right one step at a time.
-    addParam(createParam<LEDBezel>(Vec(76, 142), module, Vocode_O_Matic::MATRIX_ONE_STEP_RIGHT_PARAM, 0.0f, 1.0f, 0.0f));
+    addParam(createParam<LEDBezel>(Vec(76, 142), module, Vocode_O_Matic::MATRIX_ONE_STEP_RIGHT_PARAM));
     addChild(createLight<LedLight<GreenLight>>(Vec(78.2, 144), module, Vocode_O_Matic::MATRIX_ONE_STEP_RIGHT_LIGHT));
 
     // Push button which shifts the matrix to the left one step at a time.
-    addParam(createParam<LEDBezel>(Vec(76, 104), module, Vocode_O_Matic::MATRIX_ONE_STEP_LEFT_PARAM, 0.0f, 1.0f, 0.0f));
+    addParam(createParam<LEDBezel>(Vec(76, 104), module, Vocode_O_Matic::MATRIX_ONE_STEP_LEFT_PARAM));
     addChild(createLight<LedLight<GreenLight>>(Vec(78.2, 106), module, Vocode_O_Matic::MATRIX_ONE_STEP_LEFT_LIGHT));
 
     // Matrix shift hold toggle.
-    addParam(createParam<LEDBezel>(Vec(12, 142), module, Vocode_O_Matic::MATRIX_HOLD_TOGGLE_PARAM, 0.0f, 1.0f, 0.0f));
+    addParam(createParam<LEDBezel>(Vec(12, 142), module, Vocode_O_Matic::MATRIX_HOLD_TOGGLE_PARAM));
     addChild(createLight<LedLight<RedLight>>(Vec(14.2, 144), module, Vocode_O_Matic::MATRIX_HOLD_TOGGLE_LIGHT));
 
     // Matrix Mode Display
@@ -384,8 +381,8 @@ struct Vocode_O_MaticWidget : ModuleWidget {
     addChild(matrix_shift_position_display);
 
     // Output of vocoded signal.
-    addOutput(createPort<PJ301MPort>(Vec(10, 219), PortWidget::OUTPUT, module, Vocode_O_Matic::LEFT_OUTPUT));
-    addOutput(createPort<PJ301MPort>(Vec(42, 219), PortWidget::OUTPUT, module, Vocode_O_Matic::RIGHT_OUTPUT));
+    addOutput(createOutput<PJ301MPort>(Vec(10, 219), module, Vocode_O_Matic::LEFT_OUTPUT));
+    addOutput(createOutput<PJ301MPort>(Vec(42, 219), module, Vocode_O_Matic::RIGHT_OUTPUT));
 
     // Matrix, origin is bottom left.
     for (int i = 0; i < NR_OF_BANDS; i++) {
@@ -393,7 +390,7 @@ struct Vocode_O_MaticWidget : ModuleWidget {
             int x = HBASE + j * LED_WIDTH - 0.20 * LED_WIDTH;
             int y = VBASE - i * (LED_HEIGHT + 1);
             int offset = i * NR_OF_BANDS + j;
-            addParam(createParam<LButton>(Vec(x, y), module, Vocode_O_Matic::MOD_MATRIX_PARAM + offset, 0.0, 1.0f, 0.0f));
+            addParam(createParam<LButton>(Vec(x, y), module, Vocode_O_Matic::MOD_MATRIX_PARAM + offset));
             addChild(createLight<MediumLight<BlueLight>>(Vec(x, y), module, Vocode_O_Matic::MOD_MATRIX + offset));
         }
     }
@@ -402,7 +399,7 @@ struct Vocode_O_MaticWidget : ModuleWidget {
     for (int i = 0; i < NR_OF_BANDS; i++) {
             int y = VBASE - i * (LED_HEIGHT + 1);
             int offset = i; // * NR_OF_BANDS;
-            addParam(createParam<LButton>(Vec(x, y), module, Vocode_O_Matic::MUTE_OUTPUT_PARAM_00 + offset, 0.0, 1.0f, 0.0f));
+            addParam(createParam<LButton>(Vec(x, y), module, Vocode_O_Matic::MUTE_OUTPUT_PARAM_00 + offset));
             addChild(createLight<MediumLight<GreenLight>>(Vec(x, y), module, Vocode_O_Matic::MUTE_OUTPUT_LIGHT_00 + offset));
     }
   };

@@ -3,6 +3,9 @@
 #include "Sculpt-O-Sound.hpp"
 #include "comp_coeffs.hpp"
 
+#define INITIAL_CARRIER_GAIN 1.0
+#define INITIAL_MODULATOR_GAIN 1.0
+
 struct Vocode_O_Matic : Module {
 
   // Define CV trigger a la synthkit for shifting the matrix.
@@ -11,7 +14,7 @@ struct Vocode_O_Matic : Module {
 
   void refresh_led_matrix(int lights_offset, int p_cnt[NR_OF_BANDS], int button_value[NR_OF_BANDS][NR_OF_BANDS], bool led_state[1024])
   {
-     for (int i = 0; i < NR_OF_BANDS; i++)     
+     for (int i = 0; i < NR_OF_BANDS; i++)
      {
         for (int j = 0; j < NR_OF_BANDS; j++)
         {
@@ -42,7 +45,7 @@ struct Vocode_O_Matic : Module {
     // Refresh the visible matrix.
     refresh_led_matrix(lights_offset, p_cnt, button_value, led_state);
     *matrix_shift_position += 1;
-    if (*matrix_shift_position >= NR_OF_BANDS) 
+    if (*matrix_shift_position >= NR_OF_BANDS)
         *matrix_shift_position = 0;
   }
 
@@ -54,7 +57,7 @@ struct Vocode_O_Matic : Module {
     // Refresh the visible matrix.
     refresh_led_matrix(lights_offset, p_cnt, button_value, led_state);
     *matrix_shift_position -= 1;
-    if (*matrix_shift_position < 0) 
+    if (*matrix_shift_position < 0)
         *matrix_shift_position = NR_OF_BANDS - 1;
   }
 
@@ -63,7 +66,7 @@ struct Vocode_O_Matic : Module {
         mute_output[i] = false;
     }
   }
- 
+
   void print_mute_buttons(bool mute_output[NR_OF_BANDS]) {
     for (int i = 0; i <  NR_OF_BANDS - 1; i++) {
         printf("%02d: %d ", i, mute_output[i] == true ? 1: 0);
@@ -117,13 +120,13 @@ struct Vocode_O_Matic : Module {
     MUTE_OUTPUT_PARAM_29,
     MUTE_OUTPUT_PARAM_30,
     MOD_MATRIX_PARAM,
-    NUM_PARAMS = MOD_MATRIX_PARAM + NR_OF_BANDS * NR_OF_BANDS 
+    NUM_PARAMS = MOD_MATRIX_PARAM + NR_OF_BANDS * NR_OF_BANDS
   };
 
   enum InputIds {
     // input signal
     CARR_INPUT,
-    MOD_INPUT, 
+    MOD_INPUT,
     SHIFT_RIGHT_INPUT,
     SHIFT_LEFT_INPUT,
     NUM_INPUTS
@@ -140,7 +143,7 @@ struct Vocode_O_Matic : Module {
     // bypass light.
     BYPASS_LIGHT,
     // matrix type light (toggles when pressed)
-    MATRIX_MODE_TOGGLE_LIGHT, 
+    MATRIX_MODE_TOGGLE_LIGHT,
     // matrix shift indicator light
     MATRIX_HOLD_TOGGLE_LIGHT,
     // Step toggle to set shift by hand
@@ -184,7 +187,7 @@ struct Vocode_O_Matic : Module {
   float blinkPhase = -1.0f;
   float oneStepBlinkPhase = 0.0f;
 
-  void step() override;
+  void process(const ProcessArgs &args) override;
 
   // For more advanced Module features, read Rack's engine.hpp header file
   // - dataToJson, dataFromJson: serialization of internal data
@@ -194,17 +197,17 @@ struct Vocode_O_Matic : Module {
   void onReset() override;
   void onRandomize() override;
 
-  float smoothing_factor,   
+  float smoothing_factor,
         ym[NR_OF_BANDS][3],  // filter taps (y = output, x = input )
         xm[3] = {0.0,  0.0,  0.0};
   float yc[NR_OF_BANDS][3],  // filter taps (y = output, x = input )
         xc[3] = {0.0,  0.0,  0.0};
-  float xm_env = 0.0, 
+  float xm_env = 0.0,
         ym_env[NR_OF_BANDS][2];
 
   int freq[33] = {0, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160, 200, 250,
                315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500,
-               3150, 4000, 5000, 6300, 8000, 10000,      
+               3150, 4000, 5000, 6300, 8000, 10000,
                12500, 16000, 20000, 22025};
   int i = 0;
   double carr_bandwidth = INITIAL_CARR_BW_IN_SEMITONES;
@@ -212,10 +215,10 @@ struct Vocode_O_Matic : Module {
   double fsamp = FFSAMP;
 
   // Button for bypass on and off.
-  SchmittTrigger bypass_button_trig;
+  dsp::SchmittTrigger bypass_button_trig;
   bool fx_bypass = false;
   // Button to toggle the filter band coupling type (4 * log)
-  SchmittTrigger matrix_mode_button_trig;
+  dsp::SchmittTrigger matrix_mode_button_trig;
   bool matrix_mode_button_pressed = false;
   // Start with linear coupling of filters.
   int matrix_mode_selector = INITIAL_MATRIX_MODE;
@@ -224,20 +227,20 @@ struct Vocode_O_Matic : Module {
   // What is the shift position of the matrix.
   int matrix_shift_position = 1;
 
-  SchmittTrigger matrix_hold_button_trig;
+  dsp::SchmittTrigger matrix_hold_button_trig;
   bool matrix_hold_button_pressed = false;
-  SchmittTrigger matrix_one_step_right_button_trig;
+  dsp::SchmittTrigger matrix_one_step_right_button_trig;
   bool matrix_one_step_right_button_pressed = false;
-  SchmittTrigger matrix_one_step_left_button_trig;
+  dsp::SchmittTrigger matrix_one_step_left_button_trig;
   bool matrix_one_step_left_button_pressed = false;
 
-  SchmittTrigger mute_output_trig;
+  dsp::SchmittTrigger mute_output_trig;
 
   int wait = 1;
   int wait2 = 1;
   int p_cnt[NR_OF_BANDS];
   int button_value[NR_OF_BANDS][NR_OF_BANDS];
-  bool mute_output[NR_OF_BANDS]; 
+  bool mute_output[NR_OF_BANDS];
   float mod_alpha1[NR_OF_BANDS];
   float mod_alpha2[NR_OF_BANDS];
   float mod_beta[NR_OF_BANDS];
@@ -249,8 +252,8 @@ struct Vocode_O_Matic : Module {
   float left_level[NR_OF_BANDS];
   float right_level[NR_OF_BANDS];
   float start_level[NR_OF_BANDS];
-  float envelope_attack_time[NR_OF_BANDS], envelope_release_time[NR_OF_BANDS]; 
-  float envelope_attack_factor[NR_OF_BANDS], envelope_release_factor[NR_OF_BANDS]; 
+  float envelope_attack_time[NR_OF_BANDS], envelope_release_time[NR_OF_BANDS];
+  float envelope_attack_factor[NR_OF_BANDS], envelope_release_factor[NR_OF_BANDS];
   float width = 1.0;
   float width_old = width;
   bool led_state[1024] = {};
@@ -274,7 +277,7 @@ struct Vocode_O_Matic : Module {
     // Store setting of matrix_mode
     json_t *matrix_modeJ = json_real(matrix_mode);
     json_object_set_new(rootJm, "matrix_mode", matrix_modeJ);
-    
+
     // Store matrix hold button status
     json_t *matrix_hold_button_pressedJ = json_boolean(matrix_hold_button_pressed);
     json_object_set_new(rootJm, "matrix_hold_button_pressed", matrix_hold_button_pressedJ);
@@ -305,12 +308,12 @@ struct Vocode_O_Matic : Module {
     json_object_set_new(rootJm, "mute_output", mute_outputJ);
 
     return rootJm;
-  }       
-          
+  }
+
   void dataFromJson(json_t *rootJm) override {
 
 
-    // Restore bypass state 
+    // Restore bypass state
     // fx_bypass = (params[BYPASS_SWITCH].value == 1) ? true: false;
     json_t *bypassJ = json_object_get(rootJm, "fx_bypass");
     if (bypassJ) {
@@ -323,7 +326,7 @@ struct Vocode_O_Matic : Module {
         matrix_shift_position = (int) json_number_value(matrix_shift_positionJ);
     }
 
-    // Restore matrix type 
+    // Restore matrix type
     json_t *matrix_modeJ = json_object_get(rootJm, "matrix_mode");
     if (matrix_modeJ) {
         matrix_mode = (int) json_number_value(matrix_modeJ);
@@ -364,7 +367,7 @@ struct Vocode_O_Matic : Module {
         }
         matrix_mode_read_from_settings = true;
         refresh_led_matrix(lights_offset, p_cnt, button_value, led_state);
-    } 
+    }
 
     // Restore mute_output
     json_t *mute_outputJ = json_object_get(rootJm, "mute_output");
@@ -378,18 +381,31 @@ struct Vocode_O_Matic : Module {
         refresh_mute_output_leds(mute_output_lights_offset, mute_output);
     }
 
-  } 
+  }
 
   Vocode_O_Matic() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+    configParam(Vocode_O_Matic::CARRIER_GAIN_PARAM, 1.0, 10.0, INITIAL_CARRIER_GAIN, "");
+    configParam(Vocode_O_Matic::MODULATOR_GAIN_PARAM, 1.0, 10.0, INITIAL_MODULATOR_GAIN, "");
+    configParam(Vocode_O_Matic::PANNING_PARAM, 0.0, MAX_PAN, 1.0 / INITIAL_PAN_OFFSET, "");
+    configParam(Vocode_O_Matic::PANNING_PARAM, 0.5, MAX_PAN, 1.0 / INITIAL_PAN_OFFSET, "");
+    configParam(Vocode_O_Matic::BYPASS_SWITCH , 0.0f, 1.0f, 0.0f, "");
+    configParam(Vocode_O_Matic::MATRIX_MODE_TOGGLE_PARAM, 0.0f, 1.0f, 0.0f, "");
+    configParam(Vocode_O_Matic::MATRIX_ONE_STEP_RIGHT_PARAM, 0.0f, 1.0f, 0.0f, "");
+    configParam(Vocode_O_Matic::MATRIX_ONE_STEP_LEFT_PARAM, 0.0f, 1.0f, 0.0f, "");
+    configParam(Vocode_O_Matic::MATRIX_HOLD_TOGGLE_PARAM, 0.0f, 1.0f, 0.0f, "");
+    for (int offset = 0; offset < NR_OF_BANDS; offset++) {
+      configParam(Vocode_O_Matic::MOD_MATRIX_PARAM + offset, 0.0, 1.0f, 0.0f, "");
+      configParam(Vocode_O_Matic::MUTE_OUTPUT_PARAM_00 + offset, 0.0, 1.0f, 0.0f, "");
+    }
 
     // Initialize the filter coefficients.
     comp_all_coeffs(freq, mod_bandwidth, fsamp, mod_alpha1, mod_alpha2, mod_beta);
     comp_all_coeffs(freq, carr_bandwidth, fsamp, carr_alpha1, carr_alpha2, carr_beta);
-  
-    // Initialize all filter taps. 
+
+    // Initialize all filter taps.
     for (int i = 0; i < NR_OF_BANDS; i++) {
-     for (int j = 0; j < 3; j++) { 
+     for (int j = 0; j < 3; j++) {
           ym[i][j] = 0.0;
       }
       ym_env[i][0] = 0.0; // Envelope of modulator.
@@ -414,11 +430,11 @@ struct Vocode_O_Matic : Module {
     // Reset lights.
     lights[MATRIX_HOLD_TOGGLE_LIGHT].value = 0.0;
     lights[BYPASS_LIGHT].value = 0.0;
-  
-    comp_attack_times(envelope_attack_time); 
+
+    comp_attack_times(envelope_attack_time);
     comp_attack_factors(envelope_attack_factor, envelope_attack_time);
-  
-    comp_release_times(envelope_release_time); 
+
+    comp_release_times(envelope_release_time);
     comp_release_factors(envelope_release_factor, envelope_release_time);
-  } 
+  }
 };
