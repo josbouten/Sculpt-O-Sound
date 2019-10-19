@@ -168,3 +168,11 @@ struct MsDisplayWidget2 : TransparentWidget {
     nvgText(args.vg, textPos.x, textPos.y, to_display.str().c_str(), NULL);
   }
 };
+
+struct LButton : SvgSwitch {
+  LButton() {
+    momentary = true;
+    addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/L.svg")));
+    addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Ldown.svg")));
+  }
+};
