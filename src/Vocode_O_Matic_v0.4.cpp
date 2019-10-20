@@ -34,7 +34,7 @@ void Vocode_O_Matic::onReset() {
   for (int i = 0; i < NR_OF_BANDS; i++) {
     mute_output[i] = false;
     params[MUTE_OUTPUT_PARAM_00 + i].setValue(0.0);
-    lights[MUTE_OUTPUT_LIGHT_00 + i].value = 1.0;
+    lights[MUTE_OUTPUT_LIGHT_00 + i].setBrightness(1.0);
   }
   // Show mute led values.
   refresh_mute_output_leds(MUTE_OUTPUT_LIGHT_00, mute_output);
@@ -43,8 +43,8 @@ void Vocode_O_Matic::onReset() {
   oneStepBlinkPhase = 0.0f;
 
   // Reset toggle lights.
-  lights[MATRIX_HOLD_TOGGLE_LIGHT].value = 0.0;
-  lights[BYPASS_LIGHT].value = 0.0;
+  lights[MATRIX_HOLD_TOGGLE_LIGHT].setBrightness(0.0);
+  lights[BYPASS_LIGHT].setBrightness(0.0);
 
   // Set gain to initial value.
   //params[CARRIER_GAIN_PARAM].value = INITIAL_CARRIER_GAIN;
@@ -66,10 +66,10 @@ void Vocode_O_Matic::onRandomize() {
   for (int i = 0; i < NR_OF_BANDS; i++) {
     if ((rand() / (RAND_MAX + 1.0)) > 0.5) {
         mute_output[i] = false;
-        lights[MUTE_OUTPUT_LIGHT_00 + i].value = 1.0;
+        lights[MUTE_OUTPUT_LIGHT_00 + i].setBrightness(1.0);
     } else {
         mute_output[i] = true;
-        lights[MUTE_OUTPUT_LIGHT_00 + i].value = 0.0;
+        lights[MUTE_OUTPUT_LIGHT_00 + i].setBrightness(0.0);
     }
   }
 
@@ -137,8 +137,8 @@ void Vocode_O_Matic::process(const ProcessArgs &args) {
     blinkPhase -= 1.0f;
   oneStepBlinkPhase += oneStepDeltaTime;
   if (oneStepBlinkPhase >= 0.1f) { // light will be on for a very short time.
-    lights[MATRIX_ONE_STEP_RIGHT_LIGHT].value = 0.0f;
-    lights[MATRIX_ONE_STEP_LEFT_LIGHT].value = 0.0f;
+    lights[MATRIX_ONE_STEP_RIGHT_LIGHT].setBrightness(0.0f);
+    lights[MATRIX_ONE_STEP_LEFT_LIGHT].setBrightness(0.0f);
   }
 
   // Process trigger signal on matrix shift input.
@@ -152,15 +152,15 @@ void Vocode_O_Matic::process(const ProcessArgs &args) {
   if (bypass_button_trig.process(params[BYPASS_SWITCH].getValue())) {
     fx_bypass = !fx_bypass;
   }
-  lights[BYPASS_LIGHT].value = fx_bypass ? 1.00 : 0.0;
+  lights[BYPASS_LIGHT].setBrightness(fx_bypass ? 1.00 : 0.0);
   if (matrix_hold_button_pressed) { // We blink only if the button is toggled in the on position.
-    lights[MATRIX_HOLD_TOGGLE_LIGHT].value = (blinkPhase < 0.5f) ? 1.0f : 0.0f;
+    lights[MATRIX_HOLD_TOGGLE_LIGHT].setBrightness((blinkPhase < 0.5f) ? 1.0f : 0.0f);
   }
 
   // Hold matrix movement if toggle is pressed.
   if (matrix_hold_button_trig.process(params[MATRIX_HOLD_TOGGLE_PARAM].getValue())) {
     matrix_hold_button_pressed = !matrix_hold_button_pressed;
-    lights[MATRIX_HOLD_TOGGLE_LIGHT].value = matrix_hold_button_pressed ? 1.00 : 0.0;
+    lights[MATRIX_HOLD_TOGGLE_LIGHT].setBrightness(matrix_hold_button_pressed ? 1.00 : 0.0);
   }
 
   // If one step right button was pressed:
@@ -168,7 +168,7 @@ void Vocode_O_Matic::process(const ProcessArgs &args) {
     // Start a new blink period.
     oneStepBlinkPhase = 0.0f;
     // Light up the button;
-    lights[MATRIX_ONE_STEP_RIGHT_LIGHT].value = 1.00;
+    lights[MATRIX_ONE_STEP_RIGHT_LIGHT].setBrightness(1.00);
     // Shift the buttons one step.
     shift_buttons_right(button_value, p_cnt, led_state, &matrix_shift_position);
   }
@@ -185,7 +185,7 @@ void Vocode_O_Matic::process(const ProcessArgs &args) {
     // Start a new blink period.
     oneStepBlinkPhase = 0.0f;
     // Light up the button;
-    lights[MATRIX_ONE_STEP_LEFT_LIGHT].value = 1.00;
+    lights[MATRIX_ONE_STEP_LEFT_LIGHT].setBrightness(1.00);
     // Shift the buttons one step.
     shift_buttons_left(button_value, p_cnt, led_state, &matrix_shift_position);
   }
@@ -200,7 +200,7 @@ void Vocode_O_Matic::process(const ProcessArgs &args) {
   // If toggle matrix preset button was pressed.
   if (matrix_mode_button_trig.process(params[MATRIX_MODE_TOGGLE_PARAM].getValue())) {
     matrix_mode_button_pressed = false;
-    lights[MATRIX_MODE_TOGGLE_PARAM].value = matrix_mode_button_pressed ? 1.00 : 0.0;
+    lights[MATRIX_MODE_TOGGLE_PARAM].setBrightness(matrix_mode_button_pressed ? 1.00 : 0.0);
     matrix_mode++;
     if (matrix_mode > NR_MATRIX_MODES - 1) { matrix_mode = 0; }
     choose_matrix(matrix_mode, button_value, p_cnt);
@@ -228,7 +228,7 @@ void Vocode_O_Matic::process(const ProcessArgs &args) {
             wait = 20000;
             led_state[i] = !led_state[i];
             int index = MOD_MATRIX + i;
-            lights[index].value = !lights[index].value;
+            lights[index].setBrightness(1.0f - lights[index].getBrightness());
             int chosen_row = i / NR_OF_BANDS;
             int chosen_col = i % NR_OF_BANDS;
             if ((p_cnt[chosen_row] > 0) && (!led_state[i])) {
@@ -258,7 +258,7 @@ void Vocode_O_Matic::process(const ProcessArgs &args) {
           if (wait2 == 0) {
               wait2 = 20000;
               mute_output[i] = !mute_output[i];
-              lights[MUTE_OUTPUT_LIGHT_00 + i].value = 1.0 - lights[MUTE_OUTPUT_LIGHT_00 + i].value;
+              lights[MUTE_OUTPUT_LIGHT_00 + i].setBrightness(1.0 - lights[MUTE_OUTPUT_LIGHT_00 + i].getBrightness());
               refresh = true;
           } else {
               wait2 -= 1;

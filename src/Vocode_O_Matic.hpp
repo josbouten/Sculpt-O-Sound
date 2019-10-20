@@ -19,12 +19,12 @@ struct Vocode_O_Matic : Module {
         for (int j = 0; j < NR_OF_BANDS; j++)
         {
             led_state[i * NR_OF_BANDS + j] = false;
-            lights[lights_offset + i * NR_OF_BANDS + j].value = false;
+            lights[lights_offset + i * NR_OF_BANDS + j].setBrightness(false);
         }
         for (int j = 0; j < p_cnt[i]; j++)
         {
             led_state[i * NR_OF_BANDS + button_value[i][j]] = true;
-            lights[lights_offset + i * NR_OF_BANDS + button_value[i][j]].value = true;
+            lights[lights_offset + i * NR_OF_BANDS + button_value[i][j]].setBrightness(true);
         }
      }
   }
@@ -33,7 +33,7 @@ struct Vocode_O_Matic : Module {
   {
     for (int i = 0; i < NR_OF_BANDS; i++) {
         // Switch led off if mute_output is true.
-        lights[offset + i].value = (mute_output[i] == true) ? 0.0: 1.0;
+        lights[offset + i].setBrightness((mute_output[i] == true) ? 0.0: 1.0);
     }
   }
 
@@ -428,8 +428,8 @@ struct Vocode_O_Matic : Module {
 
     blinkPhase = -1.0f;
     // Reset lights.
-    lights[MATRIX_HOLD_TOGGLE_LIGHT].value = 0.0;
-    lights[BYPASS_LIGHT].value = 0.0;
+    lights[MATRIX_HOLD_TOGGLE_LIGHT].setBrightness(0.0);
+    lights[BYPASS_LIGHT].setBrightness(0.0);
 
     comp_attack_times(envelope_attack_time);
     comp_attack_factors(envelope_attack_factor, envelope_attack_time);
