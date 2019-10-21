@@ -2,7 +2,6 @@
 #include "matrix.hpp"
 #include "Vocode_O_Matic.hpp"
 #include "Sculpt-O-Sound.hpp"
-#include "../deps/SynthDevKit/src/CV.hpp"
 #include "pan_and_level.hpp"
 
 //#define PANNING

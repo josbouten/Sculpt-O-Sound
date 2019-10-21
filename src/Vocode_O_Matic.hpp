@@ -1,5 +1,5 @@
 #include "std.hpp"
-#include "../deps/SynthDevKit/src/CV.hpp"
+#include "../SynthDevKit/src/CV.hpp"
 #include "Sculpt-O-Sound.hpp"
 #include "comp_coeffs.hpp"
 
