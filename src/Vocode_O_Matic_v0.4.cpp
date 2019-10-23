@@ -84,7 +84,9 @@ void Vocode_O_Matic::process(const ProcessArgs &args) {
   // Do da vocoding thang.
   float deltaTime = args.sampleTime;
   float oneStepDeltaTime = args.sampleTime;
+#ifdef DEBUGMSG
   bool refresh = false;
+#endif
 
   xc[0] = inputs[CARR_INPUT].getVoltage() * params[CARRIER_GAIN_PARAM].getValue();
   xm[0] = inputs[MOD_INPUT].getVoltage() * params[MODULATOR_GAIN_PARAM].getValue();
@@ -258,13 +260,15 @@ void Vocode_O_Matic::process(const ProcessArgs &args) {
               wait2 = 20000;
               mute_output[i] = !mute_output[i];
               lights[MUTE_OUTPUT_LIGHT_00 + i].setBrightness(1.0 - lights[MUTE_OUTPUT_LIGHT_00 + i].getBrightness());
+#ifdef DEBUGMSG
               refresh = true;
+#endif
           } else {
               wait2 -= 1;
           }
       }
   }
-#ifdef DEBUG
+#ifdef DEBUGMSG
   if (refresh) {
       print_mute_buttons(mute_output);
       refresh_mute_output_leds(MUTE_OUTPUT_LIGHT_00, mute_output);

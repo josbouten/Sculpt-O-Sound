@@ -193,11 +193,11 @@ void choose_matrix(int matrix_mode, int button_value[NR_OF_BANDS][NR_OF_BANDS], 
         break;
      break;
   }
-#ifdef DEBUG
+#ifdef DEBUGMSG
   print_matrix(buttons);
 #endif
   refresh_matrix(button_value, p_cnt, buttons);
-#ifdef DEBUG
+#ifdef DEBUGMSG
   print_matrix(button_value);
   print_p_cnt(p_cnt);
 #endif

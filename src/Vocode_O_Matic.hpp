@@ -39,7 +39,7 @@ struct Vocode_O_Matic : Module {
 
   void shift_buttons_right(int button_value[NR_OF_BANDS][NR_OF_BANDS], int p_cnt[NR_OF_BANDS], bool led_state[1024], int *matrix_shift_position) {
     matrix_shift_buttons_right(button_value, p_cnt);
-#ifdef DEBUG
+#ifdef DEBUGMSG
     print_matrix(button_value, p_cnt);
 #endif
     // Refresh the visible matrix.
@@ -51,7 +51,7 @@ struct Vocode_O_Matic : Module {
 
   void shift_buttons_left(int button_value[NR_OF_BANDS][NR_OF_BANDS], int p_cnt[NR_OF_BANDS], bool led_state[1024], int *matrix_shift_position) {
     matrix_shift_buttons_left(button_value, p_cnt);
-#ifdef DEBUG
+#ifdef DEBUGMSG
     print_matrix(button_value, p_cnt);
 #endif
     // Refresh the visible matrix.
