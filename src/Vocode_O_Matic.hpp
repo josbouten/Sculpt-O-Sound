@@ -262,6 +262,8 @@ struct Vocode_O_Matic : Module {
   int lights_offset = MOD_MATRIX;
   int mute_output_lights_offset = MUTE_OUTPUT_LIGHT_00;
 
+  int  lbuttonPressedVal = 0;
+
   // Some code to read/save state of bypass button.
   json_t *dataToJson() override {
     json_t *rootJm = json_object();
@@ -436,5 +438,24 @@ struct Vocode_O_Matic : Module {
 
     comp_release_times(envelope_release_time);
     comp_release_factors(envelope_release_factor, envelope_release_time);
+  }
+};
+
+struct LButton : SvgSwitch {
+  Vocode_O_Matic *module;
+  LButton() {
+    momentary = true;
+    shadow->visible = false;
+    addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/L.svg")));
+    addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/L.svg")));
+  }
+
+  void onButton(const event::Button &e) override {
+    if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
+      if (paramQuantity && module) {
+        module->lbuttonPressedVal = paramQuantity->paramId;
+      }
+    }
+    e.consume(this);
   }
 };

@@ -222,51 +222,40 @@ void Vocode_O_Matic::process(const ProcessArgs &args) {
   }
 #endif
 
-  // Handle the matrix button presses every half second ( assumption Fsamp = 44100 Hz ).
-  if (wait == 0) {
-    for (int i = 0; i < NR_OF_BANDS * NR_OF_BANDS; i++) {
-        if (params[MOD_MATRIX_PARAM + i].getValue()) {
-            wait = 20000;
-            led_state[i] = !led_state[i];
-            int index = MOD_MATRIX + i;
-            lights[index].setBrightness(1.0f - lights[index].getBrightness());
-            int chosen_row = i / NR_OF_BANDS;
-            int chosen_col = i % NR_OF_BANDS;
-            if ((p_cnt[chosen_row] > 0) && (!led_state[i])) {
-                for (int col = 0; col < NR_OF_BANDS; col++) { // Find the right column.
-                    if (button_value[chosen_row][col] == chosen_col) {
-                        button_value[chosen_row][col] = NOT_PRESSED;
-                         // Shift all values from unpressed button 1 position to the left.
-                        for (int shift_col = col; shift_col < p_cnt[chosen_row]; shift_col++) {
-                             button_value[chosen_row][shift_col] = button_value[chosen_row][shift_col + 1];
-                        }
-                        p_cnt[chosen_row]--;
-                        break; // As soon as one button is unpressed we are done.
-                    }
-                }
+  if (lbuttonPressedVal > 0) {
+    if (lbuttonPressedVal >= MOD_MATRIX_PARAM && lbuttonPressedVal < MOD_MATRIX_PARAM + NR_OF_BANDS * NR_OF_BANDS) {
+      i = lbuttonPressedVal - MOD_MATRIX_PARAM;
+      led_state[i] = !led_state[i];
+      int index = MOD_MATRIX + i;
+      lights[index].setBrightness(1.0f - lights[index].getBrightness());
+      int chosen_row = i / NR_OF_BANDS;
+      int chosen_col = i % NR_OF_BANDS;
+      if ((p_cnt[chosen_row] > 0) && (!led_state[i])) {
+        for (int col = 0; col < NR_OF_BANDS; col++) { // Find the right column.
+          if (button_value[chosen_row][col] == chosen_col) {
+            button_value[chosen_row][col] = NOT_PRESSED;
+             // Shift all values from unpressed button 1 position to the left.
+            for (int shift_col = col; shift_col < p_cnt[chosen_row]; shift_col++) {
+              button_value[chosen_row][shift_col] = button_value[chosen_row][shift_col + 1];
             }
-            else {
-                button_value[chosen_row][p_cnt[chosen_row]] = chosen_col;
-                p_cnt[chosen_row]++;
-            }
-        }
-    }
-  } else wait -= 1;
-
-  // Handle mute buttons every half second.
-  for (int i = 0; i <NR_OF_BANDS; i++) {
-      if (mute_output_trig.process(params[MUTE_OUTPUT_PARAM_00 + i].getValue())) {
-          if (wait2 == 0) {
-              wait2 = 20000;
-              mute_output[i] = !mute_output[i];
-              lights[MUTE_OUTPUT_LIGHT_00 + i].setBrightness(1.0 - lights[MUTE_OUTPUT_LIGHT_00 + i].getBrightness());
-#ifdef DEBUGMSG
-              refresh = true;
-#endif
-          } else {
-              wait2 -= 1;
+            p_cnt[chosen_row]--;
+            break; // As soon as one button is unpressed we are done.
           }
+        }
       }
+      else {
+          button_value[chosen_row][p_cnt[chosen_row]] = chosen_col;
+          p_cnt[chosen_row]++;
+      }
+    } else {
+      i = lbuttonPressedVal - MUTE_OUTPUT_PARAM_00;
+      mute_output[i] = !mute_output[i];
+      lights[MUTE_OUTPUT_LIGHT_00 + i].setBrightness(1.0 - lights[MUTE_OUTPUT_LIGHT_00 + i].getBrightness());
+#ifdef DEBUGMSG
+      refresh = true;
+#endif
+    }
+    lbuttonPressedVal = 0;
   }
 #ifdef DEBUGMSG
   if (refresh) {
@@ -389,21 +378,37 @@ struct Vocode_O_MaticWidget : ModuleWidget {
 
     // Matrix, origin is bottom left.
     for (int i = 0; i < NR_OF_BANDS; i++) {
-        for (int j = 0; j < NR_OF_BANDS; j++) {
-            int x = HBASE + j * LED_WIDTH - 0.20 * LED_WIDTH;
-            int y = VBASE - i * (LED_HEIGHT + 1);
-            int offset = i * NR_OF_BANDS + j;
-            addParam(createParam<LButton>(Vec(x, y), module, Vocode_O_Matic::MOD_MATRIX_PARAM + offset));
-            addChild(createLight<MediumLight<BlueLight>>(Vec(x, y), module, Vocode_O_Matic::MOD_MATRIX + offset));
+      for (int j = 0; j < NR_OF_BANDS; j++) {
+        int x = HBASE + j * LED_WIDTH - 0.20 * LED_WIDTH;
+        int y = VBASE - i * (LED_HEIGHT + 1);
+        int offset = i * NR_OF_BANDS + j;
+        {
+          LButton *lb = new LButton();
+          lb->module = module;
+          lb->box.pos = Vec(x, y);
+          if (module) {
+            lb->paramQuantity = module->paramQuantities[Vocode_O_Matic::MOD_MATRIX_PARAM + offset];
+          }
+          addChild(lb);
         }
+        addChild(createLight<MediumLight<BlueLight>>(Vec(x, y), module, Vocode_O_Matic::MOD_MATRIX + offset));
+      }
     }
     // Mute output buttons to the left of the matrix.
     int x = HBASE + 0.25 * LED_WIDTH + NR_OF_BANDS * LED_WIDTH;
     for (int i = 0; i < NR_OF_BANDS; i++) {
-            int y = VBASE - i * (LED_HEIGHT + 1);
-            int offset = i; // * NR_OF_BANDS;
-            addParam(createParam<LButton>(Vec(x, y), module, Vocode_O_Matic::MUTE_OUTPUT_PARAM_00 + offset));
-            addChild(createLight<MediumLight<GreenLight>>(Vec(x, y), module, Vocode_O_Matic::MUTE_OUTPUT_LIGHT_00 + offset));
+      int y = VBASE - i * (LED_HEIGHT + 1);
+      int offset = i; // * NR_OF_BANDS;
+      {
+        LButton *lb = new LButton();
+        lb->module = module;
+        lb->box.pos = Vec(x, y);
+        if (module) {
+          lb->paramQuantity = module->paramQuantities[Vocode_O_Matic::MUTE_OUTPUT_PARAM_00 + offset];
+        }
+        addChild(lb);
+      }
+      addChild(createLight<MediumLight<GreenLight>>(Vec(x, y), module, Vocode_O_Matic::MUTE_OUTPUT_LIGHT_00 + offset));
     }
   };
 };
