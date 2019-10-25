@@ -88,39 +88,9 @@ struct Vocode_O_Matic : Module {
     CARRIER_GAIN_PARAM,
     MODULATOR_GAIN_PARAM,
     PANNING_PARAM,
-    MUTE_OUTPUT_PARAM_00,
-    MUTE_OUTPUT_PARAM_01,
-    MUTE_OUTPUT_PARAM_02,
-    MUTE_OUTPUT_PARAM_03,
-    MUTE_OUTPUT_PARAM_04,
-    MUTE_OUTPUT_PARAM_05,
-    MUTE_OUTPUT_PARAM_06,
-    MUTE_OUTPUT_PARAM_07,
-    MUTE_OUTPUT_PARAM_08,
-    MUTE_OUTPUT_PARAM_09,
-    MUTE_OUTPUT_PARAM_10,
-    MUTE_OUTPUT_PARAM_11,
-    MUTE_OUTPUT_PARAM_12,
-    MUTE_OUTPUT_PARAM_13,
-    MUTE_OUTPUT_PARAM_14,
-    MUTE_OUTPUT_PARAM_15,
-    MUTE_OUTPUT_PARAM_16,
-    MUTE_OUTPUT_PARAM_17,
-    MUTE_OUTPUT_PARAM_18,
-    MUTE_OUTPUT_PARAM_19,
-    MUTE_OUTPUT_PARAM_20,
-    MUTE_OUTPUT_PARAM_21,
-    MUTE_OUTPUT_PARAM_22,
-    MUTE_OUTPUT_PARAM_23,
-    MUTE_OUTPUT_PARAM_24,
-    MUTE_OUTPUT_PARAM_25,
-    MUTE_OUTPUT_PARAM_26,
-    MUTE_OUTPUT_PARAM_27,
-    MUTE_OUTPUT_PARAM_28,
-    MUTE_OUTPUT_PARAM_29,
-    MUTE_OUTPUT_PARAM_30,
-    MOD_MATRIX_PARAM,
-    NUM_PARAMS = MOD_MATRIX_PARAM + NR_OF_BANDS * NR_OF_BANDS
+    ENUMS(MUTE_OUTPUT_PARAM, NR_OF_BANDS),
+    ENUMS(MOD_MATRIX_PARAM, NR_OF_BANDS * NR_OF_BANDS),
+    NUM_PARAMS
   };
 
   enum InputIds {
@@ -149,39 +119,9 @@ struct Vocode_O_Matic : Module {
     // Step toggle to set shift by hand
     MATRIX_ONE_STEP_RIGHT_LIGHT,
     MATRIX_ONE_STEP_LEFT_LIGHT,
-    MUTE_OUTPUT_LIGHT_00,
-    MUTE_OUTPUT_LIGHT_01,
-    MUTE_OUTPUT_LIGHT_02,
-    MUTE_OUTPUT_LIGHT_03,
-    MUTE_OUTPUT_LIGHT_04,
-    MUTE_OUTPUT_LIGHT_05,
-    MUTE_OUTPUT_LIGHT_06,
-    MUTE_OUTPUT_LIGHT_07,
-    MUTE_OUTPUT_LIGHT_08,
-    MUTE_OUTPUT_LIGHT_09,
-    MUTE_OUTPUT_LIGHT_10,
-    MUTE_OUTPUT_LIGHT_11,
-    MUTE_OUTPUT_LIGHT_12,
-    MUTE_OUTPUT_LIGHT_13,
-    MUTE_OUTPUT_LIGHT_14,
-    MUTE_OUTPUT_LIGHT_15,
-    MUTE_OUTPUT_LIGHT_16,
-    MUTE_OUTPUT_LIGHT_17,
-    MUTE_OUTPUT_LIGHT_18,
-    MUTE_OUTPUT_LIGHT_19,
-    MUTE_OUTPUT_LIGHT_20,
-    MUTE_OUTPUT_LIGHT_21,
-    MUTE_OUTPUT_LIGHT_22,
-    MUTE_OUTPUT_LIGHT_23,
-    MUTE_OUTPUT_LIGHT_24,
-    MUTE_OUTPUT_LIGHT_25,
-    MUTE_OUTPUT_LIGHT_26,
-    MUTE_OUTPUT_LIGHT_27,
-    MUTE_OUTPUT_LIGHT_28,
-    MUTE_OUTPUT_LIGHT_29,
-    MUTE_OUTPUT_LIGHT_30,
-    MOD_MATRIX,
-    NUM_LIGHTS = MOD_MATRIX + NR_OF_BANDS * NR_OF_BANDS
+    ENUMS(MUTE_OUTPUT_LIGHT, NR_OF_BANDS),
+    ENUMS(MOD_MATRIX, NR_OF_BANDS * NR_OF_BANDS),
+    NUM_LIGHTS
   };
 
   float blinkPhase = -1.0f;
@@ -260,7 +200,7 @@ struct Vocode_O_Matic : Module {
   bool mute_output_led_state[NR_OF_BANDS] = {};
   bool matrix_mode_read_from_settings = false;
   int lights_offset = MOD_MATRIX;
-  int mute_output_lights_offset = MUTE_OUTPUT_LIGHT_00;
+  int mute_output_lights_offset = MUTE_OUTPUT_LIGHT;
 
   int  lbuttonPressedVal = 0;
 
@@ -398,7 +338,7 @@ struct Vocode_O_Matic : Module {
     configParam(Vocode_O_Matic::MATRIX_HOLD_TOGGLE_PARAM, 0.0f, 1.0f, 0.0f, "");
     for (int offset = 0; offset < NR_OF_BANDS; offset++) {
       configParam(Vocode_O_Matic::MOD_MATRIX_PARAM + offset, 0.0, 1.0f, 0.0f, "");
-      configParam(Vocode_O_Matic::MUTE_OUTPUT_PARAM_00 + offset, 0.0, 1.0f, 0.0f, "");
+      configParam(Vocode_O_Matic::MUTE_OUTPUT_PARAM + offset, 0.0, 1.0f, 0.0f, "");
     }
 
     // Initialize the filter coefficients.
@@ -425,7 +365,7 @@ struct Vocode_O_Matic : Module {
     refresh_led_matrix(lights_offset, p_cnt, button_value, led_state);
 
     // Show leds in mute output column.
-    refresh_mute_output_leds(MUTE_OUTPUT_LIGHT_00, mute_output);
+    refresh_mute_output_leds(MUTE_OUTPUT_LIGHT, mute_output);
 
 
     blinkPhase = -1.0f;

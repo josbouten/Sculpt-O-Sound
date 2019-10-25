@@ -32,11 +32,11 @@ void Vocode_O_Matic::onReset() {
   // Set mute output buttons to not mute.
   for (int i = 0; i < NR_OF_BANDS; i++) {
     mute_output[i] = false;
-    params[MUTE_OUTPUT_PARAM_00 + i].setValue(0.0);
-    lights[MUTE_OUTPUT_LIGHT_00 + i].setBrightness(1.0);
+    params[MUTE_OUTPUT_PARAM + i].setValue(0.0);
+    lights[MUTE_OUTPUT_LIGHT + i].setBrightness(1.0);
   }
   // Show mute led values.
-  refresh_mute_output_leds(MUTE_OUTPUT_LIGHT_00, mute_output);
+  refresh_mute_output_leds(MUTE_OUTPUT_LIGHT, mute_output);
 
   blinkPhase = -1.0f;
   oneStepBlinkPhase = 0.0f;
@@ -65,15 +65,15 @@ void Vocode_O_Matic::onRandomize() {
   for (int i = 0; i < NR_OF_BANDS; i++) {
     if ((rand() / (RAND_MAX + 1.0)) > 0.5) {
         mute_output[i] = false;
-        lights[MUTE_OUTPUT_LIGHT_00 + i].setBrightness(1.0);
+        lights[MUTE_OUTPUT_LIGHT + i].setBrightness(1.0);
     } else {
         mute_output[i] = true;
-        lights[MUTE_OUTPUT_LIGHT_00 + i].setBrightness(0.0);
+        lights[MUTE_OUTPUT_LIGHT + i].setBrightness(0.0);
     }
   }
 
   // Show mute led values.
-  refresh_mute_output_leds(MUTE_OUTPUT_LIGHT_00, mute_output);
+  refresh_mute_output_leds(MUTE_OUTPUT_LIGHT, mute_output);
 
   // Set gain to initial value.
   params[CARRIER_GAIN_PARAM].setValue(INITIAL_CARRIER_GAIN);
@@ -248,9 +248,9 @@ void Vocode_O_Matic::process(const ProcessArgs &args) {
           p_cnt[chosen_row]++;
       }
     } else {
-      i = lbuttonPressedVal - MUTE_OUTPUT_PARAM_00;
+      i = lbuttonPressedVal - MUTE_OUTPUT_PARAM;
       mute_output[i] = !mute_output[i];
-      lights[MUTE_OUTPUT_LIGHT_00 + i].setBrightness(1.0 - lights[MUTE_OUTPUT_LIGHT_00 + i].getBrightness());
+      lights[MUTE_OUTPUT_LIGHT + i].setBrightness(1.0 - lights[MUTE_OUTPUT_LIGHT + i].getBrightness());
 #ifdef DEBUGMSG
       refresh = true;
 #endif
@@ -260,7 +260,7 @@ void Vocode_O_Matic::process(const ProcessArgs &args) {
 #ifdef DEBUGMSG
   if (refresh) {
       print_mute_buttons(mute_output);
-      refresh_mute_output_leds(MUTE_OUTPUT_LIGHT_00, mute_output);
+      refresh_mute_output_leds(MUTE_OUTPUT_LIGHT, mute_output);
       refresh = false;
   }
 #endif
@@ -404,11 +404,11 @@ struct Vocode_O_MaticWidget : ModuleWidget {
         lb->module = module;
         lb->box.pos = Vec(x, y);
         if (module) {
-          lb->paramQuantity = module->paramQuantities[Vocode_O_Matic::MUTE_OUTPUT_PARAM_00 + offset];
+          lb->paramQuantity = module->paramQuantities[Vocode_O_Matic::MUTE_OUTPUT_PARAM + offset];
         }
         addChild(lb);
       }
-      addChild(createLight<MediumLight<GreenLight>>(Vec(x, y), module, Vocode_O_Matic::MUTE_OUTPUT_LIGHT_00 + offset));
+      addChild(createLight<MediumLight<GreenLight>>(Vec(x, y), module, Vocode_O_Matic::MUTE_OUTPUT_LIGHT + offset));
     }
   };
 };
