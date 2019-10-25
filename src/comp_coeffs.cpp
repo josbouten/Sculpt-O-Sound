@@ -26,7 +26,7 @@ void comp_all_coeffs(int freq[NR_OF_BANDS], float bandwidth, double fsamp, float
      alpha2[i] = gamma * (1 + beta[i]);
      alpha2[i] /= alpha1[i];
      beta[i] /= alpha1[i];
-#ifdef DEBUG
+#ifdef DEBUGMSG
      printf("fsamp: %f\n", fsamp);
      printf("bandwidth: %f\n", bandwidth);
      printf("omega_1: %f\n", omega_1);

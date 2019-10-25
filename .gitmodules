@@ -1,0 +1,3 @@
+[submodule "SynthDevKit"]
+	path = SynthDevKit
+	url = https://github.com/JerrySievert/SynthDevKit.git
