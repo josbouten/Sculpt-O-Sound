@@ -1,7 +1,7 @@
 # VCV vocoder plugin
 # Copyright: Zaphod B. 2018, 2019
 
-![alt text](res/pic_logo_sos.gif)
+![alt text](doc/pic_logo_sos.gif)
 
 
 
@@ -11,7 +11,7 @@ Vocode-O-Matic, v0.4 is a 31 terts band vocoder with editable frequency matrix f
 Its use is restricted to 44100 Hz sampling frequency at the moment.
 I posted a video on youtube which demonstrates Vocode-O-Matic. You can find it here: https://www.youtube.com/watch?v=u_tcVmCJ_R8
 
-![alt text](res/Screen_dump_Vocode-O-Matic-v0.4_01.png)
+![alt text](doc/Screen_dump_Vocode-O-Matic-v0.4_01.png)
 
 The vocoder has 31 terts band filters for the carrier and modulator inputs.
 To get an interesting result, start by using a pad like sound with a big bandwidth as a carrier and
