@@ -3,8 +3,6 @@
 
 ![alt text](doc/pic_logo_sos.gif)
 
-
-
 Sculpt-O-Sound presents:
 
 Vocode-O-Matic, v0.4 is a 31 terts band vocoder with editable frequency matrix for Rack v1.x.
@@ -72,6 +70,10 @@ If you use the Vocode-O-Matic-example.vcv settings file make sure you hear the s
 Sources
 =======
 All filters are based on the series of tutorial papers about Effect Design by Jon Dattorro published in the Journal of the Audio Engineering Society (https://ccrma.stanford.edu/~dattorro/EffectDesignPart1.pdf).
+
+Aknowledgements
+===============
+I am deeply indebted to Jerry Sievert and Netboy3 for their help in porting the v0.6 version of Vocode-O-Matic to the v1.x standard. Thanks a lot!
 
 Example
 =======
