@@ -5,9 +5,9 @@
 
 
 
-Sculpt-O-Sound presents: 
+Sculpt-O-Sound presents:
 
-Vocode-O-Matic, v0.4 is a 31 terts band vocoder with editable frequency matrix for Rack v0.6x.
+Vocode-O-Matic, v0.4 is a 31 terts band vocoder with editable frequency matrix for Rack v1.x.
 Its use is restricted to 44100 Hz sampling frequency at the moment.
 I posted a video on youtube which demonstrates Vocode-O-Matic. You can find it here: https://www.youtube.com/watch?v=u_tcVmCJ_R8
 
@@ -43,12 +43,12 @@ Matrix buttons
 ==============
 The filter matrix consists of toggle switches, so you can make your own coupling between modulator and carrier filters.
 Mind you, no attenuation is done, so if you combine a lot of modulator bands with one carrier filter, the output of the filter
-may exceed the maximum sample value (voltage) allowed resulting in distortion. 
+may exceed the maximum sample value (voltage) allowed resulting in distortion.
 
 Matrix mode button
 ==================
 The mode toggle button lets you choose between 5 filter mappings. Number 4 is a linear mapping of the modulator filters
-against the carrier filters. This is the default at startup. Number 5 is a inverse mapping. 
+against the carrier filters. This is the default at startup. Number 5 is a inverse mapping.
 Mapping 0, 1, 2, 3 are log mappings. All sound differently. And by toggling switches in the matrix you can change them.
 
 Shift L R buttons
@@ -65,7 +65,7 @@ On the right hand side of the filter matrix for every frequency band of the carr
 
 Bypass button
 =============
-The bypass toggle button when pressed will turn red, this will put the vocoder in bypass mode. 
+The bypass toggle button when pressed will turn red, this will put the vocoder in bypass mode.
 This will send the modulator and carrier input signals to the left and right outputs respectively.
 If you use the Vocode-O-Matic-example.vcv settings file make sure you hear the string sample and the drum loop in bypass mode. If not, reload the samples in the simpler modules.
 
@@ -93,8 +93,8 @@ Please let me know if you have used Vocode-O-Matic in your music (send me a link
 
 Changelog
 =========
-v0.4 
-    
+v0.4
+
     - internal state and parameter settings are saved.
 
     - outputs can be muted
