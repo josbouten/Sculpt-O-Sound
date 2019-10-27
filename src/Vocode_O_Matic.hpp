@@ -349,6 +349,7 @@ struct Vocode_O_Matic : Module {
     for (int i = 0; i < NR_OF_BANDS; i++) {
      for (int j = 0; j < 3; j++) {
           ym[i][j] = 0.0;
+          yc[i][j] = 0.0;
       }
       ym_env[i][0] = 0.0; // Envelope of modulator.
       ym_env[i][1] = 0.0;
