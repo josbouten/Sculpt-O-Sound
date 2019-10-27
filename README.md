@@ -73,7 +73,7 @@ All filters are based on the series of tutorial papers about Effect Design by Jo
 
 Aknowledgements
 ===============
-I am deeply indebted to Jerry Sievert and Netboy3 for their help in porting the v0.6 version of Vocode-O-Matic to the v1.x standard. Thanks a lot!
+I am deeply indebted to Jerry Sievert and Netboy3 for their help in porting the for Rack v0.6 version of Vocode-O-Matic to the for v1.x standard. Thanks a lot!
 
 Example
 =======
@@ -95,7 +95,9 @@ Please let me know if you have used Vocode-O-Matic in your music (send me a link
 
 Changelog
 =========
-v0.4
+v0.4.1
+
+    - upgrade from v0.6c VCVRack to v1.x VCVRack
 
     - internal state and parameter settings are saved.
 
