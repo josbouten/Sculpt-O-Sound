@@ -1,12 +1,12 @@
 Oct 2019
-- changed version to 0.5,
+- changed version to 0.7,
 - changed code to Rack v1.x with some great help from Jerry Sievert and Netboy3,
 - added tooltips,
 - code cleanup,
 - added some comments.
 
 Mon April 22 2019 
-- changed version to 0.4 for Rack 0.6.4,
+- changed version to 0.6.4 for Rack 0.6.4,
 - added text to the front panel,
 - added trigger input for shifting matrix to the left and to the right, also added hold button,
 - internal state and parameter settings are saved in patch,
