@@ -1,3 +1,20 @@
+/*
+Copyright (C) 2018, Jos Bouten aka Zaphod B.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 #include "std.hpp"
 #include "../SynthDevKit/src/CV.hpp"
 #include "Sculpt-O-Sound.hpp"
@@ -326,19 +343,28 @@ struct Vocode_O_Matic : Module {
   }
 
   Vocode_O_Matic() {
-		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-    configParam(Vocode_O_Matic::CARRIER_GAIN_PARAM, 1.0, 10.0, INITIAL_CARRIER_GAIN, "");
-    configParam(Vocode_O_Matic::MODULATOR_GAIN_PARAM, 1.0, 10.0, INITIAL_MODULATOR_GAIN, "");
-    configParam(Vocode_O_Matic::PANNING_PARAM, 0.0, MAX_PAN, 1.0 / INITIAL_PAN_OFFSET, "");
-    configParam(Vocode_O_Matic::PANNING_PARAM, 0.5, MAX_PAN, 1.0 / INITIAL_PAN_OFFSET, "");
-    configParam(Vocode_O_Matic::BYPASS_SWITCH , 0.0f, 1.0f, 0.0f, "");
-    configParam(Vocode_O_Matic::MATRIX_MODE_TOGGLE_PARAM, 0.0f, 1.0f, 0.0f, "");
-    configParam(Vocode_O_Matic::MATRIX_ONE_STEP_RIGHT_PARAM, 0.0f, 1.0f, 0.0f, "");
-    configParam(Vocode_O_Matic::MATRIX_ONE_STEP_LEFT_PARAM, 0.0f, 1.0f, 0.0f, "");
-    configParam(Vocode_O_Matic::MATRIX_HOLD_TOGGLE_PARAM, 0.0f, 1.0f, 0.0f, "");
+	config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+    configParam(Vocode_O_Matic::CARRIER_GAIN_PARAM, 1.0, 10.0, INITIAL_CARRIER_GAIN, "Gain factor for carrier signal (default=1).", "");
+    configParam(Vocode_O_Matic::MODULATOR_GAIN_PARAM, 1.0, 10.0, INITIAL_MODULATOR_GAIN, "Gain factor for modulator signal (default=1)", "");
+    configParam(Vocode_O_Matic::PANNING_PARAM, 0.5, MAX_PAN, 1.0 / INITIAL_PAN_OFFSET, "Panning width of even and odd filter outputs.", "");
+    configParam(Vocode_O_Matic::BYPASS_SWITCH , 0.0f, 1.0f, 0.0f, "Bypass vocoder and play carrier on left and modulator on right channel.", "");
+    configParam(Vocode_O_Matic::MATRIX_MODE_TOGGLE_PARAM, 0.0f, 1.0f, 0.0f, "Toggle through all matrix modes.", "");
+    configParam(Vocode_O_Matic::MATRIX_ONE_STEP_RIGHT_PARAM, 0.0f, 1.0f, 0.0f, "Move matrix one step to the right.", "");
+    configParam(Vocode_O_Matic::MATRIX_ONE_STEP_LEFT_PARAM, 0.0f, 1.0f, 0.0f, "Move matrix one step to the left.", "");
+    configParam(Vocode_O_Matic::MATRIX_HOLD_TOGGLE_PARAM, 0.0f, 1.0f, 0.0f, "Prevent the matrix from shifting.", "");
+    char message[255];
     for (int offset = 0; offset < NR_OF_BANDS; offset++) {
-      configParam(Vocode_O_Matic::MOD_MATRIX_PARAM + offset, 0.0, 1.0f, 0.0f, "");
-      configParam(Vocode_O_Matic::MUTE_OUTPUT_PARAM + offset, 0.0, 1.0f, 0.0f, "");
+      configParam(Vocode_O_Matic::MOD_MATRIX_PARAM + offset, 0.0, 1.0f, 0.0f, "", "");
+      sprintf(message, "Mute %d Hz band.", freq[offset + 1]);
+      configParam(Vocode_O_Matic::MUTE_OUTPUT_PARAM + offset, 0.0, 1.0f, 0.0f, message, "");
+    }
+
+    // Add tooltips to the buttons.
+    for (int i = 0; i < NR_OF_BANDS; i++) {
+        for (int j = 0; j < NR_OF_BANDS; j++) {
+            sprintf(message, "Modulator %d Hz -> Carrier %d Hz.", freq[j + 1], freq[i + 1]);
+            configParam(Vocode_O_Matic::MOD_MATRIX_PARAM + i + j * NR_OF_BANDS, 0.0, 1.0, 0.0, message);
+        }
     }
 
     // Initialize the filter coefficients.

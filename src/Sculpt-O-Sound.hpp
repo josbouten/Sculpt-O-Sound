@@ -1,3 +1,20 @@
+/*
+Copyright (C) 2018, Jos Bouten aka Zaphod B.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 #include "rack.hpp"
 
 #pragma once
@@ -19,7 +36,6 @@ struct LedLight : BASE {
 extern Plugin *pluginInstance;
 
 // Forward-declare each Model, defined in each module source file
-
 extern Model *modelVocode_O_Matic;
 
 #include <sstream>
@@ -31,101 +47,6 @@ struct MsDisplayWidget : TransparentWidget {
   std::shared_ptr<Font> font;
 
   MsDisplayWidget() {
-    font = APP->window->loadFont(asset::plugin(pluginInstance, "res/Segment7Standard.ttf"));
-  };
-
-  void draw(NVGcontext *vg) override
-  {
-    // Background
-    //NVGcolor backgroundColor = nvgRGB(0x20, 0x20, 0x20);
-    NVGcolor backgroundColor = nvgRGB(0x20, 0x10, 0x10);
-    NVGcolor borderColor = nvgRGB(0x10, 0x10, 0x10);
-    nvgBeginPath(vg);
-    nvgRoundedRect(vg, 0.0, 0.0, box.size.x, box.size.y, 4.0);
-    nvgFillColor(vg, backgroundColor);
-    nvgFill(vg);
-    nvgStrokeWidth(vg, 1.5);
-    nvgStrokeColor(vg, borderColor);
-    nvgStroke(vg);
-    // text
-    nvgFontSize(vg, 18);
-    nvgFontFaceId(vg, font->handle);
-    nvgTextLetterSpacing(vg, 2.5);
-
-    std::stringstream to_display;
-    if (value) {
-      to_display << std::right  << std::setw(5) << *value;
-    }
-
-    Vec textPos = Vec(4.0f, 17.0f);
-
-    NVGcolor textColor = nvgRGB(0xdf, 0xd2, 0x2c);
-    nvgFillColor(vg, nvgTransRGBA(textColor, 16));
-    nvgText(vg, textPos.x, textPos.y, "~~~~~", NULL);
-
-    textColor = nvgRGB(0xda, 0xe9, 0x29);
-    nvgFillColor(vg, nvgTransRGBA(textColor, 16));
-    nvgText(vg, textPos.x, textPos.y, "\\\\\\\\\\", NULL);
-
-    textColor = nvgRGB(0xf0, 0x00, 0x00);
-    nvgFillColor(vg, textColor);
-    nvgText(vg, textPos.x, textPos.y, to_display.str().c_str(), NULL);
-  }
-};
-
-struct MsDisplayWidget1 : TransparentWidget {
-
-  int *value = nullptr;
-  std::shared_ptr<Font> font;
-
-  MsDisplayWidget1() {
-    font = APP->window->loadFont(asset::plugin(pluginInstance, "res/Segment7Standard.ttf"));
-  };
-
-  void draw(NVGcontext *vg) override
-  {
-    // Background
-    //NVGcolor backgroundColor = nvgRGB(0x20, 0x20, 0x20);
-    NVGcolor backgroundColor = nvgRGB(0x20, 0x10, 0x10);
-    NVGcolor borderColor = nvgRGB(0x10, 0x10, 0x10);
-    nvgBeginPath(vg);
-    nvgRoundedRect(vg, 0.0, 0.0, box.size.x, box.size.y, 1.0);
-    nvgFillColor(vg, backgroundColor);
-    nvgFill(vg);
-    nvgStrokeWidth(vg, 1.5);
-    nvgStrokeColor(vg, borderColor);
-    nvgStroke(vg);
-    // text
-    nvgFontSize(vg, 18);
-    nvgFontFaceId(vg, font->handle);
-    nvgTextLetterSpacing(vg, 2.5);
-
-    std::stringstream to_display;
-    if (value) {
-      to_display << std::right  << std::setw(1) << *value;
-    }
-
-    Vec textPos = Vec(4.0f, 17.0f);
-
-    NVGcolor textColor = nvgRGB(0xdf, 0xd2, 0x2c);
-    nvgFillColor(vg, nvgTransRGBA(textColor, 8));
-    nvgText(vg, textPos.x, textPos.y, "~", NULL);
-
-    textColor = nvgRGB(0xda, 0xe9, 0x29);
-    nvgFillColor(vg, nvgTransRGBA(textColor, 8));
-    nvgText(vg, textPos.x, textPos.y, "\\", NULL);
-
-    textColor = nvgRGB(0xf0, 0x00, 0x00);
-    nvgFillColor(vg, textColor);
-    nvgText(vg, textPos.x, textPos.y, to_display.str().c_str(), NULL);
-  }
-};
-struct MsDisplayWidget2 : TransparentWidget {
-
-  int *value = nullptr;
-  std::shared_ptr<Font> font;
-
-  MsDisplayWidget2() {
     value = nullptr;
     font = APP->window->loadFont(asset::plugin(pluginInstance, "res/Segment7Standard.ttf"));
   };
@@ -133,7 +54,6 @@ struct MsDisplayWidget2 : TransparentWidget {
   void draw(const DrawArgs &args) override
   {
     // Background
-    //NVGcolor backgroundColor = nvgRGB(0x20, 0x20, 0x20);
     NVGcolor backgroundColor = nvgRGB(0x20, 0x10, 0x10);
     NVGcolor borderColor = nvgRGB(0x10, 0x10, 0x10);
     nvgBeginPath(args.vg);

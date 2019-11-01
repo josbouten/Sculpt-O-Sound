@@ -2,7 +2,7 @@
   "slug": "Sculpt-O-Sound",
   "name": "Vocode-O-Matic",
   "version": "1.0.0",
-  "license": "proprietary",
+  "license": "gpl-3.0",
   "brand": "Sculpt-O-Sound",
   "author": "Zaphod B",
   "authorEmail": "zaphodb42a@gmail.com",
@@ -15,7 +15,7 @@
     {
       "slug": "Vocode_O_Matic",
       "name": "Vocode-O-Matic",
-      "description": "Vocode-O-Matic from Sculpt-O-Sound",
+      "description": "Vocode-O-Matic a 31 terts band vocoder from Sculpt-O-Sound",
       "tags": [
         "Effect"
       ]

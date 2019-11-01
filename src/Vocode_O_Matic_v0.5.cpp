@@ -1,3 +1,24 @@
+/*
+// This is Vocode-O-Matic, a vocoder plugin for VCV Rack v1.x
+// Author: Zaphod B aka Jos Bouten
+// You can contact me here: zaphodb42a at gmail dot com
+
+Copyright (C) 2018, Jos Bouten aka Zaphod B.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 #include "std.hpp"
 #include "matrix.hpp"
 #include "Vocode_O_Matic.hpp"
@@ -274,9 +295,9 @@ void Vocode_O_Matic::process(const ProcessArgs &args) {
     // Initialize output signal.
     outputs[RIGHT_OUTPUT].setVoltage(0.0);
     outputs[LEFT_OUTPUT].setVoltage(0.0);
+
     // The output is the sum of all carrier band signals multiplied by all
     // envelope outputs for that band (unless a carrier band is muted).
-
     for (int i = NR_OF_BANDS -1; i >= 0; i--)
     {
       for (int j = 0; j < p_cnt[i]; j++)
@@ -287,16 +308,16 @@ void Vocode_O_Matic::process(const ProcessArgs &args) {
         //
         // Only the non muted channels are added to the output signal.
         if (mute_output[i] == false) {
-            //
-            // Left channel.
-            float fl_tmp = fl_tmp0 * left_level[i];
-            // Compute output value of signal ( superposition )
-            outputs[LEFT_OUTPUT].setVoltage(outputs[LEFT_OUTPUT].getVoltage() + fl_tmp);
-            //
-            // Right channel.
-            fl_tmp = fl_tmp0 * right_level[i];
-            // Compute output value of signal ( superposition )
-            outputs[RIGHT_OUTPUT].setVoltage(outputs[RIGHT_OUTPUT].getVoltage() + fl_tmp);
+          //
+          // Left channel.
+          float fl_tmp = fl_tmp0 * left_level[i];
+          // Compute output value of signal ( superposition )
+          outputs[LEFT_OUTPUT].setVoltage(outputs[LEFT_OUTPUT].getVoltage() + fl_tmp);
+          //
+          // Right channel.
+          fl_tmp = fl_tmp0 * right_level[i];
+          // Compute output value of signal ( superposition )
+          outputs[RIGHT_OUTPUT].setVoltage(outputs[RIGHT_OUTPUT].getVoltage() + fl_tmp);
         }
       }
     }
@@ -305,7 +326,7 @@ void Vocode_O_Matic::process(const ProcessArgs &args) {
 
 struct Vocode_O_MaticWidget : ModuleWidget {
   Vocode_O_MaticWidget(Vocode_O_Matic *module) {
-		setModule(module);
+	setModule(module);
 
     // Set background.
     setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Sculpt-O-Sound-_-Vocode_O_Matic_v0.4.svg")));
@@ -323,7 +344,6 @@ struct Vocode_O_MaticWidget : ModuleWidget {
     addParam(createParam<RoundSmallBlackKnob>(Vec(10,  25), module, Vocode_O_Matic::CARRIER_GAIN_PARAM));
     addParam(createParam<RoundSmallBlackKnob>(Vec(40,  25), module, Vocode_O_Matic::MODULATOR_GAIN_PARAM));
 #ifdef PANNING
-    //addParam(createParam<RoundSmallBlackKnob>(Vec(70,  47), module, Vocode_O_Matic::PANNING_PARAM, 0.0, MAX_PAN, 1.0 / INITIAL_PAN_OFFSET));
     addParam(createParam<RoundSmallBlackKnob>(Vec(70,  25), module, Vocode_O_Matic::PANNING_PARAM));
 #endif
 
@@ -355,7 +375,7 @@ struct Vocode_O_MaticWidget : ModuleWidget {
     addChild(createLight<LedLight<RedLight>>(Vec(14.2, 144), module, Vocode_O_Matic::MATRIX_HOLD_TOGGLE_LIGHT));
 
     // Matrix Mode Display
-    MsDisplayWidget2 *matrix_mode_display = new MsDisplayWidget2();
+    MsDisplayWidget *matrix_mode_display = new MsDisplayWidget();
     matrix_mode_display->box.pos = Vec(38, 105);
     matrix_mode_display->box.size = Vec(30, 20);
     if (module) {
@@ -364,7 +384,7 @@ struct Vocode_O_MaticWidget : ModuleWidget {
     addChild(matrix_mode_display);
 
     // Matrix Shift Position Display
-    MsDisplayWidget2 *matrix_shift_position_display = new MsDisplayWidget2();
+    MsDisplayWidget *matrix_shift_position_display = new MsDisplayWidget();
     matrix_shift_position_display->box.pos = Vec(38, 143);
     matrix_shift_position_display->box.size = Vec(30, 20);
     if (module) {
@@ -376,7 +396,7 @@ struct Vocode_O_MaticWidget : ModuleWidget {
     addOutput(createOutput<PJ301MPort>(Vec(10, 219), module, Vocode_O_Matic::LEFT_OUTPUT));
     addOutput(createOutput<PJ301MPort>(Vec(42, 219), module, Vocode_O_Matic::RIGHT_OUTPUT));
 
-    // Matrix, origin is bottom left.
+    // Add the button matrix. Note its origin is on the bottom left.
     for (int i = 0; i < NR_OF_BANDS; i++) {
       for (int j = 0; j < NR_OF_BANDS; j++) {
         int x = HBASE + j * LED_WIDTH - 0.20 * LED_WIDTH;
@@ -394,7 +414,8 @@ struct Vocode_O_MaticWidget : ModuleWidget {
         addChild(createLight<MediumLight<BlueLight>>(Vec(x, y), module, Vocode_O_Matic::MOD_MATRIX + offset));
       }
     }
-    // Mute output buttons to the left of the matrix.
+
+    // Add mute output buttons to the left of the matrix.
     int x = HBASE + 0.25 * LED_WIDTH + NR_OF_BANDS * LED_WIDTH;
     for (int i = 0; i < NR_OF_BANDS; i++) {
       int y = VBASE - i * (LED_HEIGHT + 1);
@@ -413,8 +434,4 @@ struct Vocode_O_MaticWidget : ModuleWidget {
   };
 };
 
-// Specify the Module and ModuleWidget subclass, human-readable
-// author name for categorization per pluginInstance, module slug (should never
-// change), human-readable module name, and any number of tags
-// (found in `include/tags.hpp`) separated by commas.
 Model *modelVocode_O_Matic = createModel<Vocode_O_Matic, Vocode_O_MaticWidget>("Vocode_O_Matic");
