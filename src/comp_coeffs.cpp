@@ -1,3 +1,22 @@
+/*
+This is Vocode-O-Matic, a vocoder plugin for VCV Rack v1.x
+Copyright (C) 2018, Jos Bouten aka Zaphod B.
+You can contact me here: josbouten at gmail dot com
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 #include "std.hpp"
 #include <math.h>
 #include <stdio.h>
@@ -26,7 +45,7 @@ void comp_all_coeffs(int freq[NR_OF_BANDS], float bandwidth, double fsamp, float
      alpha2[i] = gamma * (1 + beta[i]);
      alpha2[i] /= alpha1[i];
      beta[i] /= alpha1[i];
-#ifdef DEBUG
+#ifdef DEBUGMSG
      printf("fsamp: %f\n", fsamp);
      printf("bandwidth: %f\n", bandwidth);
      printf("omega_1: %f\n", omega_1);
@@ -47,6 +66,33 @@ void print_all_coeffs(float alpha1[], float alpha2[], float beta[]) {
   }
 }
 
+void comp_release_times(float release_time[NR_OF_BANDS])
+{ // Compute release times for the envelope followers for the respective frequency bands.
+  int i;
+  double f_c;
+  for (i = 0; i < NR_OF_BANDS; i++)
+  {
+    f_c = ((float) freq[i+1] + (float) freq[i]) / 2.0;
+    // Make bands above band UPPER_SMOOTHING_BAND sound less harsh.
+    if (i > UPPER_SMOOTHING_BAND)
+      release_time[i] = SMOOTHING_FACTOR * (2 * PI / f_c) * INITIAL_ENVELOPE_RELEASE_TEMPERATURE;
+    else
+      release_time[i] = (2 * PI / f_c) * INITIAL_ENVELOPE_RELEASE_TEMPERATURE;
+  }
+}
+
+void comp_attack_times(float attack_time[NR_OF_BANDS])
+{ // Compute attack times for the envelope followers for the respective frequency bands.
+  int i;
+  double f_c;
+  for (i = 0; i < NR_OF_BANDS; i++)
+  {
+    f_c = ((float) freq[i+1] + (float) freq[i]) / 2.0;
+    attack_time[i]  = (2 * PI / f_c) * INITIAL_ENVELOPE_ATTACK_TEMPERATURE;
+  }
+}
+
+
 float init_release_time(int freqIndex)
 {
   int freq[] = {0, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160, 200, 250,
@@ -63,13 +109,11 @@ float init_release_time(int freqIndex)
   return(release_time);
 }
 
-void init_release_times(float release_time[NR_OF_BANDS])
+void init_release_times(float release_time[NR_OF_BANDS]) 
 {
-  int i;
-  for (i = 0; i < NR_OF_BANDS; i++)
-  {
-    release_time[i] = init_release_time(i);
-  }
+    for (int i = 0; i < NR_OF_BANDS; i++) {
+        release_time[i] = init_release_time(i);
+    }
 }
 
 float init_attack_time(int freqIndex)
@@ -87,7 +131,7 @@ void init_attack_times(float attack_time[NR_OF_BANDS])
   for (int freqIndex = 0; freqIndex < NR_OF_BANDS; freqIndex++)
   {
     attack_time[freqIndex] = init_attack_time(freqIndex);
-  }
+   }
 }
 
 void print_array(float times[NR_OF_BANDS]) {

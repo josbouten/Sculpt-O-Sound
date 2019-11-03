@@ -5,8 +5,7 @@ using namespace std;
 // Sliders
 //
 //-----------------------------------------------------
-
-struct MySlider_01 : SVGFader 
+struct MySlider_01 : SvgSlider 
 {
 	MySlider_01() 
     {
@@ -15,17 +14,17 @@ struct MySlider_01 : SVGFader
 		maxHandlePos = Vec(0, -4).plus(margin);
 		minHandlePos = Vec(0, 33).plus(margin);
 
-        background->svg = SVG::load(assetPlugin(plugin,"res/mschack/mschack_sliderBG_01.svg"));
+        background->svg = APP->window->loadSvg(asset::plugin(pluginInstance2, "res/mschack/mschack_sliderBG_01.svg"));
 		background->wrap();
 		background->box.pos = margin;
 		box.size = background->box.size.plus(margin.mult(2));
 
-        handle->svg = SVG::load(assetPlugin(plugin,"res/mschack/mschack_sliderKNOB_01.svg"));
+        handle->svg = APP->window->loadSvg(asset::plugin(pluginInstance2, "res/mschack/mschack_sliderKNOB_01.svg"));
 		handle->wrap();
 	}
 };
 
-struct Slider02_10x15 : SVGFader 
+struct Slider02_10x15 : SvgSlider
 {
 	Slider02_10x15() 
     {
@@ -33,12 +32,12 @@ struct Slider02_10x15 : SVGFader
 		maxHandlePos = Vec(-3, 0).plus(margin);
 		minHandlePos = Vec(-3, 60).plus(margin);
 
-        background->svg = SVG::load(assetPlugin(plugin,"res/mschack/mschack_sliderBG_02.svg"));
+        background->svg = APP->window->loadSvg(asset::plugin(pluginInstance2, "res/mschack/mschack_sliderBG_02.svg"));
 		background->wrap();
 		background->box.pos = margin;
 		box.size = background->box.size.plus(margin.mult(2));
 
-        handle->svg = SVG::load(assetPlugin(plugin,"res/mschack/mschack_Slider02_10x15.svg"));
+        handle->svg = APP->window->loadSvg(asset::plugin(pluginInstance2, "res/mschack/mschack_Slider02_10x15.svg"));
 		handle->wrap();
 	}
 
@@ -48,12 +47,6 @@ struct Slider02_10x15 : SVGFader
         LEVEL,
         PAN
     };
-
-    //vector <string> typeName;
-    //typeName.push_back("attack");
-    //typeName.push_back("release");
-    //typeName.push_back("pan");
-    //typeName.push_back("level");
 };
 
 struct SliderWithId: Slider02_10x15 
@@ -61,21 +54,22 @@ struct SliderWithId: Slider02_10x15
     int id;
     Type type;
 
+/*
     void onChange(EventChange &e) override {
       // Do your own thang.
       printf("Slider change detected for type %d slider with number: %d\n", type, id);
       //printf("Slider change detected for %s slider %d\n", typeName[(int)type], id);
       // Pass event to super class.
-      SVGFader::onChange(e);
+      SvgSlider::onChange(e);
     }
 
     void onHoverKey(EventHoverKey &e) override {
         printf("Hovering above %d, %d!\n", id, type);
         EventMouseDown emd;
         emd.button = 1;
-        SVGFader::onMouseDown(emd);
-        SVGFader::onHoverKey(e);
+        SvgSlider::onMouseDown(emd);
+        SvgSlider::onHoverKey(e);
     }
-
+*/
 };
 

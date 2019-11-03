@@ -1,26 +1,27 @@
+/*
+This is Vocode-O-Matic, a vocoder plugin for VCV Rack v1.x
+Copyright (C) 2018, Jos Bouten aka Zaphod B.
+You can contact me here: josbouten at gmail dot com
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 #ifndef PAN_AND_LEVEL_HPP
 #define PAN_AND_LEVEL_HPP
 
-#define MAX_LEVEL       24  // all levels in dB
-#define INITIAL_LEVEL   72  // all levels in dB
-#define MIN_LEVEL      -24  // all levels in dB
-#define LEVEL_REL_INCR  15.0
+void init_pan_and_level(float startLevel[NR_OF_BANDS], float left_pan[NR_OF_BANDS], float right_pan[NR_OF_BANDS], float left_level[NR_OF_BANDS], float right_level[NR_OF_BANDS]);
 
-#define MIN_PAN         -0.999 // Right
-#define MAX_PAN          0.999 // Left
-#define PAN_REL_INCR     15.0
+void set_pan_and_level(float startLevel[NR_OF_BANDS], float left_pan[NR_OF_BANDS], float right_pan[NR_OF_BANDS], float left_level[NR_OF_BANDS], float right_level[NR_OF_BANDS], float width);
 
-#define CENTER_PAN_VALUE 0.0
-#define INITIAL_PAN   CENTER_PAN_VALUE
-#define INITIAL_PAN_OFFSET ((MAX_PAN - MIN_PAN) / 5)
-#define PAN_STEPS 50 // increment = (MAX_PAN - MIN_PAN) / PAN_STEPS
-
-float equal_loudness_value(int _index);
-float min_equal_loudness_value(void);
-
-void init_pan_and_level(float level[NR_OF_BANDS], float left_pan[NR_OF_BANDS], float right_pan[NR_OF_BANDS], float left_level[NR_OF_BANDS], float right_level[NR_OF_BANDS]);
-
-void set_pan_and_level(float level[NR_OF_BANDS], float left_pan[NR_OF_BANDS], float right_pan[NR_OF_BANDS], float left_level[NR_OF_BANDS], float right_level[NR_OF_BANDS], float width);
-
-void initialize_levels(float level[NR_OF_BANDS]);
 #endif

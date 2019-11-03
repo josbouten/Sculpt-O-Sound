@@ -1,3 +1,22 @@
+/*
+This is Vocode-O-Matic, a vocoder plugin for VCV Rack v1.x
+Copyright (C) 2018, Jos Bouten aka Zaphod B.
+You can contact me here: josbouten at gmail dot com
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
 #ifndef _STD_H
 #define _STD_H
 
@@ -15,6 +34,10 @@
 #define LOWER_ENVELOPE_RELEASE_TEMPERATURE 0.01
 #define INITIAL_ENVELOPE_RELEASE_TEMPERATURE 5
 #define UPPER_ENVELOPE_RELEASE_TEMPERATURE 100
+#define ENVELOPE_TEMPERATURE 10
+
+#define MIN_PAN         -0.999 // Right
+#define MAX_PAN          0.999 // Left
 
 #define CENTER_PAN_VALUE 0.0
 #define INITIAL_PAN   CENTER_PAN_VALUE
@@ -25,18 +48,7 @@
 #define PI 3.1415828
 #define FFSAMP 44100.0
 #define NR_OF_BANDS 31
+#define FALSE 0
+#define TRUE 1
 
-#define INITIAL_CARRIER_GAIN 1.0
-#define MAX_CARRIER_GAIN 3.0
-#define INITIAL_MODULATOR_GAIN 1.0
-#define MAX_MODULATOR_GAIN 3.0
-
-#define INITIAL_ATTACK_TIME 1 // ms
-#define INITIAL_RELEASE_TIME 1 // ms
-
-#define MAX_SHORT 32767
-
-float fl_max(float, float);
-float fl_min(float, float);
-float fl_abs(float);
 #endif

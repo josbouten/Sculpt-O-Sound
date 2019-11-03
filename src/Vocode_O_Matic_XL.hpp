@@ -6,6 +6,11 @@
 #include "sliders.hpp"
 #include "pan_and_level.hpp"
 
+    // Add tooltips to the sliders.
+
+#define INITIAL_CARRIER_GAIN 1.0
+#define INITIAL_MODULATOR_GAIN 1.0
+
 struct Vocode_O_Matic_XL : Module {
 
     // Define CV trigger a la synthkit for shifting the matrix.
@@ -87,163 +92,13 @@ struct Vocode_O_Matic_XL : Module {
     MATRIX_ONE_STEP_LEFT_PARAM,
     CARRIER_GAIN_PARAM,
     MODULATOR_GAIN_PARAM,
-    MUTE_OUTPUT_PARAM_00,
-    MUTE_OUTPUT_PARAM_01,
-    MUTE_OUTPUT_PARAM_02,
-    MUTE_OUTPUT_PARAM_03,
-    MUTE_OUTPUT_PARAM_04,
-    MUTE_OUTPUT_PARAM_05,
-    MUTE_OUTPUT_PARAM_06,
-    MUTE_OUTPUT_PARAM_07,
-    MUTE_OUTPUT_PARAM_08,
-    MUTE_OUTPUT_PARAM_09,
-    MUTE_OUTPUT_PARAM_10,
-    MUTE_OUTPUT_PARAM_11,
-    MUTE_OUTPUT_PARAM_12,
-    MUTE_OUTPUT_PARAM_13,
-    MUTE_OUTPUT_PARAM_14,
-    MUTE_OUTPUT_PARAM_15,
-    MUTE_OUTPUT_PARAM_16,
-    MUTE_OUTPUT_PARAM_17,
-    MUTE_OUTPUT_PARAM_18,
-    MUTE_OUTPUT_PARAM_19,
-    MUTE_OUTPUT_PARAM_20,
-    MUTE_OUTPUT_PARAM_21,
-    MUTE_OUTPUT_PARAM_22,
-    MUTE_OUTPUT_PARAM_23,
-    MUTE_OUTPUT_PARAM_24,
-    MUTE_OUTPUT_PARAM_25,
-    MUTE_OUTPUT_PARAM_26,
-    MUTE_OUTPUT_PARAM_27,
-    MUTE_OUTPUT_PARAM_28,
-    MUTE_OUTPUT_PARAM_29,
-    MUTE_OUTPUT_PARAM_30,
-    ATTACK_TIME_PARAM_00,
-    ATTACK_TIME_PARAM_01,
-    ATTACK_TIME_PARAM_02,
-    ATTACK_TIME_PARAM_03,
-    ATTACK_TIME_PARAM_04,
-    ATTACK_TIME_PARAM_05,
-    ATTACK_TIME_PARAM_06,
-    ATTACK_TIME_PARAM_07,
-    ATTACK_TIME_PARAM_08,
-    ATTACK_TIME_PARAM_09,
-    ATTACK_TIME_PARAM_10,
-    ATTACK_TIME_PARAM_11,
-    ATTACK_TIME_PARAM_12,
-    ATTACK_TIME_PARAM_13,
-    ATTACK_TIME_PARAM_14,
-    ATTACK_TIME_PARAM_15,
-    ATTACK_TIME_PARAM_16,
-    ATTACK_TIME_PARAM_17,
-    ATTACK_TIME_PARAM_18,
-    ATTACK_TIME_PARAM_19,
-    ATTACK_TIME_PARAM_20,
-    ATTACK_TIME_PARAM_21,
-    ATTACK_TIME_PARAM_22,
-    ATTACK_TIME_PARAM_23,
-    ATTACK_TIME_PARAM_24,
-    ATTACK_TIME_PARAM_25,
-    ATTACK_TIME_PARAM_26,
-    ATTACK_TIME_PARAM_27,
-    ATTACK_TIME_PARAM_28,
-    ATTACK_TIME_PARAM_29,
-    ATTACK_TIME_PARAM_30,
-    RELEASE_TIME_PARAM_00,
-    RELEASE_TIME_PARAM_01,
-    RELEASE_TIME_PARAM_02,
-    RELEASE_TIME_PARAM_03,
-    RELEASE_TIME_PARAM_04,
-    RELEASE_TIME_PARAM_05,
-    RELEASE_TIME_PARAM_06,
-    RELEASE_TIME_PARAM_07,
-    RELEASE_TIME_PARAM_08,
-    RELEASE_TIME_PARAM_09,
-    RELEASE_TIME_PARAM_10,
-    RELEASE_TIME_PARAM_11,
-    RELEASE_TIME_PARAM_12,
-    RELEASE_TIME_PARAM_13,
-    RELEASE_TIME_PARAM_14,
-    RELEASE_TIME_PARAM_15,
-    RELEASE_TIME_PARAM_16,
-    RELEASE_TIME_PARAM_17,
-    RELEASE_TIME_PARAM_18,
-    RELEASE_TIME_PARAM_19,
-    RELEASE_TIME_PARAM_20,
-    RELEASE_TIME_PARAM_21,
-    RELEASE_TIME_PARAM_22,
-    RELEASE_TIME_PARAM_23,
-    RELEASE_TIME_PARAM_24,
-    RELEASE_TIME_PARAM_25,
-    RELEASE_TIME_PARAM_26,
-    RELEASE_TIME_PARAM_27,
-    RELEASE_TIME_PARAM_28,
-    RELEASE_TIME_PARAM_29,
-    RELEASE_TIME_PARAM_30,
-    LEVEL_PARAM_00,
-    LEVEL_PARAM_01,
-    LEVEL_PARAM_02,
-    LEVEL_PARAM_03,
-    LEVEL_PARAM_04,
-    LEVEL_PARAM_05,
-    LEVEL_PARAM_06,
-    LEVEL_PARAM_07,
-    LEVEL_PARAM_08,
-    LEVEL_PARAM_09,
-    LEVEL_PARAM_10,
-    LEVEL_PARAM_11,
-    LEVEL_PARAM_12,
-    LEVEL_PARAM_13,
-    LEVEL_PARAM_14,
-    LEVEL_PARAM_15,
-    LEVEL_PARAM_16,
-    LEVEL_PARAM_17,
-    LEVEL_PARAM_18,
-    LEVEL_PARAM_19,
-    LEVEL_PARAM_20,
-    LEVEL_PARAM_21,
-    LEVEL_PARAM_22,
-    LEVEL_PARAM_23,
-    LEVEL_PARAM_24,
-    LEVEL_PARAM_25,
-    LEVEL_PARAM_26,
-    LEVEL_PARAM_27,
-    LEVEL_PARAM_28,
-    LEVEL_PARAM_29,
-    LEVEL_PARAM_30,
-    PAN_PARAM_00,
-    PAN_PARAM_01,
-    PAN_PARAM_02,
-    PAN_PARAM_03,
-    PAN_PARAM_04,
-    PAN_PARAM_05,
-    PAN_PARAM_06,
-    PAN_PARAM_07,
-    PAN_PARAM_08,
-    PAN_PARAM_09,
-    PAN_PARAM_10,
-    PAN_PARAM_11,
-    PAN_PARAM_12,
-    PAN_PARAM_13,
-    PAN_PARAM_14,
-    PAN_PARAM_15,
-    PAN_PARAM_16,
-    PAN_PARAM_17,
-    PAN_PARAM_18,
-    PAN_PARAM_19,
-    PAN_PARAM_20,
-    PAN_PARAM_21,
-    PAN_PARAM_22,
-    PAN_PARAM_23,
-    PAN_PARAM_24,
-    PAN_PARAM_25,
-    PAN_PARAM_26,
-    PAN_PARAM_27,
-    PAN_PARAM_28,
-    PAN_PARAM_29,
-    PAN_PARAM_30,
-    MOD_MATRIX_PARAM,
-    NUM_PARAMS = MOD_MATRIX_PARAM + NR_OF_BANDS * NR_OF_BANDS 
+    ENUMS(MUTE_OUTPUT_PARAM, NR_OF_BANDS),
+    ENUMS(MOD_MATRIX_PARAM, NR_OF_BANDS * NR_OF_BANDS),
+    ENUMS(ATTACK_TIME_PARAM, NR_OF_BANDS),
+    ENUMS(RELEASE_TIME_PARAM, NR_OF_BANDS),
+    ENUMS(LEVEL_PARAM, NR_OF_BANDS),
+    ENUMS(PAN_PARAM, NR_OF_BANDS),
+    NUM_PARAMS
   };
 
   enum InputIds {
@@ -272,45 +127,15 @@ struct Vocode_O_Matic_XL : Module {
     // Step toggle to set shift by hand
     MATRIX_ONE_STEP_RIGHT_LIGHT,
     MATRIX_ONE_STEP_LEFT_LIGHT,
-    MUTE_OUTPUT_LIGHT_00,
-    MUTE_OUTPUT_LIGHT_01,
-    MUTE_OUTPUT_LIGHT_02,
-    MUTE_OUTPUT_LIGHT_03,
-    MUTE_OUTPUT_LIGHT_04,
-    MUTE_OUTPUT_LIGHT_05,
-    MUTE_OUTPUT_LIGHT_06,
-    MUTE_OUTPUT_LIGHT_07,
-    MUTE_OUTPUT_LIGHT_08,
-    MUTE_OUTPUT_LIGHT_09,
-    MUTE_OUTPUT_LIGHT_10,
-    MUTE_OUTPUT_LIGHT_11,
-    MUTE_OUTPUT_LIGHT_12,
-    MUTE_OUTPUT_LIGHT_13,
-    MUTE_OUTPUT_LIGHT_14,
-    MUTE_OUTPUT_LIGHT_15,
-    MUTE_OUTPUT_LIGHT_16,
-    MUTE_OUTPUT_LIGHT_17,
-    MUTE_OUTPUT_LIGHT_18,
-    MUTE_OUTPUT_LIGHT_19,
-    MUTE_OUTPUT_LIGHT_20,
-    MUTE_OUTPUT_LIGHT_21,
-    MUTE_OUTPUT_LIGHT_22,
-    MUTE_OUTPUT_LIGHT_23,
-    MUTE_OUTPUT_LIGHT_24,
-    MUTE_OUTPUT_LIGHT_25,
-    MUTE_OUTPUT_LIGHT_26,
-    MUTE_OUTPUT_LIGHT_27,
-    MUTE_OUTPUT_LIGHT_28,
-    MUTE_OUTPUT_LIGHT_29,
-    MUTE_OUTPUT_LIGHT_30,
-    MOD_MATRIX,
-    NUM_LIGHTS = MOD_MATRIX + NR_OF_BANDS * NR_OF_BANDS
+    ENUMS(MUTE_OUTPUT_LIGHT, NR_OF_BANDS),
+    ENUMS(MOD_MATRIX, NR_OF_BANDS * NR_OF_BANDS),
+    NUM_LIGHTS 
   };
 
   float blinkPhase = -1.0f;
   float oneStepBlinkPhase = 0.0f;
 
-  void step() override;
+  void process(const ProcessArgs &args) override;
 
   // For more advanced Module features, read Rack's engine.hpp header file
   // - toJson, fromJson: serialization of internal data
@@ -338,10 +163,10 @@ struct Vocode_O_Matic_XL : Module {
   double fsamp = FFSAMP;
 
   // Button for bypass on and off.
-  SchmittTrigger bypass_button_trig;
+  dsp::SchmittTrigger bypass_button_trig;
   bool fx_bypass = false;
   // Button to toggle the filter band coupling type (4 * log)
-  SchmittTrigger matrix_mode_button_trig;
+  dsp::SchmittTrigger matrix_mode_button_trig;
   bool matrix_mode_button_pressed = false;
   // Start with linear coupling of filters.
   int matrix_mode_selector = INITIAL_MATRIX_MODE;
@@ -351,18 +176,18 @@ struct Vocode_O_Matic_XL : Module {
   int matrix_shift_position = 1;
 
   // Button to control triggering of matrix movement
-  SchmittTrigger matrix_hold_button_trig;
+  dsp::SchmittTrigger matrix_hold_button_trig;
   bool matrix_hold_button_pressed = false;
   // Button to step matrix on step to the right.
-  SchmittTrigger matrix_one_step_right_button_trig;
+  dsp::SchmittTrigger matrix_one_step_right_button_trig;
   bool matrix_one_step_right_button_pressed = false;
   // Button to step matrix on step to the left.
-  SchmittTrigger matrix_one_step_left_button_trig;
+  dsp::SchmittTrigger matrix_one_step_left_button_trig;
   bool matrix_one_step_left_button_pressed = false;
 
   // Carrier channels can be muted.
   // Detect that the buttons are pressed using this SchmittTrigger
-  SchmittTrigger mute_output_trig;
+  dsp::SchmittTrigger mute_output_trig;
 
   int wait = 1;
   int wait2 = 1;
@@ -396,7 +221,9 @@ struct Vocode_O_Matic_XL : Module {
   bool mute_output_led_state[NR_OF_BANDS] = {};
   bool matrix_mode_read_from_settings = false;
   int lights_offset = MOD_MATRIX;
-  int mute_output_lights_offset = MUTE_OUTPUT_LIGHT_00;
+  int mute_output_lights_offset = MUTE_OUTPUT_LIGHT;
+
+  int  lbuttonPressedVal = 0;
 
   // Sliders
   SliderWithId *release_time_slider[NR_OF_BANDS]; 
@@ -405,7 +232,7 @@ struct Vocode_O_Matic_XL : Module {
   SliderWithId *level_slider[NR_OF_BANDS]; 
 
   // Some code to read/save state of bypass button.
-  json_t *toJson() override {
+  json_t *dataToJson() override {
     json_t *rootJm = json_object();
 
     // Store bypass setting
@@ -479,7 +306,7 @@ struct Vocode_O_Matic_XL : Module {
     return rootJm;
   }       
           
-  void fromJson(json_t *rootJm) override {
+  void dataFromJson(json_t *rootJm) override {
 
 
     // Restore bypass state 
@@ -596,7 +423,32 @@ struct Vocode_O_Matic_XL : Module {
 
   } 
 
-  Vocode_O_Matic_XL() : Module(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS) {
+  Vocode_O_Matic_XL() {
+    config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+    configParam(Vocode_O_Matic_XL::CARRIER_GAIN_PARAM, 1.0, 10.0, INITIAL_CARRIER_GAIN, "Gain factor for carrier signal (default=1).", "");
+    configParam(Vocode_O_Matic_XL::MODULATOR_GAIN_PARAM, 1.0, 10.0, INITIAL_MODULATOR_GAIN, "Gain factor for modulator signal (default=1)", "");
+    configParam(Vocode_O_Matic_XL::PAN_PARAM, 0.5, MAX_PAN, 1.0 / INITIAL_PAN_OFFSET, "Panning width of even and odd filter outputs.", "");
+    configParam(Vocode_O_Matic_XL::BYPASS_SWITCH , 0.0f, 1.0f, 0.0f, "Bypass vocoder and play carrier on left and modulator on right channel.", "");
+    configParam(Vocode_O_Matic_XL::MATRIX_MODE_TOGGLE_PARAM, 0.0f, 1.0f, 0.0f, "Toggle through all matrix modes.", "");
+    configParam(Vocode_O_Matic_XL::MATRIX_ONE_STEP_RIGHT_PARAM, 0.0f, 1.0f, 0.0f, "Move matrix one step to the right.", "");
+    configParam(Vocode_O_Matic_XL::MATRIX_ONE_STEP_LEFT_PARAM, 0.0f, 1.0f, 0.0f, "Move matrix one step to the left.", "");
+    configParam(Vocode_O_Matic_XL::MATRIX_HOLD_TOGGLE_PARAM, 0.0f, 1.0f, 0.0f, "Prevent the matrix from shifting.", "");
+    char message[255];
+    for (int offset = 0; offset < NR_OF_BANDS; offset++) {
+      configParam(Vocode_O_Matic_XL::MOD_MATRIX_PARAM + offset, 0.0, 1.0f, 0.0f, "", "");
+      sprintf(message, "Mute %d Hz band.", freq[offset + 1]);
+      configParam(Vocode_O_Matic_XL::MUTE_OUTPUT_PARAM + offset, 0.0, 1.0f, 0.0f, message, "");
+    }
+
+    // Add tooltips to the buttons.
+    for (int i = 0; i < NR_OF_BANDS; i++) {
+        for (int j = 0; j < NR_OF_BANDS; j++) {
+            sprintf(message, "Modulator %d Hz -> Carrier %d Hz.", freq[j + 1], freq[i + 1]);
+            configParam(Vocode_O_Matic_XL::MOD_MATRIX_PARAM + i + j * NR_OF_BANDS, 0.0, 1.0, 0.0, message);
+        }
+    }
+
+    // ToDo: add tooltips to the sliders.
 
     // Initialize the filter coefficients.
     comp_all_coeffs(freq, mod_bandwidth, fsamp, mod_alpha1, mod_alpha2, mod_beta);
@@ -606,29 +458,29 @@ struct Vocode_O_Matic_XL : Module {
     for (int i = 0; i < NR_OF_BANDS; i++) {
         for (int j = 0; j < 3; j++) { 
             ym[i][j] = 0.0;
+            yc[i][j] = 0.0;
         }
         ym_env[i][0] = 0.0; // Envelope of modulator.
         ym_env[i][1] = 0.0;
     }
     // Initialize the levels and pans.
-    initialize_levels(slider_level);
+    initialize_start_levels(slider_level);
     init_pan_and_level(slider_level, left_pan, right_pan, left_level, right_level);
     if (!matrix_mode_read_from_settings) {
         choose_matrix(4, button_value, p_cnt); // Initialize linear filter coupling.
-        initialize_mute_output(mute_output); // initialize all mute buttons (to be not pressed).
+        initialize_mute_output(mute_output);   // Initialize all mute buttons (to be not pressed).
     }
 
     // Show leds in button matrix.
     refresh_led_matrix(lights_offset, p_cnt, button_value, led_state);
 
     // Show leds in mute output column.
-    refresh_mute_output_leds(MUTE_OUTPUT_LIGHT_00, mute_output);
-
+    refresh_mute_output_leds(MUTE_OUTPUT_LIGHT, mute_output);
 
     blinkPhase = -1.0f;
     // Reset lights.
-    lights[MATRIX_HOLD_TOGGLE_LIGHT].value = 0.0;
-    lights[BYPASS_LIGHT].value = 0.0;
+    lights[MATRIX_HOLD_TOGGLE_LIGHT].setBrightness(0.0);
+    lights[BYPASS_LIGHT].setBrightness(0.0);
  
     // Init the envelope follower's variables. 
     init_attack_times(envelope_attack_time); 
@@ -638,4 +490,23 @@ struct Vocode_O_Matic_XL : Module {
     comp_attack_and_release_time_ranges(min_envelope_attack_time, max_envelope_attack_time,
                                         min_envelope_release_time, max_envelope_release_time);
   } 
+};
+
+struct LButton : SvgSwitch {
+  Vocode_O_Matic_XL *module;
+  LButton() {
+    momentary = true;
+    shadow->visible = false;
+    addFrame(APP->window->loadSvg(asset::plugin(pluginInstance2, "res/L.svg")));
+    addFrame(APP->window->loadSvg(asset::plugin(pluginInstance2, "res/L.svg")));
+  }
+
+  void onButton(const event::Button &e) override {
+    if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
+      if (paramQuantity && module) {
+        module->lbuttonPressedVal = paramQuantity->paramId;
+      }
+    }
+    e.consume(this);
+  }
 };
