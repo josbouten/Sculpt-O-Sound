@@ -1,9 +1,7 @@
 /*
-// This is Vocode-O-Matic, a vocoder plugin for VCV Rack v1.x
-// Author: Zaphod B aka Jos Bouten
-// You can contact me here: zaphodb42a at gmail dot com
-
+This is Vocode-O-Matic, a vocoder plugin for VCV Rack v1.x
 Copyright (C) 2018, Jos Bouten aka Zaphod B.
+You can contact me here: josbouten at gmail dot com
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

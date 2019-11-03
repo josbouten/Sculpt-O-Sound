@@ -1,13 +1,13 @@
-# VCV vocoder plugin
-# Copyright: Zaphod B. 2018, 2019
+# VCV vocoder plugin for vcvrack
+# Copyright: Zaphod B. 2018
 
 ![alt text](doc/pic_logo_sos.gif)
 
 Sculpt-O-Sound presents:
 
-Vocode-O-Matic, v0.5 is a 31 terts band vocoder with editable frequency matrix for Rack v1.x.
+Vocode-O-Matic, v1.0.0 is a 31 terts band vocoder with editable frequency matrix for Rack v1.x.
 Its use is restricted to 44100 Hz sampling frequency at the moment.
-I posted a video on youtube which demonstrates Vocode-O-Matic. You can find it here: https://www.youtube.com/watch?v=u_tcVmCJ_R8
+You can find a video posted on youtube which demonstrates Vocode-O-Matic. You can find it here: https://www.youtube.com/watch?v=u_tcVmCJ_R8
 
 ![alt text](doc/Screen_dump_Vocode-O-Matic-v0.4_01.png)
 
@@ -89,3 +89,8 @@ None at the moment. But please let me know if you find any, or if you wish me to
 Request
 =======
 Please let me know if you have used Vocode-O-Matic in your music (send me a link or an mp3 file). I'm very curious to hear how people use it.
+
+License
+=======
+All **source code** is copyright © 2018 Jos Bouten and is licensed under the [GNU General Public License v3.0](gpl-3.0.txt).
+All **graphics** in the `res` directory are copyright © 2018 Jos Bouten and licensed under [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/).
