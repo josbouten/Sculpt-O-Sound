@@ -1,0 +1,43 @@
+# Install Vocode-O-Matic from source
+# ==================================
+
+# Install the Rack-SDK and set the env variable RACK_DIR
+# For the 1.1.5 SDK have a look at this:
+
+# https://community.vcvrack.com/t/rack-development-blog/5864/37
+
+# Download the latest version of Vocode-O-Matic from https://github.com/josbouten/Sculpt-O-Sound
+# or check it out from github
+
+# Go to your projects dir:
+
+cd project
+
+# and pull the code:
+
+git pull https://github.com/josbouten/Sculpt-O-Sound
+
+cd Sculpt-O-Sound
+
+# Next get the code Vocode-O-Matic uses from SynthDevKit (e.g. for its CV-inputs) like so:
+
+git submodule update --init --recursive
+
+# This will create some output similar to this:
+
+# Submodule 'SynthDevKit' (https://github.com/JerrySievert/SynthDevKit.git) registered for path 'SynthDevKit'
+# Cloning into '/Users/jos/projects/Rack/plugins/Sculpt-O-Sound/SynthDevKit'...
+# Submodule path 'SynthDevKit': checked out '3eb70748b12d1965963b80dfde7a33f516d19a7f'
+
+# Then compile the code using:
+
+RACK_DIR=/Users/<your_user_name_here>/projects/Rack-SDK make
+
+# This should not take very long.
+# You can speed this up supplying a number of cores you want 'make' to use in parallel:
+
+# RACK_DIR=/Users/<your_user_name_here>/projects/Rack-SDK make -j 4
+
+# Now go to the VCV Rack SDK dir and run Rack using:
+
+make run
