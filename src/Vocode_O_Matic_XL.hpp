@@ -93,6 +93,7 @@ struct Vocode_O_Matic_XL : Module {
     ENUMS(RELEASE_TIME_PARAM, NR_OF_BANDS),
     ENUMS(LEVEL_PARAM, NR_OF_BANDS),
     ENUMS(PAN_PARAM, NR_OF_BANDS),
+    PAN_WIDTH_PARAM,
     NUM_PARAMS
   };
 
@@ -131,12 +132,6 @@ struct Vocode_O_Matic_XL : Module {
   float oneStepBlinkPhase = 0.0f;
 
   void process(const ProcessArgs &args) override;
-
-  // For more advanced Module features, read Rack's engine.hpp header file
-  // - toJson, fromJson: serialization of internal data
-  // - onSampleRateChange: event triggered by a change of sample rate
-  // - onReset, onRandomize, onCreate, onDelete: implements special behavior when user clicks these from the context menu
-
   void onReset() override;
   void onRandomize() override;
 
@@ -200,8 +195,8 @@ struct Vocode_O_Matic_XL : Module {
   float right_pan[NR_OF_BANDS];
   float left_level[NR_OF_BANDS]; // output
   float right_level[NR_OF_BANDS]; // output
-  float slider_level[NR_OF_BANDS]; // slider
-  float slider_pan[NR_OF_BANDS]; // slider
+  float slider_level[NR_OF_BANDS]; // slider level value
+  float slider_pan[NR_OF_BANDS]; // slider pan value
   float envelope_attack_time[NR_OF_BANDS];
   float envelope_release_time[NR_OF_BANDS]; 
   float envelope_attack_factor[NR_OF_BANDS];
@@ -427,6 +422,9 @@ struct Vocode_O_Matic_XL : Module {
     configParam(Vocode_O_Matic_XL::MATRIX_ONE_STEP_RIGHT_PARAM, 0.0f, 1.0f, 0.0f, "Move matrix one step to the right.", "");
     configParam(Vocode_O_Matic_XL::MATRIX_ONE_STEP_LEFT_PARAM, 0.0f, 1.0f, 0.0f, "Move matrix one step to the left.", "");
     configParam(Vocode_O_Matic_XL::MATRIX_HOLD_TOGGLE_PARAM, 0.0f, 1.0f, 0.0f, "Prevent the matrix from shifting.", "");
+#ifdef PAN_WIDTH
+    configParam(Vocode_O_Matic_XL::PAN_WIDTH_PARAM, 1.0f, 3.0f, 1.0f, "Panning width.", "");
+#endif
     char message[255];
     for (int offset = 0; offset < NR_OF_BANDS; offset++) {
       sprintf(message, "Mute %d Hz band.", freq[offset + 1]);
@@ -447,8 +445,6 @@ struct Vocode_O_Matic_XL : Module {
         configParam(Vocode_O_Matic_XL::RELEASE_TIME_PARAM + i, MIN_RELEASE_TIME, MAX_RELEASE_TIME, 10 / freq[i + 1], message, "");
         sprintf(message, "Level @ %d Hz", freq[i + 1]);
         configParam(Vocode_O_Matic_XL::LEVEL_PARAM + i, MIN_LEVEL, MAX_LEVEL, INITIAL_LEVEL, message, "");
-        sprintf(message, "Pan @ %d Hz", freq[i + 1]);
-        configParam(Vocode_O_Matic_XL::PAN_PARAM + i, MIN_PAN, MAX_PAN, INITIAL_PAN, message, "");
     }
 
     // ToDo: add tooltips to the sliders.
@@ -469,6 +465,15 @@ struct Vocode_O_Matic_XL : Module {
     // Initialize the levels and pans.
     initialize_slider_levels(slider_level);
     init_pan_and_level(slider_level, left_pan, right_pan, left_level, right_level);
+    // Now set the sliders to the initial values.
+    for (int i = 0; i < NR_OF_BANDS; i++) {
+        sprintf(message, "Pan @ %d Hz", freq[i + 1]);
+        if ((i % 2) != 0) {
+            configParam(Vocode_O_Matic_XL::PAN_PARAM + i, MIN_PAN, MAX_PAN, INITIAL_PAN + INITIAL_PAN_OFFSET, message, "");
+        } else {
+            configParam(Vocode_O_Matic_XL::PAN_PARAM + i, MIN_PAN, MAX_PAN, INITIAL_PAN - INITIAL_PAN_OFFSET, message, "");
+        }
+    }
     if (!matrix_mode_read_from_settings) {
         choose_matrix(4, button_value, p_cnt); // Initialize linear filter coupling.
         initialize_mute_output(mute_output);   // Initialize all mute buttons (to be not pressed).

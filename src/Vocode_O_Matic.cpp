@@ -258,7 +258,7 @@ void Vocode_O_Matic::process(const ProcessArgs &args) {
 #ifdef PANNING
   width = params[PANNING_PARAM].getValue();
   if (width != width_old) {
-    set_pan_and_level(start_level, left_pan, right_pan, left_level, right_level, width);
+    set_pan_and_level(slider_level, slider_pan, left_pan, right_pan, left_level, right_level, width);
     width_old = width;
   }
 #endif
@@ -305,8 +305,7 @@ void Vocode_O_Matic::process(const ProcessArgs &args) {
       refresh = false;
   }
 #endif
-
-  // Now we compute the output sample amplitude for both channels.
+  // Here we compute the output sample amplitude for both channels.
   if (fx_bypass) {
     outputs[LEFT_OUTPUT].setVoltage(inputs[CARR_INPUT].getVoltage() * params[CARRIER_GAIN_PARAM].getValue());
     outputs[RIGHT_OUTPUT].setVoltage(inputs[MOD_INPUT].getVoltage() * params[MODULATOR_GAIN_PARAM].getValue());
@@ -436,7 +435,7 @@ struct Vocode_O_MaticWidget : ModuleWidget {
       }
     }
 
-    // Add mute output buttons to the left of the matrix.
+    // Add mute output buttons on the RHS of the matrix.
     int x = HBASE + 0.25 * LED_WIDTH + NR_OF_BANDS * LED_WIDTH;
     for (int i = 0; i < NR_OF_BANDS; i++) {
       int y = VBASE - i * (LED_HEIGHT + 1);

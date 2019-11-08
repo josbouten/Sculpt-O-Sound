@@ -28,6 +28,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #define INITIAL_MOD_BW_IN_SEMITONES 4.0
 #define INITIAL_GAIN 1.0
 
+// ENVELOPE FOLLOWER
+
 #define LOWER_ENVELOPE_ATTACK_TEMPERATURE 0.01
 #define INITIAL_ENVELOPE_ATTACK_TEMPERATURE 1
 #define UPPER_ENVELOPE_ATTACK_TEMPERATURE 100
@@ -41,6 +43,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #define MIN_RELEASE_TIME 0.0001
 #define MAX_RELEASE_TIME 1.0000
 
+// LEVELS
+
 #define INITIAL_CARRIER_GAIN 1.0
 #define MIN_CARRIER_GAIN 1.0
 #define MAX_CARRIER_GAIN 10.0
@@ -52,6 +56,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #define MAX_LEVEL 10.0
 #define INITIAL_LEVEL 1.0
 
+// PANNING
 
 #define MIN_PAN         -0.999 // Right
 #define MAX_PAN          0.999 // Left
@@ -62,11 +67,20 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #define UPPER_SMOOTHING_BAND 20
 #define SMOOTHING_FACTOR 10
+
+// MISC
+
 #define PI 3.1415828
+#define HALF_PI PI / 2.0
+#define QUATER_PI PI / 4.0
 #define FFSAMP 44100.0
 #define NR_OF_BANDS 31
+
+// LOGIC
 #define FALSE 0
 #define TRUE 1
+
+// NUMBERS
 
 #define MAX_SHORT 32767
 

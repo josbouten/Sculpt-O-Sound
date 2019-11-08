@@ -93,6 +93,7 @@ void Vocode_O_Matic_XL::onRandomize() {
   // in the library where they can not be reached?
   params[CARRIER_GAIN_PARAM].setValue(INITIAL_CARRIER_GAIN);
   params[MODULATOR_GAIN_PARAM].setValue(INITIAL_MODULATOR_GAIN);
+  params[PAN_WIDTH_PARAM].setValue(1.0f);
 }
 
 void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
@@ -258,10 +259,10 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
   }
 
   // Panning
-#ifdef PANNING
-  width = params[PANNING_PARAM].getValue();
+#ifdef PAN_WIDTH
+  width = params[PAN_WIDTH_PARAM].getValue();
   if (width != width_old) {
-    set_pan_and_level(slider_level, left_pan, right_pan, left_level, right_level, width);
+    set_pan_and_level(slider_level, slider_pan, left_pan, right_pan, left_level, right_level, width);
     width_old = width;
   }
 #endif
@@ -347,7 +348,8 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
         print_array(envelope_release_factor);
     }
  
-    // Handle pan slider changes here.
+    // Handle pan and level slider changes here.
+    // First process pan slider changes.
     change = false;
     for (int i = 0; i < NR_OF_BANDS; i++) {
         if (params[PAN_PARAM + i].value != slider_pan[i]) {
@@ -356,12 +358,11 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
         }
     }
     if (change) {
-        // compute new pan values.
-        int width = 1;
-        set_pan_and_level(slider_level, left_pan, right_pan, left_level, right_level, width);
+        for (int i = 0; i < NR_OF_BANDS; i++) {
+            left_pan[i] = left_pan_factor(slider_pan[i]);
+            right_pan[i] = right_pan_factor(slider_pan[i]);
+        }
     }
-
-    // ToDo: how to implement the pan slider values ???
 
     // Handle level slider changes here.
     for (int i = 0; i < NR_OF_BANDS; i++) {
@@ -372,7 +373,7 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
     }
     if (change) {
         int width = 1;
-        set_pan_and_level(slider_level, left_pan, right_pan, left_level, right_level, width);
+        set_pan_and_level(slider_level, slider_pan, left_pan, right_pan, left_level, right_level, width);
     }
     
   } else {
@@ -435,11 +436,11 @@ struct Vocode_O_Matic_XL_Widget : ModuleWidget,  Vocode_O_Matic_XL {
     // Dial for modulator gain.
     // Dial for panning.
     // Note: format is Vec(x-pos, y-pos)
-    addParam(createParam<RoundSmallBlackKnob>(Vec(10,  25), module, Vocode_O_Matic_XL::CARRIER_GAIN_PARAM)); //, 1.0, MAX_CARRIER_GAIN, INITIAL_CARRIER_GAIN));
-    addParam(createParam<RoundSmallBlackKnob>(Vec(40,  25), module, Vocode_O_Matic_XL::MODULATOR_GAIN_PARAM)); //, 1.0, MAX_MODULATOR_GAIN, INITIAL_MODULATOR_GAIN));
-#ifdef PANNING
-    //addParam(ParamWidget::create<RoundSmallBlackKnob>(Vec(70,  47), module, Vocode_O_Matic_XL::PANNING_PARAM, 0.0, MAX_PAN, 1.0 / INITIAL_PAN_OFFSET));
-    addParam(createParam<RoundSmallBlackKnob>(Vec(70,  25), module, Vocode_O_Matic_XL::PANNING_PARAM)); //, 0.5, MAX_PAN, 1.0 / INITIAL_PAN_OFFSET));
+    addParam(createParam<RoundSmallBlackKnob>(Vec(10,  25), module, Vocode_O_Matic_XL::CARRIER_GAIN_PARAM)); 
+    addParam(createParam<RoundSmallBlackKnob>(Vec(40,  25), module, Vocode_O_Matic_XL::MODULATOR_GAIN_PARAM));
+
+#ifdef PAN_WIDTH
+    addParam(createParam<RoundSmallBlackKnob>(Vec(80,  25), module, Vocode_O_Matic_XL::PAN_WIDTH_PARAM)); 
 #endif
 
     // INTPUTS (SIGNAL AND PARAMS)
@@ -450,23 +451,23 @@ struct Vocode_O_Matic_XL_Widget : ModuleWidget,  Vocode_O_Matic_XL {
     addInput(createInput<PJ301MPort>(Vec(105, 103), module, Vocode_O_Matic_XL::SHIFT_LEFT_INPUT));
 
     // Bypass switch.
-    addParam(createParam<LEDBezel>(Vec(12,  66), module, Vocode_O_Matic_XL::BYPASS_SWITCH));// , 0.0f, 1.0f, 0.0f));
+    addParam(createParam<LEDBezel>(Vec(12,  66), module, Vocode_O_Matic_XL::BYPASS_SWITCH));
     addChild(createLight<LedLight<RedLight>>(Vec(14.2, 68), module, Vocode_O_Matic_XL::BYPASS_LIGHT));
 
     // Matrix type switch: linear, inverse + 4 * log
-    addParam(createParam<LEDBezel>(Vec(12, 104), module, Vocode_O_Matic_XL::MATRIX_MODE_TOGGLE_PARAM)); //, 0.0f, 1.0f, 0.0f));
+    addParam(createParam<LEDBezel>(Vec(12, 104), module, Vocode_O_Matic_XL::MATRIX_MODE_TOGGLE_PARAM));
     addChild(createLight<LedLight<GreenLight>>(Vec(14.2, 106), module, Vocode_O_Matic_XL::MATRIX_MODE_TOGGLE_LIGHT));
 
     // Push button which shifts the matrix to the right one step at a time.
-    addParam(createParam<LEDBezel>(Vec(76, 142), module, Vocode_O_Matic_XL::MATRIX_ONE_STEP_RIGHT_PARAM)); //, 0.0f, 1.0f, 0.0f));
+    addParam(createParam<LEDBezel>(Vec(76, 142), module, Vocode_O_Matic_XL::MATRIX_ONE_STEP_RIGHT_PARAM));
     addChild(createLight<LedLight<GreenLight>>(Vec(78.2, 144), module, Vocode_O_Matic_XL::MATRIX_ONE_STEP_RIGHT_LIGHT));
 
     // Push button which shifts the matrix to the left one step at a time.
-    addParam(createParam<LEDBezel>(Vec(76, 104), module, Vocode_O_Matic_XL::MATRIX_ONE_STEP_LEFT_PARAM)); //, 0.0f, 1.0f, 0.0f));
+    addParam(createParam<LEDBezel>(Vec(76, 104), module, Vocode_O_Matic_XL::MATRIX_ONE_STEP_LEFT_PARAM));
     addChild(createLight<LedLight<GreenLight>>(Vec(78.2, 106), module, Vocode_O_Matic_XL::MATRIX_ONE_STEP_LEFT_LIGHT));
 
     // Matrix shift hold toggle.
-    addParam(createParam<LEDBezel>(Vec(12, 142), module, Vocode_O_Matic_XL::MATRIX_HOLD_TOGGLE_PARAM)); //, 0.0f, 1.0f, 0.0f));
+    addParam(createParam<LEDBezel>(Vec(12, 142), module, Vocode_O_Matic_XL::MATRIX_HOLD_TOGGLE_PARAM));
     addChild(createLight<LedLight<RedLight>>(Vec(14.2, 144), module, Vocode_O_Matic_XL::MATRIX_HOLD_TOGGLE_LIGHT));
 
     // Matrix Mode Display
@@ -509,7 +510,7 @@ struct Vocode_O_Matic_XL_Widget : ModuleWidget,  Vocode_O_Matic_XL {
             addChild(createLight<MediumLight<BlueLight>>(Vec(x, y), module, Vocode_O_Matic_XL::MOD_MATRIX + offset));
         }
     }
-    // Mute output buttons to the left of the matrix.
+    // Mute output buttons on the RHS of the matrix.
     int x = HBASE + 0.25 * LED_WIDTH + NR_OF_BANDS * LED_WIDTH;
     for (int i = 0; i < NR_OF_BANDS; i++) {
             int y = VBASE - i * (LED_HEIGHT + 1);
@@ -519,7 +520,7 @@ struct Vocode_O_Matic_XL_Widget : ModuleWidget,  Vocode_O_Matic_XL {
                 lb->module = module;
                 lb->box.pos = Vec(x, y);
                 if (module) {
-                    lb->paramQuantity = module->paramQuantities[Vocode_O_Matic_XL::MOD_MATRIX_PARAM + offset];
+                    lb->paramQuantity = module->paramQuantities[Vocode_O_Matic_XL::MUTE_OUTPUT_PARAM + offset];
                 }
                 addChild(lb);
             }

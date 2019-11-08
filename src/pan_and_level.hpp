@@ -20,8 +20,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #ifndef PAN_AND_LEVEL_HPP
 #define PAN_AND_LEVEL_HPP
 
-void init_pan_and_level(float startLevel[NR_OF_BANDS], float left_pan[NR_OF_BANDS], float right_pan[NR_OF_BANDS], float left_level[NR_OF_BANDS], float right_level[NR_OF_BANDS]);
+// Literature: https://www.cs.cmu.edu/~music/icm-online/readings/panlaws
 
-void set_pan_and_level(float startLevel[NR_OF_BANDS], float left_pan[NR_OF_BANDS], float right_pan[NR_OF_BANDS], float left_level[NR_OF_BANDS], float right_level[NR_OF_BANDS], float width);
+float left_pan_factor(float slider_value);
+float right_pan_factor(float slider_value);
+
+void init_pan_and_level(float slider_level[NR_OF_BANDS], float left_pan[NR_OF_BANDS], float right_pan[NR_OF_BANDS], float left_level[NR_OF_BANDS], float right_level[NR_OF_BANDS]);
+
+void set_pan_and_level(float slider_level[NR_OF_BANDS], float pan_level[NR_OF_BANDS], float left_pan[NR_OF_BANDS], float right_pan[NR_OF_BANDS], float left_level[NR_OF_BANDS], float right_level[NR_OF_BANDS], float width);
 
 #endif

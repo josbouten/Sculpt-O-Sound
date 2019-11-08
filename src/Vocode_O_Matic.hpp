@@ -209,7 +209,7 @@ struct Vocode_O_Matic : Module {
   float right_pan[NR_OF_BANDS];
   float left_level[NR_OF_BANDS];
   float right_level[NR_OF_BANDS];
-  float start_level[NR_OF_BANDS];
+  float slider_level[NR_OF_BANDS];
   float envelope_attack_time[NR_OF_BANDS], envelope_release_time[NR_OF_BANDS];
   float envelope_attack_factor[NR_OF_BANDS], envelope_release_factor[NR_OF_BANDS];
   float width = 1.0;
@@ -381,8 +381,8 @@ struct Vocode_O_Matic : Module {
       ym_env[i][1] = 0.0;
     }
     // Initialize the levels and pans.
-    initialize_slider_levels(start_level);
-    init_pan_and_level(start_level, left_pan, right_pan, left_level, right_level);
+    initialize_slider_levels(slider_level);
+    init_pan_and_level(slider_level, left_pan, right_pan, left_level, right_level);
     if (!matrix_mode_read_from_settings) {
         choose_matrix(4, button_value, p_cnt); // Initialize linear filter coupling.
         initialize_mute_output(mute_output); // initialize all mute buttons (to be not pressed).
