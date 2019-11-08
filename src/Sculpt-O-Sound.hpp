@@ -1,9 +1,12 @@
 #include "rack.hpp"
+#include "dsp/digital.hpp"
+#include <sstream>
+#include <iomanip>
 
 #pragma once
 
 // For debug purposes only !
-//#define DEBUG
+#define DEBUGMSG
 
 using namespace rack;
 
@@ -16,17 +19,12 @@ struct LedLight : BASE {
 };
 
 // Forward-declare the Plugin, defined in Template.cpp
-extern Plugin *pluginInstance;  // for Vocode-O-Matic
-extern Plugin *pluginInstance2; // for Vocode-O-Matic-XL
+extern Plugin *thePlugin;  
 
 // Forward-declare each Model, defined in each module source file
 
-extern Model *modelVocode_O_Matic_XL;
 extern Model *modelVocode_O_Matic;
-
-#include "dsp/digital.hpp"
-#include <sstream>
-#include <iomanip>
+extern Model *modelVocode_O_Matic_XL;
 
 struct MsDisplayWidget : TransparentWidget {
     
@@ -34,7 +32,8 @@ struct MsDisplayWidget : TransparentWidget {
   std::shared_ptr<Font> font;
     
   MsDisplayWidget() {
-    font = APP->window->loadFont(asset::plugin(pluginInstance, "res/Segment7Standard.ttf"));
+    value = nullptr;
+    font = APP->window->loadFont(asset::plugin(thePlugin, "res/Segment7Standard.ttf"));
   };
     
   void draw(NVGcontext *vg) override
@@ -55,7 +54,9 @@ struct MsDisplayWidget : TransparentWidget {
     nvgTextLetterSpacing(vg, 2.5);
     
     std::stringstream to_display;
-    to_display << std::right  << std::setw(2) << *value;
+    if (value != nullptr) {
+        to_display << std::right << std::setw(2) << *value;
+    }
     
     Vec textPos = Vec(4.0f, 17.0f);
     

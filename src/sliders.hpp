@@ -1,25 +1,24 @@
 #pragma once
 using namespace std;
 
-//-----------------------------------------------------
-// Sliders
-//
-//-----------------------------------------------------
+void initialize_slider_levels(float start_level[NR_OF_BANDS]);
+float equal_loudness_value(int);
+float min_equal_loudness_value(void);
+
 struct MySlider_01 : SvgSlider 
 {
 	MySlider_01() 
     {
-
 		Vec margin = Vec(0, 0);
 		maxHandlePos = Vec(0, -4).plus(margin);
 		minHandlePos = Vec(0, 33).plus(margin);
 
-        background->svg = APP->window->loadSvg(asset::plugin(pluginInstance2, "res/mschack/mschack_sliderBG_01.svg"));
+        background->svg = APP->window->loadSvg(asset::plugin(thePlugin, "res/mschack/mschack_sliderBG_01.svg"));
 		background->wrap();
 		background->box.pos = margin;
 		box.size = background->box.size.plus(margin.mult(2));
 
-        handle->svg = APP->window->loadSvg(asset::plugin(pluginInstance2, "res/mschack/mschack_sliderKNOB_01.svg"));
+        handle->svg = APP->window->loadSvg(asset::plugin(thePlugin, "res/mschack/mschack_sliderKNOB_01.svg"));
 		handle->wrap();
 	}
 };
@@ -32,12 +31,12 @@ struct Slider02_10x15 : SvgSlider
 		maxHandlePos = Vec(-3, 0).plus(margin);
 		minHandlePos = Vec(-3, 60).plus(margin);
 
-        background->svg = APP->window->loadSvg(asset::plugin(pluginInstance2, "res/mschack/mschack_sliderBG_02.svg"));
+        background->svg = APP->window->loadSvg(asset::plugin(thePlugin, "res/mschack/mschack_sliderBG_02.svg"));
 		background->wrap();
 		background->box.pos = margin;
 		box.size = background->box.size.plus(margin.mult(2));
 
-        handle->svg = APP->window->loadSvg(asset::plugin(pluginInstance2, "res/mschack/mschack_Slider02_10x15.svg"));
+        handle->svg = APP->window->loadSvg(asset::plugin(thePlugin, "res/mschack/mschack_Slider02_10x15.svg"));
 		handle->wrap();
 	}
 
@@ -49,7 +48,7 @@ struct Slider02_10x15 : SvgSlider
     };
 };
 
-struct SliderWithId: Slider02_10x15 
+struct SliderWithId: Slider02_10x15
 {
     int id;
     Type type;
@@ -72,4 +71,3 @@ struct SliderWithId: Slider02_10x15
     }
 */
 };
-

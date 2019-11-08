@@ -2,7 +2,6 @@
 #include "std.hpp"
 #include "matrix.hpp"
 #include "Vocode_O_Matic_XL.hpp"
-//#include "lbutton.hpp"
 #include "../deps/SynthDevKit/src/CV.hpp"
 #include "pan_and_level.hpp"
 #include "sliders.hpp"
@@ -56,7 +55,7 @@ void Vocode_O_Matic_XL::onReset() {
   init_release_times(envelope_release_time);
   for (int i = 0; i < NR_OF_BANDS; i++) {
     params[ATTACK_TIME_PARAM + i].value = envelope_attack_time[i];
-    params[RELEASE_TIME_PARAM + i].value = envelope_attack_time[i];
+    params[RELEASE_TIME_PARAM + i].value = envelope_release_time[i];
   }
   comp_attack_factors(envelope_attack_factor, envelope_attack_time);
   comp_release_factors(envelope_release_factor, envelope_release_time);
@@ -108,26 +107,30 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
     comp_attack_factors(envelope_attack_factor, envelope_attack_time);
     comp_release_factors(envelope_release_factor, envelope_release_time);
     only_once = 0;
-    printf("attack_time   :"); print_array(envelope_attack_time);
-    printf("release_time  :"); print_array(envelope_release_time);
-    printf("attack_factor :"); print_array(envelope_attack_factor);
-    printf("release_factor:"); print_array(envelope_release_factor);
-    printf("left_pan      :"); print_array(left_pan);
-    printf("right_pan     :"); print_array(right_pan);
-    printf("left_level    :"); print_array(left_level);
-    printf("right_level   :"); print_array(right_level);
-    printf("mod_alpha1    :"); print_array(mod_alpha1);
-    printf("mod_alpha2    :"); print_array(mod_alpha2);
-    printf("mod_beta      :"); print_array(mod_beta);
-    printf("carr_alpha1   :"); print_array(carr_alpha1);
-    printf("carr_alpha2   :"); print_array(carr_alpha2);
-    printf("carr_beta     :"); print_array(carr_beta);
+    printf("attack_time    : "); print_array(envelope_attack_time);
+    printf("release_time   : "); print_array(envelope_release_time);
+    printf("attack_factor  : "); print_array(envelope_attack_factor);
+    printf("release_factor : "); print_array(envelope_release_factor);
+    printf("left_pan       : "); print_array(left_pan);
+    printf("right_pan      : "); print_array(right_pan);
+    printf("left_level     : "); print_array(left_level);
+    printf("right_level    : "); print_array(right_level);
+    printf("mod_alpha1     : "); print_array(mod_alpha1);
+    printf("mod_alpha2     : "); print_array(mod_alpha2);
+    printf("mod_beta       : "); print_array(mod_beta);
+    printf("carr_alpha1    : "); print_array(carr_alpha1);
+    printf("carr_alpha2    : "); print_array(carr_alpha2);
+    printf("carr_beta      : "); print_array(carr_beta);
   }
+
+#ifdef DEBUGMSG
+  bool refresh = false;
+#endif
+
   // Do da vocoding thang,
   // while checking all buttons, dials and sliders.
   float deltaTime = APP->engine->getSampleTime();
   float oneStepDeltaTime = APP->engine->getSampleTime();
-  bool refresh = false;
              
   xc[0] = inputs[CARR_INPUT].getVoltage() * params[CARRIER_GAIN_PARAM].getValue();
   xm[0] = inputs[MOD_INPUT].getVoltage() * params[MODULATOR_GAIN_PARAM].getValue();
@@ -258,7 +261,7 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
 #ifdef PANNING
   width = params[PANNING_PARAM].getValue();
   if (width != width_old) {
-    set_pan_and_level(start_level, left_pan, right_pan, left_level, right_level, width);
+    set_pan_and_level(slider_level, left_pan, right_pan, left_level, right_level, width);
     width_old = width;
   }
 #endif
@@ -352,6 +355,11 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
             change = true;
         }
     }
+    if (change) {
+        // compute new pan values.
+        int width = 1;
+        set_pan_and_level(slider_level, left_pan, right_pan, left_level, right_level, width);
+    }
 
     // ToDo: how to implement the pan slider values ???
 
@@ -371,7 +379,8 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
     wait_all_sliders -= 1;
   }
 
- if (fx_bypass) {
+  // Now we compute the output sample amplitude for both channels.
+  if (fx_bypass) {
     outputs[LEFT_OUTPUT].setVoltage(inputs[CARR_INPUT].getVoltage() * params[CARRIER_GAIN_PARAM].getValue());
     outputs[RIGHT_OUTPUT].setVoltage(inputs[MOD_INPUT].getVoltage() * params[MODULATOR_GAIN_PARAM].getValue());
   }
@@ -409,12 +418,12 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
   }
 }
 
-struct Vocode_O_Matic_XL_Widget : ModuleWidget, Vocode_O_Matic_XL {
+struct Vocode_O_Matic_XL_Widget : ModuleWidget,  Vocode_O_Matic_XL {
   Vocode_O_Matic_XL_Widget(Vocode_O_Matic_XL *module) {
     setModule(module);
 
     // Set background.
-    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance2, "res/Sculpt-O-Sound-_-Vocode_O_Matic_XL_v0.1.svg")));
+    setPanel(APP->window->loadSvg(asset::plugin(thePlugin, "res/Sculpt-O-Sound-_-Vocode_O_Matic_XL_v0.1.svg")));
 
     // Add some screws.
     addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
@@ -464,14 +473,18 @@ struct Vocode_O_Matic_XL_Widget : ModuleWidget, Vocode_O_Matic_XL {
     MsDisplayWidget *matrix_mode_display = new MsDisplayWidget();                            
     matrix_mode_display->box.pos = Vec(38, 105);                                               
     matrix_mode_display->box.size = Vec(30, 20);                                             
-    matrix_mode_display->value = &module->matrix_mode;
+    if (module) {
+        matrix_mode_display->value = &module->matrix_mode;
+    }
     addChild(matrix_mode_display);                                                           
 
     // Matrix Shift Position Display 
     MsDisplayWidget *matrix_shift_position_display = new MsDisplayWidget();           
     matrix_shift_position_display->box.pos = Vec(38, 143);
     matrix_shift_position_display->box.size = Vec(30, 20);                                             
-    matrix_shift_position_display->value = &module->matrix_shift_position;
+    if (module) {
+        matrix_shift_position_display->value = &module->matrix_shift_position;
+    }
     addChild(matrix_shift_position_display);                                                           
 
     // Output of vocoded signal.
@@ -516,25 +529,25 @@ struct Vocode_O_Matic_XL_Widget : ModuleWidget, Vocode_O_Matic_XL {
     // Add 4 rows of sliders for 
     for (int i = 0; i < NR_OF_BANDS; i++) {
         // envelope attack time,
-        attack_time_slider[i] = createParam<SliderWithId>(Vec(SLIDERS_X_OFFSET + i * 12,  10), module, Vocode_O_Matic_XL::ATTACK_TIME_PARAM + i); //, min_envelope_attack_time[i], max_envelope_attack_time[i], INITIAL_ATTACK_TIME);
+        attack_time_slider[i] = createParam<SliderWithId>(Vec(SLIDERS_X_OFFSET + i * 12,  10), module, Vocode_O_Matic_XL::ATTACK_TIME_PARAM + i); 
         attack_time_slider[i] ->id = i;
         attack_time_slider[i] ->type = SliderWithId::ATTACK_TIME;
         addParam(attack_time_slider[i]);
 
         // envelope release time,
-        release_time_slider[i] = createParam<SliderWithId>(Vec(SLIDERS_X_OFFSET + i * 12,  100), module, Vocode_O_Matic_XL::RELEASE_TIME_PARAM + i); //, min_envelope_release_time[i], max_envelope_release_time[i], INITIAL_RELEASE_TIME);
+        release_time_slider[i] = createParam<SliderWithId>(Vec(SLIDERS_X_OFFSET + i * 12,  100), module, Vocode_O_Matic_XL::RELEASE_TIME_PARAM + i); 
         release_time_slider[i]->id = i;
         release_time_slider[i]->type = SliderWithId::RELEASE_TIME;
         addParam(release_time_slider[i]);
 
         // level and
-        level_slider[i] = createParam<SliderWithId>(Vec(SLIDERS_X_OFFSET + i * 12, 190), module, Vocode_O_Matic_XL::LEVEL_PARAM + i); //, MIN_LEVEL, MAX_LEVEL, INITIAL_LEVEL);
+        level_slider[i] = createParam<SliderWithId>(Vec(SLIDERS_X_OFFSET + i * 12, 190), module, Vocode_O_Matic_XL::LEVEL_PARAM + i); 
         level_slider[i]->id = i;
         level_slider[i]->type = SliderWithId::LEVEL;
         addParam(level_slider[i]);
 
         // panning.
-        pan_slider[i] = createParam<SliderWithId>(Vec(SLIDERS_X_OFFSET + i * 12, 280), module, Vocode_O_Matic_XL::PAN_PARAM + i); //, MIN_PAN, MAX_PAN, INITIAL_PAN);
+        pan_slider[i] = createParam<SliderWithId>(Vec(SLIDERS_X_OFFSET + i * 12, 280), module, Vocode_O_Matic_XL::PAN_PARAM + i); 
         pan_slider[i]->id = i;
         pan_slider[i]->type = SliderWithId::PAN;
         addParam(pan_slider[i]);

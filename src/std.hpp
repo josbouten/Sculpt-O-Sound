@@ -36,11 +36,28 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #define UPPER_ENVELOPE_RELEASE_TEMPERATURE 100
 #define ENVELOPE_TEMPERATURE 10
 
+#define MIN_ATTACK_TIME 0.0001
+#define MAX_ATTACK_TIME 1.0000
+#define MIN_RELEASE_TIME 0.0001
+#define MAX_RELEASE_TIME 1.0000
+
+#define INITIAL_CARRIER_GAIN 1.0
+#define MIN_CARRIER_GAIN 1.0
+#define MAX_CARRIER_GAIN 10.0
+#define INITIAL_MODULATOR_GAIN 1.0
+#define MIN_MODULATOR_GAIN 1.0
+#define MAX_MODULATOR_GAIN 10.0
+
+#define MIN_LEVEL 1.0
+#define MAX_LEVEL 10.0
+#define INITIAL_LEVEL 1.0
+
+
 #define MIN_PAN         -0.999 // Right
 #define MAX_PAN          0.999 // Left
 
-#define CENTER_PAN_VALUE 0.0
-#define INITIAL_PAN   CENTER_PAN_VALUE
+#define CENTER_PAN 0.0
+#define INITIAL_PAN   CENTER_PAN
 #define INITIAL_PAN_OFFSET ((MAX_PAN - MIN_PAN) / 5)
 
 #define UPPER_SMOOTHING_BAND 20
@@ -50,5 +67,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #define NR_OF_BANDS 31
 #define FALSE 0
 #define TRUE 1
+
+#define MAX_SHORT 32767
+
+float fl_max(float a, float b);
+float fl_min(float a, float b);
 
 #endif

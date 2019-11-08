@@ -33,6 +33,9 @@ void init_pan_and_level(float startLevel[NR_OF_BANDS], float left_pan[NR_OF_BAND
        float p = pow(10, startLevel[i] / 20);
        left_level[i] =  left_pan[i] * p;
        right_level[i] = right_pan[i] * p;
+#ifdef DEBUGMSG
+        printf("pan_and_level: %f %f %f %f\n", left_pan[i], right_pan[i], left_level[i], right_level[i]);
+#endif
    }
 }
 
@@ -49,5 +52,8 @@ void set_pan_and_level(float startLevel[NR_OF_BANDS], float left_pan[NR_OF_BANDS
        float p = pow(10, startLevel[i] / 20);
        left_level[i] =  left_pan[i] * p;
        right_level[i] = right_pan[i] * p;
+#ifdef DEBUGMSG
+        printf("pan_and_level: %f %f %f %f\n", left_pan[i], right_pan[i], left_level[i], right_level[i]);
+#endif
    }
 }

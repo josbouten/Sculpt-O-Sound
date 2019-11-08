@@ -75,9 +75,9 @@ void comp_release_times(float release_time[NR_OF_BANDS])
     f_c = ((float) freq[i+1] + (float) freq[i]) / 2.0;
     // Make bands above band UPPER_SMOOTHING_BAND sound less harsh.
     if (i > UPPER_SMOOTHING_BAND)
-      release_time[i] = SMOOTHING_FACTOR * (2 * PI / f_c) * INITIAL_ENVELOPE_RELEASE_TEMPERATURE;
+      release_time[i] = fl_min(SMOOTHING_FACTOR * MAX_RELEASE_TIME, SMOOTHING_FACTOR * (2 * PI / f_c) * INITIAL_ENVELOPE_RELEASE_TEMPERATURE);
     else
-      release_time[i] = (2 * PI / f_c) * INITIAL_ENVELOPE_RELEASE_TEMPERATURE;
+      release_time[i] = fl_min(SMOOTHING_FACTOR * MAX_RELEASE_TIME, (2 * PI / f_c) * INITIAL_ENVELOPE_RELEASE_TEMPERATURE);
   }
 }
 
@@ -88,7 +88,7 @@ void comp_attack_times(float attack_time[NR_OF_BANDS])
   for (i = 0; i < NR_OF_BANDS; i++)
   {
     f_c = ((float) freq[i+1] + (float) freq[i]) / 2.0;
-    attack_time[i]  = (2 * PI / f_c) * INITIAL_ENVELOPE_ATTACK_TEMPERATURE;
+    attack_time[i]  = fl_min(SMOOTHING_FACTOR * MAX_ATTACK_TIME, (2 * PI / f_c) * INITIAL_ENVELOPE_ATTACK_TEMPERATURE);
   }
 }
 

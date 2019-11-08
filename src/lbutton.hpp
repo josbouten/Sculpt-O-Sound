@@ -1,4 +1,3 @@
-
 /*
 struct LButton : SvgSwitch, MomentarySwitch {
     LButton() {

@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include "Sculpt-O-Sound.hpp"
 #include "std.hpp"
 #include "matrix.hpp"
 #include "Vocode_O_Matic.hpp"
-#include "Sculpt-O-Sound.hpp"
 #include "pan_and_level.hpp"
 
 //#define PANNING
@@ -100,6 +100,28 @@ void Vocode_O_Matic::onRandomize() {
 }
 
 void Vocode_O_Matic::process(const ProcessArgs &args) {
+  static int only_once = 1;
+  if (only_once == 1) {
+    init_attack_times(envelope_attack_time);
+    init_release_times(envelope_release_time);
+    comp_attack_factors(envelope_attack_factor, envelope_attack_time);
+    comp_release_factors(envelope_release_factor, envelope_release_time);
+    only_once = 0;
+    printf("attack_time    : "); print_array(envelope_attack_time);
+    printf("release_time   : "); print_array(envelope_release_time);
+    printf("attack_factor  : "); print_array(envelope_attack_factor);
+    printf("release_factor : "); print_array(envelope_release_factor);
+    printf("left_pan       : "); print_array(left_pan);
+    printf("right_pan      : "); print_array(right_pan);
+    printf("left_level     : "); print_array(left_level);
+    printf("right_level    : "); print_array(right_level);
+    printf("mod_alpha1     : "); print_array(mod_alpha1);
+    printf("mod_alpha2     : "); print_array(mod_alpha2);
+    printf("mod_beta       : "); print_array(mod_beta);
+    printf("carr_alpha1    : "); print_array(carr_alpha1);
+    printf("carr_alpha2    : "); print_array(carr_alpha2);
+    printf("carr_beta      : "); print_array(carr_beta);
+  }
   // Do da vocoding thang.
   float deltaTime = args.sampleTime;
   float oneStepDeltaTime = args.sampleTime;
@@ -284,6 +306,7 @@ void Vocode_O_Matic::process(const ProcessArgs &args) {
   }
 #endif
 
+  // Now we compute the output sample amplitude for both channels.
   if (fx_bypass) {
     outputs[LEFT_OUTPUT].setVoltage(inputs[CARR_INPUT].getVoltage() * params[CARRIER_GAIN_PARAM].getValue());
     outputs[RIGHT_OUTPUT].setVoltage(inputs[MOD_INPUT].getVoltage() * params[MODULATOR_GAIN_PARAM].getValue());
@@ -327,7 +350,7 @@ struct Vocode_O_MaticWidget : ModuleWidget {
 	setModule(module);
 
     // Set background.
-    setPanel(APP->window->loadSvg(asset::plugin(pluginInstance, "res/Sculpt-O-Sound-_-Vocode_O_Matic_v0.4.svg")));
+    setPanel(APP->window->loadSvg(asset::plugin(thePlugin, "res/Sculpt-O-Sound-_-Vocode_O_Matic_v0.4.svg")));
 
     // Add some screws.
     addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));

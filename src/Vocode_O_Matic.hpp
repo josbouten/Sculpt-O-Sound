@@ -21,9 +21,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "../SynthDevKit/src/CV.hpp"
 #include "Sculpt-O-Sound.hpp"
 #include "comp_coeffs.hpp"
-
-#define INITIAL_CARRIER_GAIN 1.0
-#define INITIAL_MODULATOR_GAIN 1.0
+#include "pan_and_level.hpp"
+#include "sliders.hpp"
 
 struct Vocode_O_Matic : Module {
 
@@ -38,12 +37,12 @@ struct Vocode_O_Matic : Module {
         for (int j = 0; j < NR_OF_BANDS; j++)
         {
             led_state[i * NR_OF_BANDS + j] = false;
-            lights[lights_offset + i * NR_OF_BANDS + j].setBrightness(false);
+            lights[lights_offset + i * NR_OF_BANDS + j].setBrightness(0.0);
         }
         for (int j = 0; j < p_cnt[i]; j++)
         {
             led_state[i * NR_OF_BANDS + button_value[i][j]] = true;
-            lights[lights_offset + i * NR_OF_BANDS + button_value[i][j]].setBrightness(true);
+            lights[lights_offset + i * NR_OF_BANDS + button_value[i][j]].setBrightness(1.0);
         }
      }
   }
@@ -346,9 +345,9 @@ struct Vocode_O_Matic : Module {
 
   Vocode_O_Matic() {
 	config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-    configParam(Vocode_O_Matic::CARRIER_GAIN_PARAM, 1.0, 10.0, INITIAL_CARRIER_GAIN, "Gain factor for carrier signal (default=1).", "");
-    configParam(Vocode_O_Matic::MODULATOR_GAIN_PARAM, 1.0, 10.0, INITIAL_MODULATOR_GAIN, "Gain factor for modulator signal (default=1)", "");
-    configParam(Vocode_O_Matic::PANNING_PARAM, 0.5, MAX_PAN, 1.0 / INITIAL_PAN_OFFSET, "Panning width of even and odd filter outputs.", "");
+    configParam(Vocode_O_Matic::CARRIER_GAIN_PARAM, MIN_CARRIER_GAIN, MAX_CARRIER_GAIN, INITIAL_CARRIER_GAIN, "Gain factor for carrier signal (default=1).", "");
+    configParam(Vocode_O_Matic::MODULATOR_GAIN_PARAM, MIN_MODULATOR_GAIN, MAX_MODULATOR_GAIN, INITIAL_MODULATOR_GAIN, "Gain factor for modulator signal (default=1)", "");
+    configParam(Vocode_O_Matic::PANNING_PARAM, MIN_PAN, MAX_PAN, 1.0 / INITIAL_PAN_OFFSET, "Panning width of even and odd filter outputs.", "");
     configParam(Vocode_O_Matic::BYPASS_SWITCH , 0.0f, 1.0f, 0.0f, "Bypass vocoder and play carrier on left and modulator on right channel.", "");
     configParam(Vocode_O_Matic::MATRIX_MODE_TOGGLE_PARAM, 0.0f, 1.0f, 0.0f, "Toggle through all matrix modes.", "");
     configParam(Vocode_O_Matic::MATRIX_ONE_STEP_RIGHT_PARAM, 0.0f, 1.0f, 0.0f, "Move matrix one step to the right.", "");
@@ -356,7 +355,6 @@ struct Vocode_O_Matic : Module {
     configParam(Vocode_O_Matic::MATRIX_HOLD_TOGGLE_PARAM, 0.0f, 1.0f, 0.0f, "Prevent the matrix from shifting.", "");
     char message[255];
     for (int offset = 0; offset < NR_OF_BANDS; offset++) {
-      configParam(Vocode_O_Matic::MOD_MATRIX_PARAM + offset, 0.0, 1.0f, 0.0f, "", "");
       sprintf(message, "Mute %d Hz band.", freq[offset + 1]);
       configParam(Vocode_O_Matic::MUTE_OUTPUT_PARAM + offset, 0.0, 1.0f, 0.0f, message, "");
     }
@@ -365,7 +363,7 @@ struct Vocode_O_Matic : Module {
     for (int i = 0; i < NR_OF_BANDS; i++) {
         for (int j = 0; j < NR_OF_BANDS; j++) {
             sprintf(message, "Modulator %d Hz -> Carrier %d Hz.", freq[j + 1], freq[i + 1]);
-            configParam(Vocode_O_Matic::MOD_MATRIX_PARAM + i + j * NR_OF_BANDS, 0.0, 1.0, 0.0, message);
+            configParam(Vocode_O_Matic::MOD_MATRIX_PARAM + i + j * NR_OF_BANDS, MIN_LEVEL, MAX_LEVEL, INITIAL_LEVEL, message);
         }
     }
 
@@ -383,7 +381,7 @@ struct Vocode_O_Matic : Module {
       ym_env[i][1] = 0.0;
     }
     // Initialize the levels and pans.
-    initialize_start_levels(start_level);
+    initialize_slider_levels(start_level);
     init_pan_and_level(start_level, left_pan, right_pan, left_level, right_level);
     if (!matrix_mode_read_from_settings) {
         choose_matrix(4, button_value, p_cnt); // Initialize linear filter coupling.
@@ -415,8 +413,8 @@ struct LButton : SvgSwitch {
   LButton() {
     momentary = true;
     shadow->visible = false;
-    addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/L.svg")));
-    addFrame(APP->window->loadSvg(asset::plugin(pluginInstance, "res/L.svg")));
+    addFrame(APP->window->loadSvg(asset::plugin(thePlugin, "res/L.svg")));
+    addFrame(APP->window->loadSvg(asset::plugin(thePlugin, "res/L.svg")));
   }
 
   void onButton(const event::Button &e) override {
