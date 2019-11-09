@@ -38,12 +38,12 @@ struct Vocode_O_Matic : Module {
         for (int j = 0; j < NR_OF_BANDS; j++)
         {
             led_state[i * NR_OF_BANDS + j] = false;
-            lights[lights_offset + i * NR_OF_BANDS + j].setBrightness(false);
+            lights[lights_offset + i * NR_OF_BANDS + j].setBrightness(0.0);
         }
         for (int j = 0; j < p_cnt[i]; j++)
         {
             led_state[i * NR_OF_BANDS + button_value[i][j]] = true;
-            lights[lights_offset + i * NR_OF_BANDS + button_value[i][j]].setBrightness(true);
+            lights[lights_offset + i * NR_OF_BANDS + button_value[i][j]].setBrightness(1.0);
         }
      }
   }
