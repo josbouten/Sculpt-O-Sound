@@ -11,7 +11,7 @@ struct LButton : SvgSwitch, MomentarySwitch {
        //if ( rack::windowIsShiftPressed() ) { 
            //printf("shift pressed\n");
         //}
-#ifdef DEBUG
+#ifdef DEBUGMSG
        if (e.button == 1) {
             printf("Button pressed down\n");
        } else {

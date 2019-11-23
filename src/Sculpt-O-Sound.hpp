@@ -8,7 +8,7 @@
 // For debug purposes only !
 #define DEBUGMSG
 
-#define PAN_WIDTH
+//#define PAN_WIDTH
 
 using namespace rack;
 

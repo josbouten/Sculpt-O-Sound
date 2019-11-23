@@ -39,9 +39,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #define ENVELOPE_TEMPERATURE 10
 
 #define MIN_ATTACK_TIME 0.0001
-#define MAX_ATTACK_TIME 1.0000
+#define MAX_ATTACK_TIME 100.0000
 #define MIN_RELEASE_TIME 0.0001
-#define MAX_RELEASE_TIME 1.0000
+#define MAX_RELEASE_TIME 100.0000
 
 // LEVELS
 
@@ -53,7 +53,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #define MAX_MODULATOR_GAIN 10.0
 
 #define MIN_LEVEL 1.0
-#define MAX_LEVEL 10.0
+#define MAX_LEVEL 50.0
 #define INITIAL_LEVEL 1.0
 
 // PANNING

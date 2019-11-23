@@ -1,4 +1,5 @@
 #include "std.hpp"
+#include <stdio.h>
  
 float equal_loudness_value(int _index)
 {
@@ -46,5 +47,6 @@ void initialize_slider_levels(float start_level[NR_OF_BANDS])
   for (int i = 0; i < NR_OF_BANDS; i++) { 
     //start_level[i] = equal_loudness_value(i);
     start_level[i] = INITIAL_START_LEVEL * equal_loudness_value(i) / minimum_equal_loudness_level;
+    printf("start_level[%d] = %f\n", i, start_level[i]);
   }
 }

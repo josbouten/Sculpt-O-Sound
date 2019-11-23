@@ -8,9 +8,9 @@
 
 struct Vocode_O_Matic_XL : Module {
 
-    // Define CV trigger a la synthkit for shifting the matrix.
-    SynthDevKit::CV *cv_right = new SynthDevKit::CV(0.1f);
-    SynthDevKit::CV *cv_left =  new SynthDevKit::CV(0.1f);
+  // Define CV trigger a la synthkit for shifting the matrix.
+  SynthDevKit::CV *cv_right = new SynthDevKit::CV(0.1f);
+  SynthDevKit::CV *cv_left =  new SynthDevKit::CV(0.1f);
 
   void refresh_led_matrix(int lights_offset, int p_cnt[NR_OF_BANDS], int button_value[NR_OF_BANDS][NR_OF_BANDS], bool led_state[1024])
   {
@@ -198,7 +198,11 @@ struct Vocode_O_Matic_XL : Module {
   float slider_level[NR_OF_BANDS]; // slider level value
   float slider_pan[NR_OF_BANDS]; // slider pan value
   float envelope_attack_time[NR_OF_BANDS];
+  float envelope_attack_time_lower_range[NR_OF_BANDS];
+  float envelope_attack_time_upper_range[NR_OF_BANDS];
   float envelope_release_time[NR_OF_BANDS]; 
+  float envelope_release_time_lower_range[NR_OF_BANDS]; 
+  float envelope_release_time_upper_range[NR_OF_BANDS]; 
   float envelope_attack_factor[NR_OF_BANDS];
   float envelope_release_factor[NR_OF_BANDS]; 
   float min_envelope_attack_time[NR_OF_BANDS];
@@ -438,13 +442,17 @@ struct Vocode_O_Matic_XL : Module {
             configParam(Vocode_O_Matic_XL::MOD_MATRIX_PARAM + i + j * NR_OF_BANDS, 0.0, 1.0, 0.0, message);
         }
     }
+
+    // Init the envelope follower's variables. 
+    init_attack_times(envelope_attack_time); 
+    init_release_times(envelope_release_time); 
+    comp_release_factors(envelope_release_factor, envelope_release_time);
+    comp_attack_and_release_time_ranges(envelope_attack_time_lower_range, envelope_attack_time_upper_range, envelope_release_time_lower_range, envelope_release_time_upper_range);
     for (int i = 0; i < NR_OF_BANDS; i++) {
         sprintf(message, "Attack time @ %d Hz", freq[i + 1]);
-        configParam(Vocode_O_Matic_XL::ATTACK_TIME_PARAM + i, MIN_ATTACK_TIME, MAX_ATTACK_TIME, 10 / freq[i + 1], message, "");
+        configParam(Vocode_O_Matic_XL::ATTACK_TIME_PARAM + i, envelope_attack_time_lower_range[i], envelope_attack_time_upper_range[i], envelope_attack_time[i], message, " s");
         sprintf(message, "Release time @ %d Hz", freq[i + 1]);
-        configParam(Vocode_O_Matic_XL::RELEASE_TIME_PARAM + i, MIN_RELEASE_TIME, MAX_RELEASE_TIME, 10 / freq[i + 1], message, "");
-        sprintf(message, "Level @ %d Hz", freq[i + 1]);
-        configParam(Vocode_O_Matic_XL::LEVEL_PARAM + i, MIN_LEVEL, MAX_LEVEL, INITIAL_LEVEL, message, "");
+        configParam(Vocode_O_Matic_XL::RELEASE_TIME_PARAM + i, envelope_release_time_lower_range[i], envelope_release_time_upper_range[i], envelope_release_time[i], message, " s");
     }
 
     // ToDo: add tooltips to the sliders.
@@ -467,6 +475,8 @@ struct Vocode_O_Matic_XL : Module {
     init_pan_and_level(slider_level, left_pan, right_pan, left_level, right_level);
     // Now set the sliders to the initial values.
     for (int i = 0; i < NR_OF_BANDS; i++) {
+        sprintf(message, "Level @ %d Hz", freq[i + 1]);
+        configParam(Vocode_O_Matic_XL::LEVEL_PARAM + i, MIN_LEVEL, MAX_LEVEL, slider_level[i], message, "");
         sprintf(message, "Pan @ %d Hz", freq[i + 1]);
         if ((i % 2) != 0) {
             configParam(Vocode_O_Matic_XL::PAN_PARAM + i, MIN_PAN, MAX_PAN, INITIAL_PAN + INITIAL_PAN_OFFSET, message, "");
@@ -490,13 +500,6 @@ struct Vocode_O_Matic_XL : Module {
     lights[MATRIX_HOLD_TOGGLE_LIGHT].setBrightness(0.0);
     lights[BYPASS_LIGHT].setBrightness(0.0);
  
-    // Init the envelope follower's variables. 
-    init_attack_times(envelope_attack_time); 
-    comp_attack_factors(envelope_attack_factor, envelope_attack_time);
-    init_release_times(envelope_release_time); 
-    comp_release_factors(envelope_release_factor, envelope_release_time);
-    comp_attack_and_release_time_ranges(min_envelope_attack_time, max_envelope_attack_time,
-                                        min_envelope_release_time, max_envelope_release_time);
   } 
 };
 
