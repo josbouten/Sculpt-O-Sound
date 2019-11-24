@@ -1,13 +1,26 @@
+Nov 2019
+- added Vocode-O-Matic-XL which is basically the same as Vocode-O-Matic but it has sliders
+  for the level of the modulator bands, sliders for panning the vocoded carrier bands to either left or right
+  and sliders for the attack and release time of the envelope follower of each terts band.
+- changed version to 1.1.0
+
+Oct 2019
+- changed version to 1.0.0
+- changed code to Rack v1.x with some great help from Jerry Sievert and Netboy3,
+- added tooltips,
+- code cleanup,
+- added some comments.
+
 Mon April 22 2019 
-- changed version to 0.6.4 
-- added text to the front panel
-- added trigger input for shifting matrix to the left and to the right, also added hold button
-- internal state and parameter settings are saved in patch
-- carrier bands can be muted
-- introduced pseudo stereo: panning of modulated odd carrier bands to the left 
-  and modulated even carrier bands to the right
+- changed version to 0.6.4 for Rack 0.6.4,
+- added text to the front panel,
+- added trigger input for shifting matrix to the left and to the right, also added hold button,
+- internal state and parameter settings are saved in patch,
+- carrier bands can be muted,
+- introduced pseudo stereo: panning of modulated odd carrier bands to the left,
+  and modulated even carrier bands to the right.
 
 Sat Mar  2 22:02:38 CET 2019 
-- changed version to 0.3
-- repaired matrix shift function. It will now show buttons shifting on OSX 
+- changed version to 0.3,
+- repaired matrix shift function. It will now show buttons shifting on OSX,
   as well which it previously only did on Linux.

@@ -1,23 +1,30 @@
-# VCV vocoder plugin
-# Copyright: Zaphod B. 2018, 2019
+# VCV vocoder plugin for vcvrack
+# Copyright: Zaphod B. 2018
 
-![alt text](res/pic_logo_sos.gif)
+![alt text](doc/pic_logo_sos.gif)
 
+Sculpt-O-Sound presents:
 
+Vocode-O-Matic is a 31 terts band vocoder with editable frequency matrix for Rack v1.x.
+Its use is restricted to 44100 Hz sampling frequency at the moment.
+You can find a video posted on youtube which demonstrates Vocode-O-Matic. You can find it here: https://www.youtube.com/watch?v=u_tcVmCJ_R8
 
-Sculpt-O-Sound presents: 
+Its use is restricted to 44100 Hz sampling frequency at the moment.
+You can find a video posted on youtube which demonstrates Vocode-O-Matic. You can find it here: https://www.youtube.com/watch?v=u_tcVmCJ_R8
 
-Vocode-O-Matic, v0.4 is a 31 terts band vocoder with editable frequency matrix usable for 44100 Hz sampling frequency only (at the moment).
-
-![alt text](res/Screen_dump_Vocode-O-Matic-v0.4_01.png)
+![alt text](doc/Screen_dump_Vocode-O-Matic_v1.1.0.png)
 
 The vocoder has 31 terts band filters for the carrier and modulator inputs.
 To get an interesting result, start by using a pad like sound with a big bandwidth as a carrier and
 a rhythm loop as a modulator. You should hear the pad play the rhythm.
 
+Vocode-O-Matic-XL is basically the same as Vocode-O-Matic but it has sliders for the level of the modulator bands, sliders for panning the vocoded carrier bands to either left or right and sliders for the attack and release time of the envelope follower of each terts band.
+
+![alt text](doc/Vocode-O-Matic-XL_v1.1.0.png)
+
 Signal flow
 ===========
-The modulator signal is fed into the matrix from the bottom of the matrix anddevided into 31 frequency bands. So each column corresponds to a band of the modulator. The carrier signal is fed into the matrix from the left. So each row corresponds to a frequency band or the carrier. Buttons pressed in the matrix will allow the corresponding column's modulator band energy to modulate the corresponding row's carrier band signal. All modulated carrier signals are summed and send to 2 outputs. The sum of the modulated even bands is send to the Left output, the sum of the modulated odd bands to the Right output.
+The modulator signal is fed into the matrix from the left hand side of the matrix and devided into 31 frequency bands. The center frequency of the band pass filters used goes up from the bottom to the top of the matrix. So each row corresponds to a band of the modulator. The carrier signal is fed into the matrix from the bottom (frequencies go up from left to right). So each column corresponds to a frequency band or the carrier. Buttons pressed in the matrix will allow the corresponding row's modulator band energy to modulate the corresponding column's carrier band signal. All modulated carrier signals are summed and send to 2 outputs. The sum of the modulated even bands is send to the Left output, the sum of the modulated odd bands to the Right output. At the right hand side of the matrix are mute buttons. They allow muting a carrier band thus excluding it from the summed output.
 
 The frequency is lowest at the lower left side of the matrix. Bands more to the right or up are higher in frequency.
 
@@ -26,8 +33,8 @@ To make it easy for users Vocode-O-Matic comes with 5 presets. Mode 4 is the lin
 Inputs
 ======
 Obviously there is an input for the carrier signal and one for the modulator signal.
-A trigger puls to the Shift L input will shift the buttons of the matrix one position to the left with wrap around.
-The Shift R trigger input will shift the matrix in the opposite direction.
+A trigger pulse to the Shift L input will shift the buttons of the matrix one position to the left with wrap around.
+A trigger pulse applied to the Shift R trigger input will shift the matrix in the opposite direction.
 
 Outputs
 =======
@@ -41,13 +48,13 @@ Matrix buttons
 ==============
 The filter matrix consists of toggle switches, so you can make your own coupling between modulator and carrier filters.
 Mind you, no attenuation is done, so if you combine a lot of modulator bands with one carrier filter, the output of the filter
-may exceed the maximum sample value (voltage) allowed resulting in distortion. 
+may exceed the maximum sample value (voltage) allowed resulting in distortion.
 
 Matrix mode button
 ==================
 The mode toggle button lets you choose between 5 filter mappings. Number 4 is a linear mapping of the modulator filters
-against the carrier filters. This is the default at startup. Number 5 is a inverse mapping. 
-Mapping 0, 1, 2, 3 are log mappings. All sound differently. And by toggling switches in the matrix you can change them.
+against the carrier filters. This is the default at startup. Number 5 is an inverse mapping.
+Mapping 0, 1, 2, 3 are log mappings. All sound differently. By toggling switches in the matrix you can change them.
 
 Shift L R buttons
 =================
@@ -63,35 +70,34 @@ On the right hand side of the filter matrix for every frequency band of the carr
 
 Bypass button
 =============
-The bypass toggle button when pressed will turn red, this will put the vocoder in bypass mode. 
-This will send the modulator and carrier input signals to the left and right outputs respectively.
+The bypass toggle button when pressed will turn red, this will put the vocoder in bypass mode.
+This will send the carrier and modulator input signals to the left and right output respectively.
 If you use the Vocode-O-Matic-example.vcv settings file make sure you hear the string sample and the drum loop in bypass mode. If not, reload the samples in the simpler modules.
 
 Sources
 =======
 All filters are based on the series of tutorial papers about Effect Design by Jon Dattorro published in the Journal of the Audio Engineering Society (https://ccrma.stanford.edu/~dattorro/EffectDesignPart1.pdf).
 
+Aknowledgements
+===============
+I am deeply indebted to Jerry Sievert and Netboy3 for their help in porting the Rack v0.6 version of Vocode-O-Matic to the v1.x standard. Thanks a lot!
+
 Example
 =======
-
 Try for example the files fl1_std.wav (string from a Kurzweil K2000) and jung05.wav (a jungle loop from some sample kit).
 You can play them via a sample player like complex simpler from the NYSTHI plugin set.
 Make sure the carrier simpler loads the fl2.wav file and the modulator simpler the jung05.wav file.
+I posted a video on youtube which demonstrates this. You can find it here: https://www.youtube.com/watch?v=u_tcVmCJ_R8
 
 Known bugs
 ==========
-Since I'm relatively new to C++ programming and the Rack VCV platform I probably have not initialized all elements properly.
-What I've found is that the vocoder on occasion will only output a DC value, and not produce any other sound at all.
-Restarting Rack or opening the module once more will often solve this problem. If anyone knows how to handle this properly,
-please let me know.
+None at the moment. But please let me know if you find any, or if you wish me to add any features.
 
 Request
 =======
-Please let me know if you have used Vocode-O-Matic in your music (send me a link or a mp3 file). I'm very curious to hear how people use it.
+Please let me know if you have used Vocode-O-Matic in your music (send me a link or an mp3 file). I'm very curious to hear how people use it.
 
-Changelog
-=========
-v0.4 
-    - internal state and parameter settings are saved.
-    - outputs can be muted
-    - added text to the front panel
+License
+=======
+All **source code** is copyright © 2018 Jos Bouten and is licensed under the [GNU General Public License v3.0](gpl-3.0.txt).
+All **graphics** in the `res` directory are copyright © 2018 Jos Bouten and licensed under [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/).

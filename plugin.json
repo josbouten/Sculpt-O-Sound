@@ -1,7 +1,7 @@
 {
   "slug": "Sculpt-O-Sound",
   "name": "Sculpt-O-Sound",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "license": "GPL-3.0-or-later",
   "brand": "Sculpt-O-Sound",
   "author": "Jos Bouten aka Zaphod B.",
@@ -23,7 +23,7 @@
     {
       "slug": "Vocode_O_Matic_XL",
       "name": "Vocode-O-Matic_XL",
-      "description": "31 Terts Band Vocoder",
+      "description": "31 Terts Band Vocoder with sliders for envelope attack and release time, level and panning",
       "tags": [
         "Effect", "Vocoder"
       ]
