@@ -12,7 +12,7 @@ You can find a video posted on youtube which demonstrates Vocode-O-Matic. You ca
 Its use is restricted to 44100 Hz sampling frequency at the moment.
 You can find a video posted on youtube which demonstrates Vocode-O-Matic. You can find it here: https://www.youtube.com/watch?v=u_tcVmCJ_R8
 
-![alt text](doc/Screen_dump_Vocode-O-Matic_v1.1.0.png)
+![alt text](doc/Vocode-O-Matic_v1.1.0.png)
 
 The vocoder has 31 terts band filters for the carrier and modulator inputs.
 To get an interesting result, start by using a pad like sound with a big bandwidth as a carrier and
