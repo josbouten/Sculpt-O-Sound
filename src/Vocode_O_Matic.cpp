@@ -312,7 +312,7 @@ void Vocode_O_Matic::process(const ProcessArgs &args) {
           // Compute output value of signal ( superposition )
           outputs[LEFT_OUTPUT].setVoltage(outputs[LEFT_OUTPUT].getVoltage() + fl_tmp);
           //
-          // Right channel.
+
           fl_tmp = fl_tmp0 * right_level[i];
           // Compute output value of signal ( superposition )
           outputs[RIGHT_OUTPUT].setVoltage(outputs[RIGHT_OUTPUT].getVoltage() + fl_tmp);
@@ -413,7 +413,7 @@ struct Vocode_O_MaticWidget : ModuleWidget {
       }
     }
 
-    // Add mute output buttons to the left of the matrix.
+    // Add mute output buttons on the RHS of the matrix.
     int x = HBASE + 0.25 * LED_WIDTH + NR_OF_BANDS * LED_WIDTH;
     for (int i = 0; i < NR_OF_BANDS; i++) {
       int y = VBASE - i * (LED_HEIGHT + 1);

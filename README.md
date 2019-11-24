@@ -17,7 +17,7 @@ a rhythm loop as a modulator. You should hear the pad play the rhythm.
 
 Signal flow
 ===========
-The modulator signal is fed into the matrix from the left hand side of the matrix and devided into 31 frequency bands. The center frequency of the band pass filters used goes up from the bottom to the top of the matrix. So each row corresponds to a band of the modulator. The carrier signal is fed into the matrix from the bottom (frequencies go up from left to right). So each column corresponds to a frequency band or the carrier. Buttons pressed in the matrix will allow the corresponding row's modulator band energy to modulate the corresponding column's carrier band signal. All modulated carrier signals are summed and send to 2 outputs. The sum of the modulated even bands is send to the Left output, the sum of the modulated odd bands to the Right output. At the right hand side of the matrix are mute buttons. They allow muting a carrier band thus excluding it from the summed output.
+The modulator signal is fed into the matrix from the left hand side of the matrix and devided into 31 frequency bands. The center frequency of the band pass filters used goes up from the bottom to the top of the matrix. So each row corresponds to a band of the modulator. The carrier signal is fed into the matrix from the bottom (frequencies go up from left to right). So each column corresponds to a frequency band or the carrier. Buttons pressed in the matrix will allow the corresponding row's modulator band energy to modulate the corresponding column's carrier band signal. All modulated carrier signals are summed and send to 2 outputs. The sum of the modulated even bands is send to the Left output, the sum of the modulated odd bands to the Right output. At the right hand side of the matrix are mute buttons. They allow muting a modulator band thus excluding its effect on the carrier bands.
 
 The frequency is lowest at the lower left side of the matrix. Bands more to the right or up are higher in frequency.
 
@@ -59,7 +59,7 @@ The hold button will stop the effect of the pulse to the inputs, effectively hol
 
 Mute buttons
 ============
-On the right hand side of the filter matrix for every frequency band of the carrier a mute buttons is shown. By default all outputs are active i.e. no band is muted (lights are green). If you toggle a button the light will go out and the corresponding carrier signal will not be added to the output signal.
+On the right hand side of the filter matrix for every frequency band of the modulator a mute buttons is shown. By default all outputs are active i.e. no modulator band is muted (lights are green). If you toggle a button the light will go out and the corresponding modulator signal will not add to the vocoder effect.
 
 Bypass button
 =============
