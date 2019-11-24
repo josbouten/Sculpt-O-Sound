@@ -53,7 +53,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #define MAX_MODULATOR_GAIN 10.0
 
 #define MIN_LEVEL 1.0
-#define MAX_LEVEL 50.0
+#define MAX_LEVEL 24.0
 #define INITIAL_LEVEL 1.0
 
 // PANNING

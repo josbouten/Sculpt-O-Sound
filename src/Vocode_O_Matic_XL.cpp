@@ -499,7 +499,7 @@ struct Vocode_O_Matic_XL_Widget : ModuleWidget,  Vocode_O_Matic_XL {
             int y = VBASE - i * (LED_HEIGHT + 1);
             int offset = i * NR_OF_BANDS + j;
             {
-                LButton *lb = new LButton();
+                LButton_XL *lb = new LButton_XL();
                 lb->module = module;
                 lb->box.pos = Vec(x, y);
                 if (module) {
@@ -510,13 +510,13 @@ struct Vocode_O_Matic_XL_Widget : ModuleWidget,  Vocode_O_Matic_XL {
             addChild(createLight<MediumLight<BlueLight>>(Vec(x, y), module, Vocode_O_Matic_XL::MOD_MATRIX + offset));
         }
     }
-    // Mute output buttons on the RHS of the matrix.
+    // Add mute output buttons on the RHS of the matrix.
     int x = HBASE + 0.25 * LED_WIDTH + NR_OF_BANDS * LED_WIDTH;
     for (int i = 0; i < NR_OF_BANDS; i++) {
             int y = VBASE - i * (LED_HEIGHT + 1);
             int offset = i; // * NR_OF_BANDS;
             {
-                LButton *lb = new LButton();
+                LButton_XL *lb = new LButton_XL();
                 lb->module = module;
                 lb->box.pos = Vec(x, y);
                 if (module) {

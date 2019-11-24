@@ -5,26 +5,24 @@
 
 Sculpt-O-Sound presents:
 
-Vocode-O-Matic is a 31 terts band vocoder with editable frequency matrix for Rack v1.x.
+Vocode-O-Matic, a 31 terts band vocoder with editable frequency matrix for Rack v1.x.
 Its use is restricted to 44100 Hz sampling frequency at the moment.
-You can find a video posted on youtube which demonstrates Vocode-O-Matic. You can find it here: https://www.youtube.com/watch?v=u_tcVmCJ_R8
+You can find a video posted on youtube which demonstrates Vocode-O-Matic. Follow this link: https://www.youtube.com/watch?v=u_tcVmCJ_R8
 
-Its use is restricted to 44100 Hz sampling frequency at the moment.
-You can find a video posted on youtube which demonstrates Vocode-O-Matic. You can find it here: https://www.youtube.com/watch?v=u_tcVmCJ_R8
 
 ![alt text](doc/Vocode-O-Matic_v1.1.0.png)
 
 The vocoder has 31 terts band filters for the carrier and modulator inputs.
-To get an interesting result, start by using a pad like sound with a big bandwidth as a carrier and
-a rhythm loop as a modulator. You should hear the pad play the rhythm.
+To get an interesting result, start by using a pad like sound with a large bandwidth as a carrier and
+a rhythm loop as a modulator. The vocoder will make the pad play the rhythm.
 
-Vocode-O-Matic-XL is basically the same as Vocode-O-Matic but it has sliders for the level of the modulator bands, sliders for panning the vocoded carrier bands to either left or right and sliders for the attack and release time of the envelope follower of each terts band.
+Vocode-O-Matic-XL is basically the same as Vocode-O-Matic but it has sliders for the level of the modulator bands, sliders for panning the vocoded carrier bands to either left or right and sliders for the attack and release time of the envelope follower of each terts band. Be careful with the level sliders. If you crank them up too much, the sound will be distorted.
 
 ![alt text](doc/Vocode-O-Matic-XL_v1.1.0.png)
 
 Signal flow
 ===========
-The modulator signal is fed into the matrix from the left hand side of the matrix and devided into 31 frequency bands. The center frequency of the band pass filters used goes up from the bottom to the top of the matrix. So each row corresponds to a band of the modulator. The carrier signal is fed into the matrix from the bottom (frequencies go up from left to right). So each column corresponds to a frequency band or the carrier. Buttons pressed in the matrix will allow the corresponding row's modulator band energy to modulate the corresponding column's carrier band signal. All modulated carrier signals are summed and send to 2 outputs. The sum of the modulated even bands is send to the Left output, the sum of the modulated odd bands to the Right output. At the right hand side of the matrix are mute buttons. They allow muting a carrier band thus excluding it from the summed output.
+The modulator signal is fed into the matrix from the left hand side of the matrix and devided into 31 frequency bands. The center frequency of the band pass filters used goes up from the bottom to the top of the matrix. So each row corresponds to a band of the modulator. The carrier signal is fed into the matrix from the bottom (frequencies go up from left to right). So each column corresponds to a frequency band or the carrier. Buttons pressed in the matrix will allow the corresponding row's modulator band energy to amplitude modulate the corresponding column's carrier band signal. All modulated carrier signals are summed and send to 2 outputs. In Vocode-O-Matic the sum of the modulated even bands is send to the Left output, the sum of the modulated odd bands to the Right output. In Vocode-O-Matic-XL you can pan each band to the output you like. At the right hand side of the matrix are mute buttons. They allow muting a modulator band thus excluding its effect on the carrier bands.
 
 The frequency is lowest at the lower left side of the matrix. Bands more to the right or up are higher in frequency.
 
@@ -42,7 +40,7 @@ There is a Left and a Right output. The vocoder produces a semi stereo signal al
 
 Knobs
 =====
-The rotary knobs on top of the rack element are gain buttons for the carrier and modulator input signals.
+The rotary knobs on top of the rack element are gain buttons for the carrier and modulator input signals. Be careful with them, if you turn them up too much. the vocoder output signal will be distorted.
 
 Matrix buttons
 ==============
@@ -66,7 +64,7 @@ The hold button will stop the effect of the pulse to the inputs, effectively hol
 
 Mute buttons
 ============
-On the right hand side of the filter matrix for every frequency band of the carrier a mute buttons is shown. By default all outputs are active i.e. no band is muted (lights are green). If you toggle a button the light will go out and the corresponding carrier signal will not be added to the output signal.
+On the right hand side of the filter matrix for every frequency band of the modulator a mute buttons is shown. By default all outputs are active i.e. no modulator band is muted (lights are green). If you toggle a button the light will go out and the corresponding modulator signal will not add to the vocoder effect.
 
 Bypass button
 =============

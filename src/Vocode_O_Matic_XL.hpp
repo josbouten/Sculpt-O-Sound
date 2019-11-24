@@ -476,7 +476,11 @@ struct Vocode_O_Matic_XL : Module {
     // Now set the sliders to the initial values.
     for (int i = 0; i < NR_OF_BANDS; i++) {
         sprintf(message, "Level @ %d Hz", freq[i + 1]);
-        configParam(Vocode_O_Matic_XL::LEVEL_PARAM + i, MIN_LEVEL, MAX_LEVEL, slider_level[i], message, "");
+        float minimum_equal_loudness_level = min_equal_loudness_value();
+        float max_level = INITIAL_LEVEL + MAX_LEVEL * (equal_loudness_value(i) / minimum_equal_loudness_level);
+        float min_level = INITIAL_LEVEL + MIN_LEVEL * (equal_loudness_value(i) / minimum_equal_loudness_level);
+        configParam(Vocode_O_Matic_XL::LEVEL_PARAM + i, min_level, max_level, slider_level[i], message, " dB");
+        //configParam(Vocode_O_Matic_XL::LEVEL_PARAM + i, MIN_LEVEL, MAX_LEVEL, slider_level[i], message, " dB");
         sprintf(message, "Pan @ %d Hz", freq[i + 1]);
         if ((i % 2) != 0) {
             configParam(Vocode_O_Matic_XL::PAN_PARAM + i, MIN_PAN, MAX_PAN, INITIAL_PAN + INITIAL_PAN_OFFSET, message, "");
@@ -503,9 +507,9 @@ struct Vocode_O_Matic_XL : Module {
   } 
 };
 
-struct LButton : SvgSwitch {
+struct LButton_XL : SvgSwitch {
   Vocode_O_Matic_XL *module;
-  LButton() {
+  LButton_XL() {
     momentary = true;
     shadow->visible = false;
     addFrame(APP->window->loadSvg(asset::plugin(thePlugin, "res/L.svg")));
