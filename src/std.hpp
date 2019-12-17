@@ -87,4 +87,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 float fl_max(float a, float b);
 float fl_min(float a, float b);
 
+#define PRESSES 1
+#define NOT_PRESSED 0
+
 #endif

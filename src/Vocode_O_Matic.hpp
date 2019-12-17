@@ -30,8 +30,7 @@ struct Vocode_O_Matic : Module {
   SynthDevKit::CV *cv_right = new SynthDevKit::CV(0.1f);
   SynthDevKit::CV *cv_left =  new SynthDevKit::CV(0.1f);
 
-  void refresh_led_matrix(int lights_offset, int p_cnt[NR_OF_BANDS], int button_value[NR_OF_BANDS][NR_OF_BANDS], bool led_state[1024])
-  {
+  void refresh_led_matrix(int lights_offset, int p_cnt[NR_OF_BANDS], int button_value[NR_OF_BANDS][NR_OF_BANDS], bool led_state[1024]) {
      for (int i = 0; i < NR_OF_BANDS; i++)
      {
         for (int j = 0; j < NR_OF_BANDS; j++)
@@ -47,8 +46,7 @@ struct Vocode_O_Matic : Module {
      }
   }
 
-  void refresh_mute_output_leds(int offset, bool mute_output[NR_OF_BANDS])
-  {
+  void refresh_mute_output_leds(int offset, bool mute_output[NR_OF_BANDS]) {
     for (int i = 0; i < NR_OF_BANDS; i++) {
         // Switch led off if mute_output is true.
         lights[offset + i].setBrightness((mute_output[i] == true) ? 0.0: 1.0);
@@ -90,6 +88,31 @@ struct Vocode_O_Matic : Module {
         printf("%02d: %d ", i, mute_output[i] == true ? 1: 0);
     }
     printf("%02d %d\n", NR_OF_BANDS - 1, mute_output[NR_OF_BANDS - 1] == true ? 1: 0);
+  }
+
+  void handle_single_button(int x, int y, int set) {
+    int p, k;
+    bool found = false;
+    if (set == PRESSED) {
+        for (k = 0; k < p_cnt[x]; k++) {
+            if (button_value[x][k] == y) {
+                found = true;
+                break;
+            }
+        }
+        if (found == false) button_value[x][p_cnt[x]++] = y;
+    } else {
+        for (k = 0; k < p_cnt[x]; k++) {
+            if (button_value[x][k] == y) {
+                button_value[x][k] = NOT_PRESSED;
+                // Move rest on position back.
+                for (p = k; p < p_cnt[x]; p++) {
+                    button_value[x][p] = button_value[x][p + 1];
+                }
+            }
+        }
+        button_value[x][p_cnt[x]--] = NOT_PRESSED;
+    }
   }
 
   enum ParamIds {
@@ -138,7 +161,7 @@ struct Vocode_O_Matic : Module {
     MATRIX_ONE_STEP_RIGHT_LIGHT,
     MATRIX_ONE_STEP_LEFT_LIGHT,
     ENUMS(MUTE_OUTPUT_LIGHT, NR_OF_BANDS),
-    ENUMS(MOD_MATRIX, NR_OF_BANDS * NR_OF_BANDS),
+    ENUMS(MOD_MATRIX_LIGHT, NR_OF_BANDS * NR_OF_BANDS),
     NUM_LIGHTS
   };
 
@@ -199,6 +222,7 @@ struct Vocode_O_Matic : Module {
   int p_cnt[NR_OF_BANDS];
   int button_value[NR_OF_BANDS][NR_OF_BANDS];
   bool mute_output[NR_OF_BANDS];
+  bool mute_output_old[NR_OF_BANDS];
   float mod_alpha1[NR_OF_BANDS];
   float mod_alpha2[NR_OF_BANDS];
   float mod_beta[NR_OF_BANDS];
@@ -217,10 +241,12 @@ struct Vocode_O_Matic : Module {
   bool led_state[1024] = {};
   bool mute_output_led_state[NR_OF_BANDS] = {};
   bool matrix_mode_read_from_settings = false;
-  int lights_offset = MOD_MATRIX;
+  int lights_offset = MOD_MATRIX_LIGHT;
   int mute_output_lights_offset = MUTE_OUTPUT_LIGHT;
 
-  int  lbuttonPressedVal = 0;
+  int  button_left_clicked_val = 0;
+  int  button_right_clicked_val = 0;
+  bool right_click_state = false;
 
   // Some code to read/save state of bypass button.
   json_t *dataToJson() override {
@@ -420,7 +446,12 @@ struct LButton : SvgSwitch {
   void onButton(const event::Button &e) override {
     if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
       if (paramQuantity && module) {
-        module->lbuttonPressedVal = paramQuantity->paramId;
+        module->button_left_clicked_val = paramQuantity->paramId;
+      }
+    }
+    if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
+      if (paramQuantity && module) {
+        module->button_right_clicked_val = paramQuantity->paramId;
       }
     }
     e.consume(this);

@@ -45,8 +45,9 @@ void initialize_slider_levels(float start_level[NR_OF_BANDS])
 {
   float minimum_equal_loudness_level = min_equal_loudness_value();
   for (int i = 0; i < NR_OF_BANDS; i++) { 
-    //start_level[i] = equal_loudness_value(i);
     start_level[i] = INITIAL_START_LEVEL * equal_loudness_value(i) / minimum_equal_loudness_level;
+#ifdef DEBUGMSG
     printf("start_level[%d] = %f\n", i, start_level[i]);
+#endif
   }
 }

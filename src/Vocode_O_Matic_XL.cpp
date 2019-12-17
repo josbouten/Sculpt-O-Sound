@@ -33,6 +33,7 @@ void Vocode_O_Matic_XL::onReset() {
 
   // Set mute output buttons to not mute.
   for (int i = 0; i < NR_OF_BANDS; i++) {
+    mute_output_old[i] = false;
     mute_output[i] = false;
     params[MUTE_OUTPUT_PARAM + i].setValue(0.0);
     lights[MUTE_OUTPUT_LIGHT + i].setBrightness(1.0);
@@ -97,6 +98,9 @@ void Vocode_O_Matic_XL::onRandomize() {
 }
 
 void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
+  int x, y;
+  float rc;
+  static int x1 = -1, x2 = -1, y1,  y2;
   static int only_once = 1;
   if (only_once == 1) {
     init_attack_times(envelope_attack_time);
@@ -108,6 +112,7 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
     comp_attack_factors(envelope_attack_factor, envelope_attack_time);
     comp_release_factors(envelope_release_factor, envelope_release_time);
     only_once = 0;
+#ifdef DEBUGMSG
     printf("attack_time    : "); print_array(envelope_attack_time);
     printf("release_time   : "); print_array(envelope_release_time);
     printf("attack_factor  : "); print_array(envelope_attack_factor);
@@ -122,6 +127,7 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
     printf("carr_alpha1    : "); print_array(carr_alpha1);
     printf("carr_alpha2    : "); print_array(carr_alpha2);
     printf("carr_beta      : "); print_array(carr_beta);
+#endif
   }
 
 #ifdef DEBUGMSG
@@ -183,8 +189,8 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
     blinkPhase -= 1.0f;
   oneStepBlinkPhase += oneStepDeltaTime;
   if (oneStepBlinkPhase >= 0.1f) { // light will be on for a very short time.
-    lights[MATRIX_ONE_STEP_RIGHT_LIGHT].value = 0.0f;
-    lights[MATRIX_ONE_STEP_LEFT_LIGHT].value = 0.0f;
+    lights[MATRIX_ONE_STEP_RIGHT_LIGHT].setBrightness(0.0f);
+    lights[MATRIX_ONE_STEP_LEFT_LIGHT].setBrightness(0.0f);
   }
 
   // Process trigger signal on matrix shift input. 
@@ -198,15 +204,15 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
   if (bypass_button_trig.process(params[BYPASS_SWITCH].getValue())) {
     fx_bypass = !fx_bypass;
   }
-  lights[BYPASS_LIGHT].value = fx_bypass ? 1.00 : 0.0;
+  lights[BYPASS_LIGHT].setBrightness(fx_bypass ? 1.00 : 0.0);
   if (matrix_hold_button_pressed) { // We blink only if the button is toggled in the on position.
-    lights[MATRIX_HOLD_TOGGLE_LIGHT].value = (blinkPhase < 0.5f) ? 1.0f : 0.0f;
+    lights[MATRIX_HOLD_TOGGLE_LIGHT].setBrightness((blinkPhase < 0.5f) ? 1.0f : 0.0f);
   }
 
   // Hold matrix movement if toggle is pressed.
   if (matrix_hold_button_trig.process(params[MATRIX_HOLD_TOGGLE_PARAM].getValue())) {
     matrix_hold_button_pressed = !matrix_hold_button_pressed;
-    lights[MATRIX_HOLD_TOGGLE_LIGHT].value = matrix_hold_button_pressed ? 1.00 : 0.0;
+    lights[MATRIX_HOLD_TOGGLE_LIGHT].setBrightness(matrix_hold_button_pressed ? 1.00 : 0.0);
   }
 
   // If one step right button was pressed:
@@ -214,7 +220,7 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
     // Start a new blink period.
     oneStepBlinkPhase = 0.0f;
     // Light up the button;
-    lights[MATRIX_ONE_STEP_RIGHT_LIGHT].value = 1.00;
+    lights[MATRIX_ONE_STEP_RIGHT_LIGHT].setBrightness(1.00);
     // Shift the buttons one step.
     shift_buttons_right(button_value, p_cnt, led_state, &matrix_shift_position);
   }
@@ -231,7 +237,7 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
     // Start a new blink period.
     oneStepBlinkPhase = 0.0f;
     // Light up the button;
-    lights[MATRIX_ONE_STEP_LEFT_LIGHT].value = 1.00;
+    lights[MATRIX_ONE_STEP_LEFT_LIGHT].setBrightness(1.00);
     // Shift the buttons one step.
     shift_buttons_left(button_value, p_cnt, led_state, &matrix_shift_position);
   }
@@ -246,7 +252,7 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
   // If toggle matrix preset button was pressed.
   if (matrix_mode_button_trig.process(params[MATRIX_MODE_TOGGLE_PARAM].getValue())) {
     matrix_mode_button_pressed = false;
-    lights[MATRIX_MODE_TOGGLE_PARAM].value = matrix_mode_button_pressed ? 1.00 : 0.0;
+    lights[MATRIX_MODE_TOGGLE_PARAM].setBrightness(matrix_mode_button_pressed ? 1.00 : 0.0);
     matrix_mode++; 
     if (matrix_mode > NR_MATRIX_MODES - 1) { matrix_mode = 0; }
     choose_matrix(matrix_mode, button_value, p_cnt);
@@ -267,15 +273,15 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
   }
 #endif
 
-  if (lbuttonPressedVal > 0) {
-    if (lbuttonPressedVal >= MOD_MATRIX_PARAM && lbuttonPressedVal < MOD_MATRIX_PARAM + NR_OF_BANDS * NR_OF_BANDS) {
-      i = lbuttonPressedVal - MOD_MATRIX_PARAM;
-      led_state[i] = !led_state[i];
-      int index = MOD_MATRIX + i;
+  if (button_left_clicked_val > 0) {
+    if (button_left_clicked_val >= MOD_MATRIX_PARAM && button_left_clicked_val < MOD_MATRIX_PARAM + NR_OF_BANDS * NR_OF_BANDS) { // There was a left click in the button matrix.
+      int buttonNr = button_left_clicked_val - MOD_MATRIX_PARAM;
+      led_state[buttonNr] = !led_state[buttonNr];
+      int index = MOD_MATRIX_LIGHT + buttonNr;
       lights[index].setBrightness(1.0f - lights[index].getBrightness());
-      int chosen_row = i / NR_OF_BANDS;
-      int chosen_col = i % NR_OF_BANDS;
-      if ((p_cnt[chosen_row] > 0) && (!led_state[i])) {
+      int chosen_row = buttonNr / NR_OF_BANDS;
+      int chosen_col = buttonNr % NR_OF_BANDS;
+      if ((p_cnt[chosen_row] > 0) && (!led_state[buttonNr])) {
         for (int col = 0; col < NR_OF_BANDS; col++) { // Find the right column.
           if (button_value[chosen_row][col] == chosen_col) {
             button_value[chosen_row][col] = NOT_PRESSED;
@@ -292,15 +298,77 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
           button_value[chosen_row][p_cnt[chosen_row]] = chosen_col;
           p_cnt[chosen_row]++;
       }
-    } else {
-      i = lbuttonPressedVal - MUTE_OUTPUT_PARAM;
-      mute_output[i] = !mute_output[i];
-      lights[MUTE_OUTPUT_LIGHT + i].setBrightness(1.0 - lights[MUTE_OUTPUT_LIGHT + i].getBrightness());
+    } else { // A mute button was left clicked.
+      int buttonNr = button_left_clicked_val - MUTE_OUTPUT_PARAM;
+      mute_output[buttonNr] = !mute_output[buttonNr];
+      lights[MUTE_OUTPUT_LIGHT + buttonNr].setBrightness(1.0 - lights[MUTE_OUTPUT_LIGHT + buttonNr].getBrightness());
 #ifdef DEBUGMSG
       refresh = true;
 #endif
     }
-    lbuttonPressedVal = 0;
+    button_left_clicked_val = 0;
+  }
+  if (button_right_clicked_val > 0) 
+  {
+    // Right button was clicked in the button matrix.
+    if (button_right_clicked_val >= MOD_MATRIX_PARAM && button_right_clicked_val < MOD_MATRIX_PARAM + NR_OF_BANDS * NR_OF_BANDS) 
+    { // There was a richt click in the button matrix.
+        right_click_state = !right_click_state;
+        int buttonNr = button_right_clicked_val - MOD_MATRIX_PARAM;
+        x = buttonNr / NR_OF_BANDS;
+        y = buttonNr - x * NR_OF_BANDS;
+        lights[MOD_MATRIX_LIGHT + buttonNr].setBrightness(1.0);
+        handle_single_button(x, y, 1.0);
+        if (x1 >= 0) { x2 = x; y2 = y; }
+        else { x1 = x; y1 = y; }
+        if ((x1 >= 0) && (x2 >= 0)) 
+        {
+            if (x1 != x2) { rc = ((float) y2 - (float) y1 ) / ((float) x2 - (float) x1); }
+            else rc = -1.0;
+            if (x1 == x2) // Vertical Path
+            {
+                if (y1 > y2) std::swap(y1, y2);
+                for (y = y1 + 1; y < y2; y++) {
+                    handle_single_button(x1, y, 1.0);
+                }
+            }
+            else 
+            {
+                if (x1 > x2) { std::swap(x1, x2); std::swap(y1, y2); }
+                for (x = x1 + 1; x < x2; x++) 
+                {
+                    y = (int) (y1 + rc * ((float) (x - x1)));
+                    if (y >= NR_OF_BANDS) {
+                        fprintf(stderr, "buttons_right_mouse::y-value too big: %d\n", y);
+                        y = NR_OF_BANDS - 1;
+                    }
+                    handle_single_button(x, y, 1.0);
+                }
+            }
+            x1 = x2 = -1;
+        }
+        refresh_led_matrix(lights_offset, p_cnt, button_value, led_state);
+    } 
+    else 
+    {   // A mute button was right clicked.
+        right_click_state = !right_click_state;
+        int buttonNr = button_right_clicked_val - MUTE_OUTPUT_PARAM;
+        if (right_click_state) { // This is solo mode, so we mute everything except the clicked button.
+            for (int i = 0; i < NR_OF_BANDS; i++) {
+                mute_output_old[i] = mute_output[i];
+                lights[MUTE_OUTPUT_LIGHT + i].setBrightness(0.0);   
+                mute_output[i] = true;
+            }
+            mute_output[buttonNr] = false;
+            lights[MUTE_OUTPUT_LIGHT + buttonNr].setBrightness(1.0);
+        } else { // This is the unmute state, so we restore the pre mute knob settings.
+            for (int i = 0; i < NR_OF_BANDS; i++) {
+                mute_output[i] = mute_output_old[i];
+                lights[MUTE_OUTPUT_LIGHT + i].setBrightness(mute_output[i] == true ? 0.0: 1.0);
+            }
+        }
+    }
+    button_right_clicked_val = 0;
   }
 #ifdef DEBUGMSG
   if (refresh) {
@@ -325,10 +393,12 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
     if (change) {
         // compute factors here.
         comp_attack_factors(envelope_attack_factor, envelope_attack_time);
+#ifdef DEBUGMSG
         printf("attack time:");
         print_array(envelope_attack_time);
         printf("attack factor:");
         print_array(envelope_attack_factor);
+#endif
     }
 
     // Handle envelope release time sliders changes.
@@ -342,10 +412,12 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
     if (change) {
         // compute factors here.
         comp_release_factors(envelope_release_factor, envelope_release_time);
+#ifdef DEBUGMSG
         printf("release time:");
         print_array(envelope_release_time);
         printf("release factor:");
         print_array(envelope_release_factor);
+#endif
     }
  
     // Handle pan and level slider changes here.
@@ -507,7 +579,7 @@ struct Vocode_O_Matic_XL_Widget : ModuleWidget,  Vocode_O_Matic_XL {
                 }
                 addChild(lb);
             }
-            addChild(createLight<MediumLight<BlueLight>>(Vec(x, y), module, Vocode_O_Matic_XL::MOD_MATRIX + offset));
+            addChild(createLight<MediumLight<BlueLight>>(Vec(x, y), module, Vocode_O_Matic_XL::MOD_MATRIX_LIGHT + offset));
         }
     }
     // Add mute output buttons on the RHS of the matrix.

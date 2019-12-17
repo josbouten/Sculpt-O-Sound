@@ -43,3 +43,5 @@ void matrix_shift_buttons_left(int button_value[NR_OF_BANDS][NR_OF_BANDS], int p
 void matrix_shift_buttons_up(int button_value[NR_OF_BANDS][NR_OF_BANDS], int p_cnt[NR_OF_BANDS]);
 
 void matrix_shift_buttons_down(int button_value[NR_OF_BANDS][NR_OF_BANDS], int p_cnt[NR_OF_BANDS]);
+
+void refresh_matrix(int button_value[NR_OF_BANDS][NR_OF_BANDS], int p_cnt[NR_OF_BANDS], int buttons[NR_OF_BANDS][NR_OF_BANDS]);

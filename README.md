@@ -22,7 +22,7 @@ Vocode-O-Matic-XL is basically the same as Vocode-O-Matic but it has sliders for
 
 Signal flow
 ===========
-The modulator signal is fed into the matrix from the left hand side of the matrix and devided into 31 frequency bands. The center frequency of the band pass filters used goes up from the bottom to the top of the matrix. So each row corresponds to a band of the modulator. The carrier signal is fed into the matrix from the bottom (frequencies go up from left to right). So each column corresponds to a frequency band or the carrier. Buttons pressed in the matrix will allow the corresponding row's modulator band energy to amplitude modulate the corresponding column's carrier band signal. All modulated carrier signals are summed and send to 2 outputs. In Vocode-O-Matic the sum of the modulated even bands is send to the Left output, the sum of the modulated odd bands to the Right output. In Vocode-O-Matic-XL you can pan each band to the output you like. At the right hand side of the matrix are mute buttons. They allow muting a modulator band thus excluding its effect on the carrier bands.
+The modulator signal is split into 31 frequency bands and fed into the matrix on the left hand side of the matrix. The center frequency of the band pass filters used goes up from the bottom to the top of the matrix. So each row corresponds to one of 31 bands. The carrier signal is fed into the matrix from the bottom (frequencies go up from left to right) and split into 31 terts bands as well. So each column corresponds to a frequency band or the carrier. Buttons pressed in the matrix will allow the corresponding row's modulator band energy level to amplitude modulate the corresponding column's carrier band signal. The energy level of the modulator signal is computed using an envelope follower (which in Vocode-O-Matic has a set attack time and release time. In the XL version you can set the attack times using sliders.). All modulated carrier signals are summed and send to 2 outputs. In Vocode-O-Matic the sum of the modulated even bands is send to the Left output, the sum of the modulated odd bands to the Right output. In Vocode-O-Matic-XL you can pan each band to Left or Right using the corresponding pan slider. At the right hand side of the matrix are mute buttons. They allow muting modulator bands thus excluding their effect on the carrier bands.
 
 The frequency is lowest at the lower left side of the matrix. Bands more to the right or up are higher in frequency.
 
@@ -44,7 +44,7 @@ The rotary knobs on top of the rack element are gain buttons for the carrier and
 
 Matrix buttons
 ==============
-The filter matrix consists of toggle switches, so you can make your own coupling between modulator and carrier filters.
+The filter matrix consists of toggle switches, so you can make your own coupling between modulator and carrier filters. If you right click on a button and right click on another button once more, all buttons between these will be pressed. This makes it easier to press a series of buttons.
 Mind you, no attenuation is done, so if you combine a lot of modulator bands with one carrier filter, the output of the filter
 may exceed the maximum sample value (voltage) allowed resulting in distortion.
 
@@ -62,9 +62,9 @@ Hold button
 ===========
 The hold button will stop the effect of the pulse to the inputs, effectively holding the matrix in its position. The 7 segment display will show the position shift of the matrix. 0 is the initial state, 30 means the matrix has shifted completely to the right (with wrap around).
 
-Mute buttons
-============
-On the right hand side of the filter matrix for every frequency band of the modulator a mute buttons is shown. By default all outputs are active i.e. no modulator band is muted (lights are green). If you toggle a button the light will go out and the corresponding modulator signal will not add to the vocoder effect.
+Modulator activation buttons
+============================
+On the right hand side of the filter matrix for every frequency band of the modulator a button is shown which can be used to (de)activate a modulator band. By default all modulator bands are active (lights are green). If you toggle a button the light will go out and the corresponding modulator band will not add to the vocoder effect. If you right click on a button all buttons will be switched to non active except the one you clicked effectively soloing the corresponding modulator band's effect on the carrier signal. You can then reactivate other modulator bands by left clicking on them. If you right click once more, the modulator activation buttons will return to the state befor you first right clicked.
 
 Bypass button
 =============
@@ -72,13 +72,20 @@ The bypass toggle button when pressed will turn red, this will put the vocoder i
 This will send the carrier and modulator input signals to the left and right output respectively.
 If you use the Vocode-O-Matic-example.vcv settings file make sure you hear the string sample and the drum loop in bypass mode. If not, reload the samples in the simpler modules.
 
+Sliders, Vocode-O-Matic-XL only
+===============================
+Pan: allows you to pan a carrier band from the left to the right channel.
+Level: allows you to amplify a band's modulator signal. 
+Attack: allows you to choose the attack time of the envelope follower for the corresponding modulatpr band.
+Release: allows you to choose the release time of the envelope follower for the corresponding modulator band.
+
 Sources
 =======
 All filters are based on the series of tutorial papers about Effect Design by Jon Dattorro published in the Journal of the Audio Engineering Society (https://ccrma.stanford.edu/~dattorro/EffectDesignPart1.pdf).
 
 Aknowledgements
 ===============
-I am deeply indebted to Jerry Sievert and Netboy3 for their help in porting the Rack v0.6 version of Vocode-O-Matic to the v1.x standard. Thanks a lot!
+I am deeply indebted to Jerry Sievert and Netboy3 for their help in porting the Rack v0.6 version of Vocode-O-Matic to the v1.x standard. Thanks a lot! And of course I am indebted to the late Jon Dattorro whos publications inspired me to start writing signal processing code for musical applications.
 
 Example
 =======
