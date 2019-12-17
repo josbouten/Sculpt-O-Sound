@@ -6,7 +6,7 @@
 #pragma once
 
 // For debug purposes only !
-#define DEBUGMSG
+//#define DEBUGMSG
 
 //#define PAN_WIDTH
 
