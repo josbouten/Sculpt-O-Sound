@@ -24,8 +24,7 @@ float equal_loudness_value(int _index)
 float min_equal_loudness_value(void)
 {
   float mi = MAX_SHORT;
-  for (int i = 0; i < NR_OF_BANDS; i++)
-  {
+  for (int i = 0; i < NR_OF_BANDS; i++) {
      mi = fl_min(mi, equal_loudness_value(i));
   }
   return(mi);
@@ -33,9 +32,8 @@ float min_equal_loudness_value(void)
 
 float max_equal_loudness_value(void)
 {
-  float ma = 0;
-  for (int i = 0; i < NR_OF_BANDS; i++)
-  {
+  float ma = 0.0;
+  for (int i = 0; i < NR_OF_BANDS; i++) {
      ma = fl_max(ma, equal_loudness_value(i));
   }
   return(ma);

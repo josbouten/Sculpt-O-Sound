@@ -66,7 +66,7 @@ void print_all_coeffs(float alpha1[], float alpha2[], float beta[]) {
   }
 }
 
-void comp_release_times(float release_time[NR_OF_BANDS])
+void comp_release_times_org(float release_time[NR_OF_BANDS])
 { // Compute release times for the envelope followers for the respective frequency bands.
   int i;
   double f_c;
@@ -81,6 +81,18 @@ void comp_release_times(float release_time[NR_OF_BANDS])
   }
 }
 
+void comp_release_times(float release_time[NR_OF_BANDS])
+{ // Compute release times for the envelope followers for the respective frequency bands.
+  int i;
+  double f_c;
+  for (i = 0; i < NR_OF_BANDS; i++)
+  {
+    f_c = ((float) freq[i+1] + (float) freq[i]) / 2.0;
+    // Make bands above band UPPER_SMOOTHING_BAND sound less harsh.
+    release_time[i] = (2 * PI / f_c) * INITIAL_ENVELOPE_RELEASE_TEMPERATURE;
+  }
+}
+
 void comp_attack_times(float attack_time[NR_OF_BANDS])
 { // Compute attack times for the envelope followers for the respective frequency bands.
   int i;
@@ -92,8 +104,7 @@ void comp_attack_times(float attack_time[NR_OF_BANDS])
   }
 }
 
-
-float init_release_time(int freqIndex)
+float init_release_time_org(int freqIndex)
 {
   int freq[] = {0, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160, 200, 250,
                315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500,
@@ -106,6 +117,19 @@ float init_release_time(int freqIndex)
     release_time = SMOOTHING_FACTOR * (2 * PI / f_c) * INITIAL_ENVELOPE_RELEASE_TEMPERATURE;
   else
     release_time = (2 * PI / f_c) * INITIAL_ENVELOPE_RELEASE_TEMPERATURE;
+  return(release_time);
+}
+
+float init_release_time(int freqIndex)
+{
+  int freq[] = {0, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160, 200, 250,
+               315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500,
+               3150, 4000, 5000, 6300, 8000, 10000,
+               12500, 16000, 20000, 22025};
+  double f_c = ((float) freq[freqIndex + 1] + (float) freq[freqIndex]) / 2.0;
+  float release_time;
+  // Make bands above band UPPER_SMOOTHING_BAND sound less harsh.
+  release_time = (2 * PI / f_c) * INITIAL_ENVELOPE_RELEASE_TEMPERATURE;
   return(release_time);
 }
 
@@ -182,7 +206,7 @@ void comp_attack_time_ranges(float attack_time_lower_range[NR_OF_BANDS], float a
   }
 }
 
-void comp_release_time_ranges(float release_time_lower_range[NR_OF_BANDS], float release_time_upper_range[NR_OF_BANDS])
+void comp_release_time_ranges_org(float release_time_lower_range[NR_OF_BANDS], float release_time_upper_range[NR_OF_BANDS])
 {
   int freq[] = {0, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160, 200, 250,
                315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500,
@@ -199,6 +223,23 @@ void comp_release_time_ranges(float release_time_lower_range[NR_OF_BANDS], float
         release_time_upper_range[i] = SMOOTHING_FACTOR * (2.0 * PI / f_c)  * UPPER_ENVELOPE_RELEASE_TEMPERATURE;
     else
         release_time_upper_range[i] = (2.0 * PI / f_c)  * UPPER_ENVELOPE_RELEASE_TEMPERATURE;
+  }
+}
+
+void comp_release_time_ranges(float release_time_lower_range[NR_OF_BANDS], float release_time_upper_range[NR_OF_BANDS])
+{
+  int freq[] = {0, 20, 25, 32, 40, 50, 63, 80, 100, 125, 160, 200, 250,
+               315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500,
+               3150, 4000, 5000, 6300, 8000, 10000,
+               12500, 16000, 20000, 22025};
+  int i;
+  double f_c;
+  for (i = 0; i < NR_OF_BANDS; i++)
+  {
+    f_c = ((float) freq[i+1] + (float) freq[i]) / 2.0;
+    release_time_lower_range[i] = (2.0 * PI / f_c)  * LOWER_ENVELOPE_RELEASE_TEMPERATURE;
+    // Make bands above band UPPER_SMOOTHING_BAND sound less harsh.
+    release_time_upper_range[i] = (2.0 * PI / f_c)  * UPPER_ENVELOPE_RELEASE_TEMPERATURE;
   }
 }
 

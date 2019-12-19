@@ -5,6 +5,7 @@
 #include "comp_coeffs.hpp"
 #include "sliders.hpp"
 #include "pan_and_level.hpp"
+#include "matrix.hpp"
 
 struct Vocode_O_Matic_XL : Module {
 
@@ -35,6 +36,10 @@ struct Vocode_O_Matic_XL : Module {
         // Switch led off if mute_output is true.
         lights[offset + i].value = (mute_output[i] == true) ? 0.0: 1.0;
     }
+  }
+ 
+  void refresh_pan_sliders() {
+    set_pan_and_level(slider_level, slider_pan, left_pan, right_pan, left_level, right_level, width);
   }
 
   void shift_buttons_right(int button_value[NR_OF_BANDS][NR_OF_BANDS], int p_cnt[NR_OF_BANDS], bool led_state[1024], int *matrix_shift_position) {
@@ -99,8 +104,119 @@ struct Vocode_O_Matic_XL : Module {
     }
   }
 
+  void pan_width_decrease() {
+      // Decrease pan and limit to MIN_PAN and MAX_PAN.
+      // Because decreasing implies that PAN can cross 0, we need to 
+      // check against MIN_PAN and MAX_PAN.
+      float increment = (MAX_PAN - MIN_PAN) / PAN_STEPS;
+      for (int i = 0; i < NR_OF_BANDS; i += 2) {
+          slider_pan[i] -= increment;
+          if (slider_pan[i] < MIN_PAN) slider_pan[i] = MIN_PAN;
+          if (slider_pan[i] > MAX_PAN) slider_pan[i] = MAX_PAN;
+          params[PAN_PARAM + i].value = slider_pan[i];
+          slider_pan[i + 1] += increment;
+          if (slider_pan[i + 1] < MIN_PAN) slider_pan[i + 1] = MIN_PAN;
+          if (slider_pan[i + 1] > MAX_PAN) slider_pan[i + 1] = MAX_PAN;
+          params[PAN_PARAM + i + 1].value = slider_pan[i + 1];
+      }
+      set_pan_and_level(slider_level, slider_pan, left_pan, right_pan, left_level, right_level, width);
+  }
+  
+  void pan_width_increase() {
+      // Increase pan and limit to MIN_PAN and MAX_PAN.
+      float increment = (MAX_PAN - MIN_PAN) / PAN_STEPS;
+      for (int i = 0; i < NR_OF_BANDS; i += 2) {
+          slider_pan[i] += increment;
+          if (slider_pan[i] > MAX_PAN) slider_pan[i] = MAX_PAN;
+          params[PAN_PARAM + i].value = slider_pan[i];
+          slider_pan[i + 1] -= increment;
+          if (slider_pan[i + 1] > MAX_PAN) slider_pan[i + 1] = MAX_PAN;
+          params[PAN_PARAM + i + 1].value = slider_pan[i + 1];
+      }
+      set_pan_and_level(slider_level, slider_pan, left_pan, right_pan, left_level, right_level, width);
+  }
+  
+  void pan_center() {
+      for (int i = 0; i < NR_OF_BANDS; i += 2) {
+          slider_pan[i] = 0;
+          slider_pan[i + 1] = 0;
+          params[PAN_PARAM + i].value = 0.0;
+          params[PAN_PARAM + i + 1].value = 0.0;
+      }
+      set_pan_and_level(slider_level, slider_pan, left_pan, right_pan, left_level, right_level, width);
+  }
+  
+  void level_increase() {
+    float increment = (MAX_LEVEL - MIN_LEVEL) / LEVEL_STEPS;
+    for (int i = 0; i < NR_OF_BANDS; i += 1) {
+        slider_level[i] += increment;
+        if (slider_level[i] > MAX_LEVEL) slider_level[i] = MAX_LEVEL;
+        params[LEVEL_PARAM + i].value = slider_level[i];
+    }
+    set_pan_and_level(slider_level, slider_pan, left_pan, right_pan, left_level, right_level, width);
+  }
+
+  void level_decrease() {
+    float increment = (MAX_LEVEL - MIN_LEVEL) / LEVEL_STEPS;
+    for (int i = 0; i < NR_OF_BANDS; i += 1) {
+        slider_level[i] -= increment;
+        if (slider_level[i] < MIN_LEVEL) slider_level[i] = MIN_LEVEL;
+        params[LEVEL_PARAM + i].value = slider_level[i];
+    }
+    set_pan_and_level(slider_level, slider_pan, left_pan, right_pan, left_level, right_level, width);
+  }
+
+  void increase_attack_time_level() {
+    //float increment = (MAX_ATTACK_TIME - MIN_ATTACK_TIME) / ATTACK_TIME_STEPS;
+    for (int i = 0; i < NR_OF_BANDS; i++) {
+        float f_c = ((float) freq[i+1] + (float) freq[i]) / 2.0;
+        float increment = (2 * PI / f_c) * INITIAL_ENVELOPE_ATTACK_TEMPERATURE;
+        envelope_attack_time[i] += increment;
+        if (envelope_attack_time[i] > MAX_ATTACK_TIME) 
+            envelope_attack_time[i] = MAX_ATTACK_TIME;
+        params[ATTACK_TIME_PARAM + i].value = envelope_attack_time[i];
+    }
+    comp_attack_factors(envelope_attack_factor, envelope_attack_time);
+  }
+
+  void decrease_attack_time_level() {
+    for (int i = 0; i < NR_OF_BANDS; i++) {
+        float f_c = ((float) freq[i+1] + (float) freq[i]) / 2.0;
+        float increment = (2 * PI / f_c) * INITIAL_ENVELOPE_ATTACK_TEMPERATURE;
+        envelope_attack_time[i] -= increment;
+        if (envelope_attack_time[i] < MIN_ATTACK_TIME) 
+            envelope_attack_time[i] = MIN_ATTACK_TIME;
+        params[ATTACK_TIME_PARAM + i].value = envelope_attack_time[i];
+    }
+    comp_attack_factors(envelope_attack_factor, envelope_attack_time);
+  }
+
+  void increase_release_time_level() {
+    for (int i = 0; i < NR_OF_BANDS; i++) {
+        float f_c = ((float) freq[i+1] + (float) freq[i]) / 2.0;
+        float increment = (2 * PI / f_c) * INITIAL_ENVELOPE_RELEASE_TEMPERATURE;
+        envelope_release_time[i] += increment;
+        if (envelope_release_time[i] > MAX_RELEASE_TIME) 
+            envelope_release_time[i] = MAX_RELEASE_TIME;
+        params[RELEASE_TIME_PARAM + i].value = envelope_release_time[i];
+    }
+    comp_release_factors(envelope_release_factor, envelope_release_time);
+  }
+
+  void decrease_release_time_level() {
+    for (int i = 0; i < NR_OF_BANDS; i++) {
+        float f_c = ((float) freq[i+1] + (float) freq[i]) / 2.0;
+        float increment = (2 * PI / f_c) * INITIAL_ENVELOPE_RELEASE_TEMPERATURE;
+        envelope_release_time[i] -= increment;
+        if (envelope_release_time[i] < MIN_RELEASE_TIME) 
+            envelope_release_time[i] = MIN_RELEASE_TIME;
+        params[RELEASE_TIME_PARAM + i].value = envelope_release_time[i];
+    }
+    comp_release_factors(envelope_release_factor, envelope_release_time);
+  }
+
   enum ParamIds {
-    // aplification factor
+    // amplification factor
     DEBUG_PARAM,
     // bypass switch
     BYPASS_SWITCH,
@@ -119,6 +235,15 @@ struct Vocode_O_Matic_XL : Module {
     ENUMS(LEVEL_PARAM, NR_OF_BANDS),
     ENUMS(PAN_PARAM, NR_OF_BANDS),
     PAN_WIDTH_PARAM,
+    PAN_INCREASE_PARAM,
+    PAN_DECREASE_PARAM,
+    PAN_CENTER_PARAM,
+    LEVEL_INCREASE_PARAM,
+    LEVEL_DECREASE_PARAM,
+    ATTACK_TIME_INCREASE_PARAM,
+    ATTACK_TIME_DECREASE_PARAM,
+    RELEASE_TIME_INCREASE_PARAM,
+    RELEASE_TIME_DECREASE_PARAM,
     NUM_PARAMS
   };
 
@@ -199,6 +324,23 @@ struct Vocode_O_Matic_XL : Module {
   // Button to step matrix on step to the left.
   dsp::SchmittTrigger matrix_one_step_left_button_trig;
   bool matrix_one_step_left_button_pressed = false;
+
+  // Push Buttons to control pan width.
+  dsp::SchmittTrigger pan_increase_button_trig;
+  dsp::SchmittTrigger pan_decrease_button_trig;
+  dsp::SchmittTrigger pan_center_button_trig;
+
+  // Push Buttons to control level.
+  dsp::SchmittTrigger level_increase_button_trig;
+  dsp::SchmittTrigger level_decrease_button_trig;
+
+  // Push Buttons to envelope attack time.
+  dsp::SchmittTrigger envelope_attack_time_increase_button_trig;
+  dsp::SchmittTrigger envelope_attack_time_decrease_button_trig;
+  
+  // Push Buttons to envelope release time.
+  dsp::SchmittTrigger envelope_release_time_increase_button_trig;
+  dsp::SchmittTrigger envelope_release_time_decrease_button_trig;
 
   // Carrier channels can be muted.
   // Detect that the buttons are pressed using this SchmittTrigger
@@ -454,6 +596,10 @@ struct Vocode_O_Matic_XL : Module {
     configParam(Vocode_O_Matic_XL::MATRIX_ONE_STEP_RIGHT_PARAM, 0.0f, 1.0f, 0.0f, "Move matrix one step to the right.", "");
     configParam(Vocode_O_Matic_XL::MATRIX_ONE_STEP_LEFT_PARAM, 0.0f, 1.0f, 0.0f, "Move matrix one step to the left.", "");
     configParam(Vocode_O_Matic_XL::MATRIX_HOLD_TOGGLE_PARAM, 0.0f, 1.0f, 0.0f, "Prevent the matrix from shifting.", "");
+    // Add macro buttons for panning.
+    configParam(Vocode_O_Matic_XL::PAN_INCREASE_PARAM, 0.0f, 1.0f, 0.0f, "Increase panning.", "");
+    configParam(Vocode_O_Matic_XL::PAN_DECREASE_PARAM, 0.0f, 1.0f, 0.0f, "Decrease panning.", "");
+    configParam(Vocode_O_Matic_XL::PAN_CENTER_PARAM, 0.0f, 1.0f, 0.0f, "Center panning.", "");
 #ifdef PAN_WIDTH
     configParam(Vocode_O_Matic_XL::PAN_WIDTH_PARAM, 1.0f, 3.0f, 1.0f, "Panning width.", "");
 #endif

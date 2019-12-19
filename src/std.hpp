@@ -40,8 +40,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #define MIN_ATTACK_TIME 0.0001
 #define MAX_ATTACK_TIME 100.0000
+#define ATTACK_TIME_STEPS 50
 #define MIN_RELEASE_TIME 0.0001
 #define MAX_RELEASE_TIME 100.0000
+#define RELEASE_TIME_STEPS 50
 
 // LEVELS
 
@@ -55,11 +57,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #define MIN_LEVEL 1.0
 #define MAX_LEVEL 24.0
 #define INITIAL_LEVEL 1.0
+#define LEVEL_STEPS 50
 
 // PANNING
 
 #define MIN_PAN         -0.999 // Right
 #define MAX_PAN          0.999 // Left
+#define PAN_STEPS 50
 
 #define CENTER_PAN 0.0
 #define INITIAL_PAN   CENTER_PAN

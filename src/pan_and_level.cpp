@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "std.hpp"
 #include <math.h>
+#include "Vocode_O_Matic_XL.hpp"
 
 // Constant Power Panning
 // Literature: https://www.cs.cmu.edu/~music/icm-online/readings/panlaws
@@ -66,3 +67,4 @@ void set_pan_and_level(float slider_level[NR_OF_BANDS], float slider_pan[NR_OF_B
 #endif
    }
 }
+

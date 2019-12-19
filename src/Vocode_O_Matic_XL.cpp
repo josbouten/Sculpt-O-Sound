@@ -4,7 +4,6 @@
 #include "Vocode_O_Matic_XL.hpp"
 #include "../deps/SynthDevKit/src/CV.hpp"
 #include "pan_and_level.hpp"
-#include "sliders.hpp"
 
 // Vocode_O_Matic_XL
 
@@ -272,6 +271,43 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
     width_old = width;
   }
 #endif
+  
+    if (pan_increase_button_trig.process(params[PAN_INCREASE_PARAM].getValue())) {
+        pan_width_increase();
+    }
+ 
+    if (pan_decrease_button_trig.process(params[PAN_DECREASE_PARAM].getValue())) {
+        pan_width_decrease();
+    }
+ 
+    if (pan_center_button_trig.process(params[PAN_CENTER_PARAM].getValue())) {
+        pan_center();
+    }
+ 
+    if (level_increase_button_trig.process(params[LEVEL_INCREASE_PARAM].getValue())) {
+        level_increase();
+    }
+ 
+    if (level_decrease_button_trig.process(params[LEVEL_DECREASE_PARAM].getValue())) {
+        level_decrease();
+    }
+ 
+    if (envelope_attack_time_increase_button_trig.process(params[ATTACK_TIME_INCREASE_PARAM].getValue())) {
+        increase_attack_time_level();
+    }
+ 
+    if (envelope_attack_time_decrease_button_trig.process(params[ATTACK_TIME_DECREASE_PARAM].getValue())) {
+        decrease_attack_time_level();
+    }
+ 
+    if (envelope_release_time_increase_button_trig.process(params[RELEASE_TIME_INCREASE_PARAM].getValue())) {
+        increase_release_time_level();
+    }
+ 
+    if (envelope_release_time_decrease_button_trig.process(params[RELEASE_TIME_DECREASE_PARAM].getValue())) {
+        decrease_release_time_level();
+    }
+    
 
   if (button_left_clicked_val > 0) {
     if (button_left_clicked_val >= MOD_MATRIX_PARAM && button_left_clicked_val < MOD_MATRIX_PARAM + NR_OF_BANDS * NR_OF_BANDS) { // There was a left click in the button matrix.
@@ -379,7 +415,7 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
 #endif
 
 
-  // Process changes in sliders for envelope attack time, envelope release time, pan and level values
+  // Process changes in sliders for envelope attack time, envelope release time, pan and level values.
   if (wait_all_sliders == 0) {
     // Handle envelope attack time sliders changes.
     wait_all_sliders = 20000;
@@ -447,7 +483,6 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
         int width = 1;
         set_pan_and_level(slider_level, slider_pan, left_pan, right_pan, left_level, right_level, width);
     }
-    
   } else {
     wait_all_sliders -= 1;
   }
@@ -599,32 +634,50 @@ struct Vocode_O_Matic_XL_Widget : ModuleWidget,  Vocode_O_Matic_XL {
             addChild(createLight<MediumLight<GreenLight>>(Vec(x, y), module, Vocode_O_Matic_XL::MUTE_OUTPUT_LIGHT + offset));
     }
 
-    // Add 4 rows of sliders for 
+    // Add 4 rows of sliders (from bottom to top of module) for
     for (int i = 0; i < NR_OF_BANDS; i++) {
-        // envelope attack time,
-        attack_time_slider[i] = createParam<SliderWithId>(Vec(SLIDERS_X_OFFSET + i * 12,  10), module, Vocode_O_Matic_XL::ATTACK_TIME_PARAM + i); 
-        attack_time_slider[i] ->id = i;
-        attack_time_slider[i] ->type = SliderWithId::ATTACK_TIME;
-        addParam(attack_time_slider[i]);
+        // panning,
+        pan_slider[i] = createParam<SliderWithId>(Vec(SLIDERS_X_OFFSET + i * 12, 280), module, Vocode_O_Matic_XL::PAN_PARAM + i); 
+        pan_slider[i]->id = i;
+        pan_slider[i]->type = SliderWithId::PAN;
+        addParam(pan_slider[i]);
 
-        // envelope release time,
-        release_time_slider[i] = createParam<SliderWithId>(Vec(SLIDERS_X_OFFSET + i * 12,  100), module, Vocode_O_Matic_XL::RELEASE_TIME_PARAM + i); 
-        release_time_slider[i]->id = i;
-        release_time_slider[i]->type = SliderWithId::RELEASE_TIME;
-        addParam(release_time_slider[i]);
-
-        // level and
+        // level,
         level_slider[i] = createParam<SliderWithId>(Vec(SLIDERS_X_OFFSET + i * 12, 190), module, Vocode_O_Matic_XL::LEVEL_PARAM + i); 
         level_slider[i]->id = i;
         level_slider[i]->type = SliderWithId::LEVEL;
         addParam(level_slider[i]);
 
-        // panning.
-        pan_slider[i] = createParam<SliderWithId>(Vec(SLIDERS_X_OFFSET + i * 12, 280), module, Vocode_O_Matic_XL::PAN_PARAM + i); 
-        pan_slider[i]->id = i;
-        pan_slider[i]->type = SliderWithId::PAN;
-        addParam(pan_slider[i]);
+        // envelope attack time and
+        attack_time_slider[i] = createParam<SliderWithId>(Vec(SLIDERS_X_OFFSET + i * 12,  100), module, Vocode_O_Matic_XL::ATTACK_TIME_PARAM + i); 
+        attack_time_slider[i]->id = i;
+        attack_time_slider[i]->type = SliderWithId::ATTACK_TIME;
+        addParam(attack_time_slider[i]);
+
+        // envelope release time.
+        release_time_slider[i] = createParam<SliderWithId>(Vec(SLIDERS_X_OFFSET + i * 12,  10), module, Vocode_O_Matic_XL::RELEASE_TIME_PARAM + i); 
+        release_time_slider[i]->id = i;
+        release_time_slider[i]->type = SliderWithId::RELEASE_TIME;
+        addParam(release_time_slider[i]);
+
     }
+
+    // Push buttons for panning.  
+    addParam(createParam<LEDBezel>(Vec(860, 280), module, Vocode_O_Matic_XL::PAN_INCREASE_PARAM));
+    addParam(createParam<LEDBezel>(Vec(860, 305), module, Vocode_O_Matic_XL::PAN_CENTER_PARAM));
+    addParam(createParam<LEDBezel>(Vec(860, 330), module, Vocode_O_Matic_XL::PAN_DECREASE_PARAM));
+
+    // Push buttons for level sliders increase / decrease
+    addParam(createParam<LEDBezel>(Vec(860, 195), module, Vocode_O_Matic_XL::LEVEL_INCREASE_PARAM));
+    addParam(createParam<LEDBezel>(Vec(860, 235), module, Vocode_O_Matic_XL::LEVEL_DECREASE_PARAM));
+
+    // Push buttons for attack time sliders increase / decrease
+    addParam(createParam<LEDBezel>(Vec(860, 110), module, Vocode_O_Matic_XL::ATTACK_TIME_INCREASE_PARAM));
+    addParam(createParam<LEDBezel>(Vec(860, 150), module, Vocode_O_Matic_XL::ATTACK_TIME_DECREASE_PARAM));
+
+    // Push buttons for release time sliders increase / decrease
+    addParam(createParam<LEDBezel>(Vec(860,  20), module, Vocode_O_Matic_XL::RELEASE_TIME_INCREASE_PARAM));
+    addParam(createParam<LEDBezel>(Vec(860,  60), module, Vocode_O_Matic_XL::RELEASE_TIME_DECREASE_PARAM));
   };
 };
 
