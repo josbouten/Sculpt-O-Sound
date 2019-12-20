@@ -6,6 +6,7 @@
 #include "sliders.hpp"
 #include "pan_and_level.hpp"
 #include "matrix.hpp"
+#include "buttons.hpp"
 
 struct Vocode_O_Matic_XL : Module {
 
@@ -110,11 +111,11 @@ struct Vocode_O_Matic_XL : Module {
       // check against MIN_PAN and MAX_PAN.
       float increment = (MAX_PAN - MIN_PAN) / PAN_STEPS;
       for (int i = 0; i < NR_OF_BANDS; i += 2) {
-          slider_pan[i] -= increment;
+          slider_pan[i] += increment;
           if (slider_pan[i] < MIN_PAN) slider_pan[i] = MIN_PAN;
           if (slider_pan[i] > MAX_PAN) slider_pan[i] = MAX_PAN;
           params[PAN_PARAM + i].value = slider_pan[i];
-          slider_pan[i + 1] += increment;
+          slider_pan[i + 1] -= increment;
           if (slider_pan[i + 1] < MIN_PAN) slider_pan[i + 1] = MIN_PAN;
           if (slider_pan[i + 1] > MAX_PAN) slider_pan[i + 1] = MAX_PAN;
           params[PAN_PARAM + i + 1].value = slider_pan[i + 1];
@@ -126,10 +127,10 @@ struct Vocode_O_Matic_XL : Module {
       // Increase pan and limit to MIN_PAN and MAX_PAN.
       float increment = (MAX_PAN - MIN_PAN) / PAN_STEPS;
       for (int i = 0; i < NR_OF_BANDS; i += 2) {
-          slider_pan[i] += increment;
+          slider_pan[i] -= increment;
           if (slider_pan[i] > MAX_PAN) slider_pan[i] = MAX_PAN;
           params[PAN_PARAM + i].value = slider_pan[i];
-          slider_pan[i + 1] -= increment;
+          slider_pan[i + 1] += increment;
           if (slider_pan[i + 1] > MAX_PAN) slider_pan[i + 1] = MAX_PAN;
           params[PAN_PARAM + i + 1].value = slider_pan[i + 1];
       }
@@ -167,7 +168,6 @@ struct Vocode_O_Matic_XL : Module {
   }
 
   void increase_attack_time_level() {
-    //float increment = (MAX_ATTACK_TIME - MIN_ATTACK_TIME) / ATTACK_TIME_STEPS;
     for (int i = 0; i < NR_OF_BANDS; i++) {
         float f_c = ((float) freq[i+1] + (float) freq[i]) / 2.0;
         float increment = (2 * PI / f_c) * INITIAL_ENVELOPE_ATTACK_TEMPERATURE;
@@ -621,6 +621,7 @@ struct Vocode_O_Matic_XL : Module {
     init_attack_times(envelope_attack_time); 
     init_release_times(envelope_release_time); 
     comp_release_factors(envelope_release_factor, envelope_release_time);
+    comp_attack_factors(envelope_attack_factor, envelope_attack_time);
     comp_attack_and_release_time_ranges(envelope_attack_time_lower_range, envelope_attack_time_upper_range, envelope_release_time_lower_range, envelope_release_time_upper_range);
     for (int i = 0; i < NR_OF_BANDS; i++) {
         sprintf(message, "Attack time @ %d Hz", freq[i + 1]);

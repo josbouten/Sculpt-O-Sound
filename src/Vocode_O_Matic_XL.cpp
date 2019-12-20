@@ -663,21 +663,21 @@ struct Vocode_O_Matic_XL_Widget : ModuleWidget,  Vocode_O_Matic_XL {
     }
 
     // Push buttons for panning.  
-    addParam(createParam<LEDBezel>(Vec(860, 280), module, Vocode_O_Matic_XL::PAN_INCREASE_PARAM));
-    addParam(createParam<LEDBezel>(Vec(860, 305), module, Vocode_O_Matic_XL::PAN_CENTER_PARAM));
-    addParam(createParam<LEDBezel>(Vec(860, 330), module, Vocode_O_Matic_XL::PAN_DECREASE_PARAM));
+    addParam(createParam<ButtonUp>(Vec(860, 285), module, Vocode_O_Matic_XL::PAN_INCREASE_PARAM));
+    addParam(createParam<ButtonCenter>(Vec(860, 310), module, Vocode_O_Matic_XL::PAN_CENTER_PARAM));
+    addParam(createParam<ButtonDown>(Vec(860, 335), module, Vocode_O_Matic_XL::PAN_DECREASE_PARAM));
 
     // Push buttons for level sliders increase / decrease
-    addParam(createParam<LEDBezel>(Vec(860, 195), module, Vocode_O_Matic_XL::LEVEL_INCREASE_PARAM));
-    addParam(createParam<LEDBezel>(Vec(860, 235), module, Vocode_O_Matic_XL::LEVEL_DECREASE_PARAM));
+    addParam(createParam<ButtonUp>(Vec(860, 195), module, Vocode_O_Matic_XL::LEVEL_INCREASE_PARAM));
+    addParam(createParam<ButtonDown>(Vec(860, 245), module, Vocode_O_Matic_XL::LEVEL_DECREASE_PARAM));
 
     // Push buttons for attack time sliders increase / decrease
-    addParam(createParam<LEDBezel>(Vec(860, 110), module, Vocode_O_Matic_XL::ATTACK_TIME_INCREASE_PARAM));
-    addParam(createParam<LEDBezel>(Vec(860, 150), module, Vocode_O_Matic_XL::ATTACK_TIME_DECREASE_PARAM));
+    addParam(createParam<ButtonUp>(Vec(860, 105), module, Vocode_O_Matic_XL::ATTACK_TIME_INCREASE_PARAM));
+    addParam(createParam<ButtonDown>(Vec(860, 160), module, Vocode_O_Matic_XL::ATTACK_TIME_DECREASE_PARAM));
 
     // Push buttons for release time sliders increase / decrease
-    addParam(createParam<LEDBezel>(Vec(860,  20), module, Vocode_O_Matic_XL::RELEASE_TIME_INCREASE_PARAM));
-    addParam(createParam<LEDBezel>(Vec(860,  60), module, Vocode_O_Matic_XL::RELEASE_TIME_DECREASE_PARAM));
+    addParam(createParam<ButtonUp>(Vec(860,  15), module, Vocode_O_Matic_XL::RELEASE_TIME_INCREASE_PARAM));
+    addParam(createParam<ButtonDown>(Vec(860,  70), module, Vocode_O_Matic_XL::RELEASE_TIME_DECREASE_PARAM));
   };
 };
 

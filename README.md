@@ -5,16 +5,15 @@
 
 Sculpt-O-Sound presents:
 
-Vocode-O-Matic, a 31 terts band vocoder with editable frequency matrix for Rack v1.x.
-Its use is restricted to 44100 Hz sampling frequency at the moment.
+Vocode-O-Matic and Vocode-O-Matic-XL, are 31 terts band vocoders with editable frequency matrix for Rack v1.x.
+Its use is restricted to 44100 Hz sampling frequency at the moment. The actual vocoding done by Vocode-O-Matic and Vocode-O-Matic-XL are the same. The XL-version has more controls which allow fine tuning of the output signal. 
 You can find a video posted on youtube which demonstrates Vocode-O-Matic. Follow this link: https://www.youtube.com/watch?v=u_tcVmCJ_R8
-
+A second video demonstrating some of the fine tuning capabilities of Vocode-O-Matic-XL can be found here:
 
 ![alt text](doc/Vocode-O-Matic_v1.1.0.png)
 
 The vocoder has 31 terts band filters for the carrier and modulator inputs.
-To get an interesting result, start by using a pad like sound with a large bandwidth as a carrier and
-a rhythm loop as a modulator. The vocoder will make the pad play the rhythm.
+To get an interesting result, start by using a pad like sound with a large bandwidth as a carrier and a rhythm loop as a modulator. The vocoder will make the pad play the rhythm.
 
 Vocode-O-Matic-XL is basically the same as Vocode-O-Matic but it has sliders for the level of the modulator bands, sliders for panning the vocoded carrier bands to either left or right and sliders for the attack and release time of the envelope follower of each terts band. Be careful with the level sliders. If you crank them up too much, the sound will be distorted.
 
@@ -22,7 +21,7 @@ Vocode-O-Matic-XL is basically the same as Vocode-O-Matic but it has sliders for
 
 Signal flow
 ===========
-The modulator signal is split into 31 frequency bands and fed into the matrix on the left hand side of the matrix. The center frequency of the band pass filters used goes up from the bottom to the top of the matrix. So each row corresponds to one of 31 bands. The carrier signal is fed into the matrix from the bottom (frequencies go up from left to right) and split into 31 terts bands as well. So each column corresponds to a frequency band or the carrier. Buttons pressed in the matrix will allow the corresponding row's modulator band energy level to amplitude modulate the corresponding column's carrier band signal. The energy level of the modulator signal is computed using an envelope follower (which in Vocode-O-Matic has a set attack time and release time. In the XL version you can set the attack times using sliders.). All modulated carrier signals are summed and send to 2 outputs. In Vocode-O-Matic the sum of the modulated even bands is send to the Left output, the sum of the modulated odd bands to the Right output. In Vocode-O-Matic-XL you can pan each band to Left or Right using the corresponding pan slider. At the right hand side of the matrix are mute buttons. They allow muting modulator bands thus excluding their effect on the carrier bands.
+The modulator signal is split into 31 frequency bands which are fed into the matrix on the left hand side of the matrix. The center frequency of the band pass filters used goes up from the bottom to the top of the matrix. So each row corresponds to one of 31 bands. The carrier signal is fed into the matrix from the bottom (frequencies go up from left to right) and split into 31 terts bands as well. So each column corresponds to a frequency band or the carrier. Buttons pressed in the matrix will allow the corresponding row's modulator band energy level to amplitude modulate the corresponding column's carrier band signal. The energy level of the modulator signal is computed using an envelope follower (which in Vocode-O-Matic has a set attack time and release time. In the XL version you can set the attack times using sliders.). All modulated carrier signals are summed and send to 2 outputs. In Vocode-O-Matic the sum of the modulated even bands is send to the Left output, the sum of the modulated odd bands to the Right output. In Vocode-O-Matic-XL you can pan each band to Left or Right using the corresponding pan slider. At the right hand side of the matrix are mute buttons. They allow muting modulator bands thus excluding their effect on the carrier bands.
 
 The frequency is lowest at the lower left side of the matrix. Bands more to the right or up are higher in frequency.
 
@@ -56,7 +55,7 @@ Mapping 0, 1, 2, 3 are log mappings. All sound differently. By toggling switches
 
 Shift L R buttons
 =================
-The shift L and shift R buttons allow you to manually shift the matrix one step left and right respectively. The display will show the shift position. The inputs next to these buttons will do the same if a pulse signal is fed to them.
+The shift L and shift R buttons allow you to manually shift the matrix one step to the left and to the right respectively. The display will show the shift position's number. The inputs next to these buttons will do the same if a pulse signal is fed to them.
 
 Hold button
 ===========
@@ -75,9 +74,13 @@ If you use the Vocode-O-Matic-example.vcv settings file make sure you hear the s
 Sliders, Vocode-O-Matic-XL only
 ===============================
 Pan: allows you to pan a carrier band from the left to the right channel.
+The three macro buttons on the right hand side of the sliders can be used to increase the pan width, center the panning or decrease the pan width. These buttons work on all pan sliders at once.
 Level: allows you to amplify a band's modulator signal. 
-Attack: allows you to choose the attack time of the envelope follower for the corresponding modulatpr band.
+The two macro buttons on the right hand side of the sliders can be used to opearate all level sliders at once, either pushing them up or down.
+Attack: allows you to choose the attack time of the envelope follower for the corresponding modulator band. 
+The two macro buttons on the right hand side of the sliders operate on all sliders at once. They can be used to increase or decrease the attack time.
 Release: allows you to choose the release time of the envelope follower for the corresponding modulator band.
+The two macro buttons on the left hand side of the sliders operate on all sliders at once. They can be used to increase or decrease the release time.
 
 Sources
 =======
