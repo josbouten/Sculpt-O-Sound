@@ -17,7 +17,7 @@ To get an interesting result, start by using a pad like sound with a large bandw
 
 Vocode-O-Matic-XL is basically the same as Vocode-O-Matic but it has sliders for the level of the modulator bands, sliders for panning the vocoded carrier bands to either left or right and sliders for the attack and release time of the envelope follower of each terts band. Be careful with the level sliders. If you crank them up too much, the sound will be distorted.
 
-![alt text](doc/Vocode-O-Matic-XL_v1.1.0.png)
+![alt text](doc/Vocode-O-Matic-XL_v1.1.1.png)
 
 Signal flow
 ===========
