@@ -46,6 +46,7 @@ Matrix buttons
 The filter matrix consists of toggle switches, so you can make your own coupling between modulator and carrier filters. If you right click on a button and right click on another button once more, all buttons between these will be pressed. This makes it easier to press a series of buttons.
 Mind you, no attenuation is done, so if you combine a lot of modulator bands with one carrier filter, the output of the filter
 may exceed the maximum sample value (voltage) allowed resulting in distortion.
+Right clicking on 2 buttons in the matrix will draw a line of pressed buttons between those buttons.
 
 Matrix mode button
 ==================
@@ -65,6 +66,11 @@ Modulator activation buttons
 ============================
 On the right hand side of the filter matrix for every frequency band of the modulator a button is shown which can be used to (de)activate a modulator band. By default all modulator bands are active (lights are green). If you toggle a button the light will go out and the corresponding modulator band will not add to the vocoder effect. If you right click on a button all buttons will be switched to non active except the one you clicked effectively soloing the corresponding modulator band's effect on the carrier signal. You can then reactivate other modulator bands by left clicking on them. If you right click once more, the modulator activation buttons will return to the state befor you first right clicked.
 
+Mute buttons
+============
+Left clicking the buttons on the right hand side of the matrix will block the effect of the modulator on the correspinding channel.
+Right clicking one of the buttons will mute all channels except the one clicked. Right clicking once more will restore the button settings.
+
 Bypass button
 =============
 The bypass toggle button when pressed will turn red, this will put the vocoder in bypass mode.
@@ -74,7 +80,8 @@ If you use the Vocode-O-Matic-example.vcv settings file make sure you hear the s
 Sliders, Vocode-O-Matic-XL only
 ===============================
 Pan: allows you to pan a carrier band from the left to the right channel.
-The three macro buttons on the right hand side of the sliders can be used to increase the pan width, center the panning or decrease the pan width. These buttons work on all pan sliders at once.
+The three macro buttons on the right hand side of the sliders can be used to pan all bands to the left (move up), to the right (move down) and center the panning.
+The three macro buttons on the left hand side of the sliders can be used to increase the pan width, center the panning or decrease the pan width. These buttons work on all pan sliders at once.
 Level: allows you to amplify a band's modulator signal. 
 The two macro buttons on the right hand side of the sliders can be used to opearate all level sliders at once, either pushing them up or down.
 Attack: allows you to choose the attack time of the envelope follower for the corresponding modulator band. 

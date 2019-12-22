@@ -263,51 +263,51 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
     matrix_shift_position = 0;
   }
 
-  // Panning
-#ifdef PAN_WIDTH
-  width = params[PAN_WIDTH_PARAM].getValue();
-  if (width != width_old) {
-    set_pan_and_level(slider_level, slider_pan, left_pan, right_pan, left_level, right_level, width);
-    width_old = width;
+  if (pan_width_increase_button_trig.process(params[PAN_WIDTH_INCREASE_PARAM].getValue())) {
+      pan_width_increase();
   }
-#endif
+ 
+  if (pan_width_decrease_button_trig.process(params[PAN_WIDTH_DECREASE_PARAM].getValue())) {
+      pan_width_decrease();
+  }
+
+  if (pan_left_button_trig.process(params[PAN_LEFT_PARAM].getValue())) {
+      pan_left();
+  }
+ 
+  if (pan_right_button_trig.process(params[PAN_RIGHT_PARAM].getValue())) {
+      pan_right();
+  }
+ 
+ 
+  if (pan_center_button_trig.process(params[PAN_CENTER_PARAM].getValue())) {
+      pan_center();
+  }
+ 
+  if (level_increase_button_trig.process(params[LEVEL_INCREASE_PARAM].getValue())) {
+      level_increase();
+  }
+ 
+  if (level_decrease_button_trig.process(params[LEVEL_DECREASE_PARAM].getValue())) {
+      level_decrease();
+  }
+ 
+  if (envelope_attack_time_increase_button_trig.process(params[ATTACK_TIME_INCREASE_PARAM].getValue())) {
+      increase_attack_time_level();
+  }
+ 
+  if (envelope_attack_time_decrease_button_trig.process(params[ATTACK_TIME_DECREASE_PARAM].getValue())) {
+      decrease_attack_time_level();
+  }
+ 
+  if (envelope_release_time_increase_button_trig.process(params[RELEASE_TIME_INCREASE_PARAM].getValue())) {
+      increase_release_time_level();
+  }
+ 
+  if (envelope_release_time_decrease_button_trig.process(params[RELEASE_TIME_DECREASE_PARAM].getValue())) {
+      decrease_release_time_level();
+  }
   
-    if (pan_increase_button_trig.process(params[PAN_INCREASE_PARAM].getValue())) {
-        pan_width_increase();
-    }
- 
-    if (pan_decrease_button_trig.process(params[PAN_DECREASE_PARAM].getValue())) {
-        pan_width_decrease();
-    }
- 
-    if (pan_center_button_trig.process(params[PAN_CENTER_PARAM].getValue())) {
-        pan_center();
-    }
- 
-    if (level_increase_button_trig.process(params[LEVEL_INCREASE_PARAM].getValue())) {
-        level_increase();
-    }
- 
-    if (level_decrease_button_trig.process(params[LEVEL_DECREASE_PARAM].getValue())) {
-        level_decrease();
-    }
- 
-    if (envelope_attack_time_increase_button_trig.process(params[ATTACK_TIME_INCREASE_PARAM].getValue())) {
-        increase_attack_time_level();
-    }
- 
-    if (envelope_attack_time_decrease_button_trig.process(params[ATTACK_TIME_DECREASE_PARAM].getValue())) {
-        decrease_attack_time_level();
-    }
- 
-    if (envelope_release_time_increase_button_trig.process(params[RELEASE_TIME_INCREASE_PARAM].getValue())) {
-        increase_release_time_level();
-    }
- 
-    if (envelope_release_time_decrease_button_trig.process(params[RELEASE_TIME_DECREASE_PARAM].getValue())) {
-        decrease_release_time_level();
-    }
-    
 
   if (button_left_clicked_val > 0) {
     if (button_left_clicked_val >= MOD_MATRIX_PARAM && button_left_clicked_val < MOD_MATRIX_PARAM + NR_OF_BANDS * NR_OF_BANDS) { // There was a left click in the button matrix.
@@ -541,14 +541,9 @@ struct Vocode_O_Matic_XL_Widget : ModuleWidget,  Vocode_O_Matic_XL {
 
     // Dial for carrier gain.
     // Dial for modulator gain.
-    // Dial for panning.
     // Note: format is Vec(x-pos, y-pos)
     addParam(createParam<RoundSmallBlackKnob>(Vec(10,  25), module, Vocode_O_Matic_XL::CARRIER_GAIN_PARAM)); 
     addParam(createParam<RoundSmallBlackKnob>(Vec(40,  25), module, Vocode_O_Matic_XL::MODULATOR_GAIN_PARAM));
-
-#ifdef PAN_WIDTH
-    addParam(createParam<RoundSmallBlackKnob>(Vec(80,  25), module, Vocode_O_Matic_XL::PAN_WIDTH_PARAM)); 
-#endif
 
     // INTPUTS (SIGNAL AND PARAMS)
     // Carrier, modulator and shift left and right Input signals.
@@ -663,9 +658,13 @@ struct Vocode_O_Matic_XL_Widget : ModuleWidget,  Vocode_O_Matic_XL {
     }
 
     // Push buttons for panning.  
-    addParam(createParam<ButtonUp>(Vec(860, 285), module, Vocode_O_Matic_XL::PAN_INCREASE_PARAM));
+    addParam(createParam<ButtonUp>(Vec(860, 285), module, Vocode_O_Matic_XL::PAN_LEFT_PARAM));
     addParam(createParam<ButtonCenter>(Vec(860, 310), module, Vocode_O_Matic_XL::PAN_CENTER_PARAM));
-    addParam(createParam<ButtonDown>(Vec(860, 335), module, Vocode_O_Matic_XL::PAN_DECREASE_PARAM));
+    addParam(createParam<ButtonDown>(Vec(860, 335), module, Vocode_O_Matic_XL::PAN_RIGHT_PARAM));
+
+    addParam(createParam<ButtonUp>(Vec(SLIDERS_X_OFFSET - 15, 285), module, Vocode_O_Matic_XL::PAN_WIDTH_INCREASE_PARAM));
+    addParam(createParam<ButtonCenter>(Vec(SLIDERS_X_OFFSET - 15, 310), module, Vocode_O_Matic_XL::PAN_CENTER_PARAM));
+    addParam(createParam<ButtonDown>(Vec(SLIDERS_X_OFFSET - 15, 335), module, Vocode_O_Matic_XL::PAN_WIDTH_DECREASE_PARAM));
 
     // Push buttons for level sliders increase / decrease
     addParam(createParam<ButtonUp>(Vec(860, 195), module, Vocode_O_Matic_XL::LEVEL_INCREASE_PARAM));

@@ -105,6 +105,28 @@ struct Vocode_O_Matic_XL : Module {
     }
   }
 
+  void pan_left() {
+      // Decrease pan and limit to MIN_PAN and MAX_PAN.
+      float increment = (MAX_PAN - MIN_PAN) / PAN_STEPS;
+      for (int i = 0; i < NR_OF_BANDS; i += 1) {
+          slider_pan[i] += increment;
+          if (slider_pan[i] > MAX_PAN) slider_pan[i] = MAX_PAN;
+          params[PAN_PARAM + i].value = slider_pan[i];
+      }
+      set_pan_and_level(slider_level, slider_pan, left_pan, right_pan, left_level, right_level, width);
+  }
+  
+  void pan_right() {
+      // Increase pan and limit to MIN_PAN and MAX_PAN.
+      float increment = (MAX_PAN - MIN_PAN) / PAN_STEPS;
+      for (int i = 0; i < NR_OF_BANDS; i += 1) {
+          slider_pan[i] -= increment;
+          if (slider_pan[i] < MIN_PAN) slider_pan[i] = MIN_PAN;
+          params[PAN_PARAM + i].value = slider_pan[i];
+      }
+      set_pan_and_level(slider_level, slider_pan, left_pan, right_pan, left_level, right_level, width);
+  }
+
   void pan_width_decrease() {
       // Decrease pan and limit to MIN_PAN and MAX_PAN.
       // Because decreasing implies that PAN can cross 0, we need to 
@@ -235,9 +257,11 @@ struct Vocode_O_Matic_XL : Module {
     ENUMS(LEVEL_PARAM, NR_OF_BANDS),
     ENUMS(PAN_PARAM, NR_OF_BANDS),
     PAN_WIDTH_PARAM,
-    PAN_INCREASE_PARAM,
-    PAN_DECREASE_PARAM,
+    PAN_WIDTH_INCREASE_PARAM,
+    PAN_WIDTH_DECREASE_PARAM,
     PAN_CENTER_PARAM,
+    PAN_LEFT_PARAM,
+    PAN_RIGHT_PARAM,
     LEVEL_INCREASE_PARAM,
     LEVEL_DECREASE_PARAM,
     ATTACK_TIME_INCREASE_PARAM,
@@ -326,9 +350,11 @@ struct Vocode_O_Matic_XL : Module {
   bool matrix_one_step_left_button_pressed = false;
 
   // Push Buttons to control pan width.
-  dsp::SchmittTrigger pan_increase_button_trig;
-  dsp::SchmittTrigger pan_decrease_button_trig;
+  dsp::SchmittTrigger pan_width_increase_button_trig;
+  dsp::SchmittTrigger pan_width_decrease_button_trig;
   dsp::SchmittTrigger pan_center_button_trig;
+  dsp::SchmittTrigger pan_left_button_trig;
+  dsp::SchmittTrigger pan_right_button_trig;
 
   // Push Buttons to control level.
   dsp::SchmittTrigger level_increase_button_trig;
@@ -472,9 +498,7 @@ struct Vocode_O_Matic_XL : Module {
           
   void dataFromJson(json_t *rootJm) override {
 
-
     // Restore bypass state 
-    // fx_bypass = (params[BYPASS_SWITCH].value == 1) ? true: false;
     json_t *bypassJ = json_object_get(rootJm, "fx_bypass");
     if (bypassJ) {
         fx_bypass = json_boolean_value(bypassJ);
@@ -588,6 +612,7 @@ struct Vocode_O_Matic_XL : Module {
   } 
 
   Vocode_O_Matic_XL() {
+    char message[255];
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
     configParam(Vocode_O_Matic_XL::CARRIER_GAIN_PARAM, MIN_CARRIER_GAIN, MAX_CARRIER_GAIN, INITIAL_CARRIER_GAIN, "Gain factor for carrier signal (default=1).", "");
     configParam(Vocode_O_Matic_XL::MODULATOR_GAIN_PARAM, MIN_MODULATOR_GAIN, MAX_MODULATOR_GAIN, INITIAL_MODULATOR_GAIN, "Gain factor for modulator signal (default=1)", "");
@@ -596,14 +621,6 @@ struct Vocode_O_Matic_XL : Module {
     configParam(Vocode_O_Matic_XL::MATRIX_ONE_STEP_RIGHT_PARAM, 0.0f, 1.0f, 0.0f, "Move matrix one step to the right.", "");
     configParam(Vocode_O_Matic_XL::MATRIX_ONE_STEP_LEFT_PARAM, 0.0f, 1.0f, 0.0f, "Move matrix one step to the left.", "");
     configParam(Vocode_O_Matic_XL::MATRIX_HOLD_TOGGLE_PARAM, 0.0f, 1.0f, 0.0f, "Prevent the matrix from shifting.", "");
-    // Add macro buttons for panning.
-    configParam(Vocode_O_Matic_XL::PAN_INCREASE_PARAM, 0.0f, 1.0f, 0.0f, "Increase panning.", "");
-    configParam(Vocode_O_Matic_XL::PAN_DECREASE_PARAM, 0.0f, 1.0f, 0.0f, "Decrease panning.", "");
-    configParam(Vocode_O_Matic_XL::PAN_CENTER_PARAM, 0.0f, 1.0f, 0.0f, "Center panning.", "");
-#ifdef PAN_WIDTH
-    configParam(Vocode_O_Matic_XL::PAN_WIDTH_PARAM, 1.0f, 3.0f, 1.0f, "Panning width.", "");
-#endif
-    char message[255];
     for (int offset = 0; offset < NR_OF_BANDS; offset++) {
       sprintf(message, "Mute %d Hz band.", freq[offset + 1]);
       configParam(Vocode_O_Matic_XL::MUTE_OUTPUT_PARAM + offset, 0.0, 1.0f, 0.0f, message, "");
