@@ -14,7 +14,7 @@
 #define VBASE NR_OF_BANDS * LED_HEIGHT + 40
 #define ORIGIN_BOTTOM_LEFT
 #define HBASE 140
-#define SLIDERS_X_OFFSET 480
+#define SLIDERS_X_OFFSET 487
 
 void Vocode_O_Matic_XL::onReset() {
   // Initialize essential variables and show leds.
@@ -658,25 +658,25 @@ struct Vocode_O_Matic_XL_Widget : ModuleWidget,  Vocode_O_Matic_XL {
     }
 
     // Push buttons for panning.  
-    addParam(createParam<ButtonUp>(Vec(860, 285), module, Vocode_O_Matic_XL::PAN_LEFT_PARAM));
-    addParam(createParam<ButtonCenter>(Vec(860, 310), module, Vocode_O_Matic_XL::PAN_CENTER_PARAM));
-    addParam(createParam<ButtonDown>(Vec(860, 335), module, Vocode_O_Matic_XL::PAN_RIGHT_PARAM));
+    addParam(createParam<ButtonUp>(Vec(863, 285), module, Vocode_O_Matic_XL::PAN_LEFT_PARAM));
+    addParam(createParam<ButtonCenter>(Vec(863, 310), module, Vocode_O_Matic_XL::PAN_CENTER_PARAM));
+    addParam(createParam<ButtonDown>(Vec(863, 335), module, Vocode_O_Matic_XL::PAN_RIGHT_PARAM));
 
-    addParam(createParam<ButtonUp>(Vec(SLIDERS_X_OFFSET - 15, 285), module, Vocode_O_Matic_XL::PAN_WIDTH_INCREASE_PARAM));
-    addParam(createParam<ButtonCenter>(Vec(SLIDERS_X_OFFSET - 15, 310), module, Vocode_O_Matic_XL::PAN_CENTER_PARAM));
-    addParam(createParam<ButtonDown>(Vec(SLIDERS_X_OFFSET - 15, 335), module, Vocode_O_Matic_XL::PAN_WIDTH_DECREASE_PARAM));
+    addParam(createParam<ButtonUp>(Vec(SLIDERS_X_OFFSET - 16, 285), module, Vocode_O_Matic_XL::PAN_WIDTH_INCREASE_PARAM));
+    addParam(createParam<ButtonCenter>(Vec(SLIDERS_X_OFFSET - 16, 315), module, Vocode_O_Matic_XL::PAN_CENTER_PARAM));
+    addParam(createParam<ButtonDown>(Vec(SLIDERS_X_OFFSET - 16, 335), module, Vocode_O_Matic_XL::PAN_WIDTH_DECREASE_PARAM));
 
     // Push buttons for level sliders increase / decrease
-    addParam(createParam<ButtonUp>(Vec(860, 195), module, Vocode_O_Matic_XL::LEVEL_INCREASE_PARAM));
-    addParam(createParam<ButtonDown>(Vec(860, 245), module, Vocode_O_Matic_XL::LEVEL_DECREASE_PARAM));
+    addParam(createParam<ButtonUp>(Vec(863, 195), module, Vocode_O_Matic_XL::LEVEL_INCREASE_PARAM));
+    addParam(createParam<ButtonDown>(Vec(863, 245), module, Vocode_O_Matic_XL::LEVEL_DECREASE_PARAM));
 
     // Push buttons for attack time sliders increase / decrease
-    addParam(createParam<ButtonUp>(Vec(860, 105), module, Vocode_O_Matic_XL::ATTACK_TIME_INCREASE_PARAM));
-    addParam(createParam<ButtonDown>(Vec(860, 160), module, Vocode_O_Matic_XL::ATTACK_TIME_DECREASE_PARAM));
+    addParam(createParam<ButtonUp>(Vec(863, 105), module, Vocode_O_Matic_XL::ATTACK_TIME_INCREASE_PARAM));
+    addParam(createParam<ButtonDown>(Vec(863, 160), module, Vocode_O_Matic_XL::ATTACK_TIME_DECREASE_PARAM));
 
     // Push buttons for release time sliders increase / decrease
-    addParam(createParam<ButtonUp>(Vec(860,  15), module, Vocode_O_Matic_XL::RELEASE_TIME_INCREASE_PARAM));
-    addParam(createParam<ButtonDown>(Vec(860,  70), module, Vocode_O_Matic_XL::RELEASE_TIME_DECREASE_PARAM));
+    addParam(createParam<ButtonUp>(Vec(863,  15), module, Vocode_O_Matic_XL::RELEASE_TIME_INCREASE_PARAM));
+    addParam(createParam<ButtonDown>(Vec(863,  70), module, Vocode_O_Matic_XL::RELEASE_TIME_DECREASE_PARAM));
   };
 };
 
