@@ -8,7 +8,6 @@ Sculpt-O-Sound presents:
 Vocode-O-Matic and Vocode-O-Matic-XL, are 31 terts band vocoders with editable frequency matrix for Rack v1.x.
 Their use is restricted to 44100 Hz sampling frequency at the moment. The actual vocoding done by Vocode-O-Matic and Vocode-O-Matic-XL are the same. The XL-version has more controls which allow fine tuning of the output signal. 
 You can find a video posted on youtube which demonstrates Vocode-O-Matic. Follow this link: https://www.youtube.com/watch?v=u_tcVmCJ_R8
-A second video demonstrating some of the fine tuning capabilities of Vocode-O-Matic-XL can be found here:
 
 ![alt text](doc/Vocode-O-Matic_v1.1.0.png)
 
