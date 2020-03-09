@@ -3,6 +3,7 @@
 #include "dsp/digital.hpp"
 #include "Sculpt-O-Sound.hpp"
 #include "comp_coeffs.hpp"
+#include "level_sliders.hpp"
 #include "sliders.hpp"
 #include "pan_and_level.hpp"
 #include "matrix.hpp"
@@ -31,11 +32,11 @@ struct Vocode_O_Matic_XL : Module {
      }
   }
 
-  void refresh_mute_output_leds(int offset, bool mute_output[NR_OF_BANDS])
+  void refresh_mute_modulator_leds(int offset, bool mute_modulator[NR_OF_BANDS])
   {
     for (int i = 0; i < NR_OF_BANDS; i++) {
-        // Switch led off if mute_output is true.
-        lights[offset + i].value = (mute_output[i] == true) ? 0.0: 1.0;
+        // Switch led off if mute_modulator is true.
+        lights[offset + i].value = (mute_modulator[i] == true) ? 0.0: 1.0;
     }
   }
  
@@ -67,17 +68,17 @@ struct Vocode_O_Matic_XL : Module {
         *matrix_shift_position = NR_OF_BANDS - 1;
   }
 
-  void initialize_mute_output(bool mute_output[NR_OF_BANDS]) {
+  void initialize_mute_modulator(bool mute_modulator[NR_OF_BANDS]) {
     for (int i = 0; i < NR_OF_BANDS; i++) {
-        mute_output[i] = false;
+        mute_modulator[i] = false;
     }
   }
  
-  void print_mute_buttons(bool mute_output[NR_OF_BANDS]) {
+  void print_mute_buttons(bool mute_modulator[NR_OF_BANDS]) {
     for (int i = 0; i <  NR_OF_BANDS - 1; i++) {
-        printf("%02d: %d ", i, mute_output[i] == true ? 1: 0);
+        printf("%02d: %d ", i, mute_modulator[i] == true ? 1: 0);
     }
-    printf("%02d %d\n", NR_OF_BANDS - 1, mute_output[NR_OF_BANDS - 1] == true ? 1: 0);
+    printf("%02d %d\n", NR_OF_BANDS - 1, mute_modulator[NR_OF_BANDS - 1] == true ? 1: 0);
   }
 
   void handle_single_button(int x, int y, int set) {
@@ -127,10 +128,10 @@ struct Vocode_O_Matic_XL : Module {
       set_pan_and_level(slider_level, slider_pan, left_pan, right_pan, left_level, right_level, width);
   }
 
+  // Decrease pan and limit to MIN_PAN and MAX_PAN.
+  // Because decreasing implies that PAN can cross 0, we need to 
+  // check against MIN_PAN and MAX_PAN.
   void pan_width_decrease() {
-      // Decrease pan and limit to MIN_PAN and MAX_PAN.
-      // Because decreasing implies that PAN can cross 0, we need to 
-      // check against MIN_PAN and MAX_PAN.
       float increment = (MAX_PAN - MIN_PAN) / PAN_STEPS;
       for (int i = 0; i < NR_OF_BANDS; i += 2) {
           slider_pan[i] += increment;
@@ -145,20 +146,23 @@ struct Vocode_O_Matic_XL : Module {
       set_pan_and_level(slider_level, slider_pan, left_pan, right_pan, left_level, right_level, width);
   }
   
+  // Increase pan and limit to MIN_PAN and MAX_PAN.
   void pan_width_increase() {
-      // Increase pan and limit to MIN_PAN and MAX_PAN.
       float increment = (MAX_PAN - MIN_PAN) / PAN_STEPS;
       for (int i = 0; i < NR_OF_BANDS; i += 2) {
           slider_pan[i] -= increment;
           if (slider_pan[i] > MAX_PAN) slider_pan[i] = MAX_PAN;
+          if (slider_pan[i] < MIN_PAN) slider_pan[i] = MIN_PAN;
           params[PAN_PARAM + i].value = slider_pan[i];
           slider_pan[i + 1] += increment;
           if (slider_pan[i + 1] > MAX_PAN) slider_pan[i + 1] = MAX_PAN;
+          if (slider_pan[i + 1] < MIN_PAN) slider_pan[i + 1] = MIN_PAN;
           params[PAN_PARAM + i + 1].value = slider_pan[i + 1];
       }
       set_pan_and_level(slider_level, slider_pan, left_pan, right_pan, left_level, right_level, width);
   }
-  
+ 
+  // Set pan to center position. 
   void pan_center() {
       for (int i = 0; i < NR_OF_BANDS; i += 2) {
           slider_pan[i] = 0;
@@ -168,7 +172,8 @@ struct Vocode_O_Matic_XL : Module {
       }
       set_pan_and_level(slider_level, slider_pan, left_pan, right_pan, left_level, right_level, width);
   }
-  
+ 
+  // Increase levels of all bands with a small value. 
   void level_increase() {
     float increment = (MAX_LEVEL - MIN_LEVEL) / LEVEL_STEPS;
     for (int i = 0; i < NR_OF_BANDS; i += 1) {
@@ -179,6 +184,7 @@ struct Vocode_O_Matic_XL : Module {
     set_pan_and_level(slider_level, slider_pan, left_pan, right_pan, left_level, right_level, width);
   }
 
+  // Decrease levels of all bands with a small value. 
   void level_decrease() {
     float increment = (MAX_LEVEL - MIN_LEVEL) / LEVEL_STEPS;
     for (int i = 0; i < NR_OF_BANDS; i += 1) {
@@ -189,68 +195,21 @@ struct Vocode_O_Matic_XL : Module {
     set_pan_and_level(slider_level, slider_pan, left_pan, right_pan, left_level, right_level, width);
   }
 
-  void increase_attack_time_level() {
-    for (int i = 0; i < NR_OF_BANDS; i++) {
-        float f_c = ((float) freq[i+1] + (float) freq[i]) / 2.0;
-        float increment = (2 * PI / f_c) * INITIAL_ENVELOPE_ATTACK_TEMPERATURE;
-        envelope_attack_time[i] += increment;
-        if (envelope_attack_time[i] > MAX_ATTACK_TIME) 
-            envelope_attack_time[i] = MAX_ATTACK_TIME;
-        params[ATTACK_TIME_PARAM + i].value = envelope_attack_time[i];
-    }
-    comp_attack_factors(envelope_attack_factor, envelope_attack_time);
-  }
-
-  void decrease_attack_time_level() {
-    for (int i = 0; i < NR_OF_BANDS; i++) {
-        float f_c = ((float) freq[i+1] + (float) freq[i]) / 2.0;
-        float increment = (2 * PI / f_c) * INITIAL_ENVELOPE_ATTACK_TEMPERATURE;
-        envelope_attack_time[i] -= increment;
-        if (envelope_attack_time[i] < MIN_ATTACK_TIME) 
-            envelope_attack_time[i] = MIN_ATTACK_TIME;
-        params[ATTACK_TIME_PARAM + i].value = envelope_attack_time[i];
-    }
-    comp_attack_factors(envelope_attack_factor, envelope_attack_time);
-  }
-
-  void increase_release_time_level() {
-    for (int i = 0; i < NR_OF_BANDS; i++) {
-        float f_c = ((float) freq[i+1] + (float) freq[i]) / 2.0;
-        float increment = (2 * PI / f_c) * INITIAL_ENVELOPE_RELEASE_TEMPERATURE;
-        envelope_release_time[i] += increment;
-        if (envelope_release_time[i] > MAX_RELEASE_TIME) 
-            envelope_release_time[i] = MAX_RELEASE_TIME;
-        params[RELEASE_TIME_PARAM + i].value = envelope_release_time[i];
-    }
-    comp_release_factors(envelope_release_factor, envelope_release_time);
-  }
-
-  void decrease_release_time_level() {
-    for (int i = 0; i < NR_OF_BANDS; i++) {
-        float f_c = ((float) freq[i+1] + (float) freq[i]) / 2.0;
-        float increment = (2 * PI / f_c) * INITIAL_ENVELOPE_RELEASE_TEMPERATURE;
-        envelope_release_time[i] -= increment;
-        if (envelope_release_time[i] < MIN_RELEASE_TIME) 
-            envelope_release_time[i] = MIN_RELEASE_TIME;
-        params[RELEASE_TIME_PARAM + i].value = envelope_release_time[i];
-    }
-    comp_release_factors(envelope_release_factor, envelope_release_time);
-  }
 
   enum ParamIds {
-    // amplification factor
+    // Amplification factor
     DEBUG_PARAM,
-    // bypass switch
+    // Bypass switch
     BYPASS_SWITCH,
-    // toggle button to choose matrix type
+    // Toggle button to choose matrix type
     MATRIX_MODE_TOGGLE_PARAM,
-    // switch to start shift of matrix (to the right)
+    // Switch to start shift of matrix (to the right)
     MATRIX_HOLD_TOGGLE_PARAM,
     MATRIX_ONE_STEP_RIGHT_PARAM,
     MATRIX_ONE_STEP_LEFT_PARAM,
     CARRIER_GAIN_PARAM,
     MODULATOR_GAIN_PARAM,
-    ENUMS(MUTE_OUTPUT_PARAM, NR_OF_BANDS),
+    ENUMS(MUTE_MODULATOR_PARAM, NR_OF_BANDS),
     ENUMS(MOD_MATRIX_PARAM, NR_OF_BANDS * NR_OF_BANDS),
     ENUMS(ATTACK_TIME_PARAM, NR_OF_BANDS),
     ENUMS(RELEASE_TIME_PARAM, NR_OF_BANDS),
@@ -272,7 +231,7 @@ struct Vocode_O_Matic_XL : Module {
   };
 
   enum InputIds {
-    // input signal
+    // Input signal
     CARR_INPUT,
     MOD_INPUT, 
     SHIFT_RIGHT_INPUT,
@@ -281,23 +240,23 @@ struct Vocode_O_Matic_XL : Module {
   };
 
   enum OutputIds {
-    // output signal
+    // Output signal
     LEFT_OUTPUT,
     RIGHT_OUTPUT,
     NUM_OUTPUTS
   };
 
   enum LightIds {
-    // bypass light.
+    // Bypass light.
     BYPASS_LIGHT,
-    // matrix type light (toggles when pressed)
+    // Matrix type light (toggles when pressed)
     MATRIX_MODE_TOGGLE_LIGHT, 
-    // matrix shift indicator light
+    // Matrix shift indicator light
     MATRIX_HOLD_TOGGLE_LIGHT,
     // Step toggle to set shift by hand
     MATRIX_ONE_STEP_RIGHT_LIGHT,
     MATRIX_ONE_STEP_LEFT_LIGHT,
-    ENUMS(MUTE_OUTPUT_LIGHT, NR_OF_BANDS),
+    ENUMS(MUTE_MODULATOR_LIGHT, NR_OF_BANDS),
     ENUMS(MOD_MATRIX_LIGHT, NR_OF_BANDS * NR_OF_BANDS),
     NUM_LIGHTS 
   };
@@ -329,7 +288,7 @@ struct Vocode_O_Matic_XL : Module {
   // Button for bypass on and off.
   dsp::SchmittTrigger bypass_button_trig;
   bool fx_bypass = false;
-  // Button to toggle the filter band coupling type (4 * log)
+  // Button to toggle the filter band coupling type (4 * log).
   dsp::SchmittTrigger matrix_mode_button_trig;
   bool matrix_mode_button_pressed = false;
   // Start with linear coupling of filters.
@@ -339,7 +298,7 @@ struct Vocode_O_Matic_XL : Module {
   // Keep track of the shift position of the matrix.
   int matrix_shift_position = 1;
 
-  // Button to control triggering of matrix movement
+  // Button to control triggering of matrix movement.
   dsp::SchmittTrigger matrix_hold_button_trig;
   bool matrix_hold_button_pressed = false;
   // Button to step matrix on step to the right.
@@ -364,21 +323,17 @@ struct Vocode_O_Matic_XL : Module {
   dsp::SchmittTrigger envelope_attack_time_increase_button_trig;
   dsp::SchmittTrigger envelope_attack_time_decrease_button_trig;
   
-  // Push Buttons to envelope release time.
+  // Push Buttons to envelope  time.
   dsp::SchmittTrigger envelope_release_time_increase_button_trig;
   dsp::SchmittTrigger envelope_release_time_decrease_button_trig;
-
-  // Carrier channels can be muted.
-  // Detect that the buttons are pressed using this SchmittTrigger
-  dsp::SchmittTrigger mute_output_trig;
 
   int wait = 1;
   int wait2 = 1;
   int wait_all_sliders = 1;
   int p_cnt[NR_OF_BANDS];
   int button_value[NR_OF_BANDS][NR_OF_BANDS];
-  bool mute_output[NR_OF_BANDS]; 
-  bool mute_output_old[NR_OF_BANDS]; 
+  bool mute_modulator[NR_OF_BANDS]; 
+  bool mute_modulator_old[NR_OF_BANDS]; 
   float mod_alpha1[NR_OF_BANDS];
   float mod_alpha2[NR_OF_BANDS];
   float mod_beta[NR_OF_BANDS];
@@ -406,16 +361,16 @@ struct Vocode_O_Matic_XL : Module {
   float width = 1.0;
   float width_old = width;
   bool led_state[NR_OF_BANDS * NR_OF_BANDS] = {};
-  bool mute_output_led_state[NR_OF_BANDS] = {};
+  bool mute_modulator_led_state[NR_OF_BANDS] = {};
   bool matrix_mode_read_from_settings = false;
   int lights_offset = MOD_MATRIX_LIGHT;
-  int mute_output_lights_offset = MUTE_OUTPUT_LIGHT;
+  int mute_modulator_lights_offset = MUTE_MODULATOR_LIGHT;
 
   int  button_left_clicked_val = 0;
   int  button_right_clicked_val = 0;
   bool right_click_state = false;
 
-  // Sliders
+  // Sliders.
   SliderWithId *release_time_slider[NR_OF_BANDS]; 
   SliderWithId *attack_time_slider[NR_OF_BANDS]; 
   SliderWithId *pan_slider[NR_OF_BANDS]; 
@@ -425,23 +380,23 @@ struct Vocode_O_Matic_XL : Module {
   json_t *dataToJson() override {
     json_t *rootJm = json_object();
 
-    // Store bypass setting
+    // Store bypass setting.
     json_t *bypassJ = json_boolean(fx_bypass);
     json_object_set_new(rootJm, "fx_bypass", bypassJ);
 
-    // Store setting of matrix_shift_position
+    // Store setting of matrix_shift_position.
     json_t *matrix_shift_positionJ = json_real(matrix_shift_position);
     json_object_set_new(rootJm, "matrix_shift_position", matrix_shift_positionJ);
 
-    // Store setting of matrix_mode
+    // Store setting of matrix_mode.
     json_t *matrix_modeJ = json_real(matrix_mode);
     json_object_set_new(rootJm, "matrix_mode", matrix_modeJ);
     
-    // Store matrix hold button status
+    // Store matrix hold button status.
     json_t *matrix_hold_button_pressedJ = json_boolean(matrix_hold_button_pressed);
     json_object_set_new(rootJm, "matrix_hold_button_pressed", matrix_hold_button_pressedJ);
 
-    // Store p_cnt
+    // Store p_cnt.
     json_t *p_cntJ = json_array();
     for (int i = 0; i < NR_OF_BANDS; i++) {
        json_array_append_new(p_cntJ, json_real(p_cnt[i]));
@@ -459,35 +414,35 @@ struct Vocode_O_Matic_XL : Module {
     }
 	json_object_set_new(rootJm, "button_values", button_valuesJ);
 
-    // Store mute_output button values
-    json_t *mute_outputJ = json_array();
+    // Store mute_modulator button values.
+    json_t *mute_modulatorJ = json_array();
     for (int i = 0; i < NR_OF_BANDS; i++) {
-       json_array_append_new(mute_outputJ, json_boolean(mute_output[i]));
+       json_array_append_new(mute_modulatorJ, json_boolean(mute_modulator[i]));
     }
-    json_object_set_new(rootJm, "mute_output", mute_outputJ);
+    json_object_set_new(rootJm, "mute_modulator", mute_modulatorJ);
 
-    // Store envelope release time slider values
+    // Store envelope release time slider values.
     json_t *envelope_release_timeJ = json_array();
     for (int i = 0; i < NR_OF_BANDS; i++) {
        json_array_append_new(envelope_release_timeJ, json_real(envelope_release_time[i]));
     }
-    json_object_set_new(rootJm, "envelope_release", envelope_release_timeJ);
+    json_object_set_new(rootJm, "envelope_", envelope_release_timeJ);
 
-    // Store envelope attack time slider values
+    // Store envelope attack time slider values.
     json_t *envelope_attack_timeJ = json_array();
     for (int i = 0; i < NR_OF_BANDS; i++) {
        json_array_append_new(envelope_attack_timeJ, json_real(envelope_attack_time[i]));
     }
     json_object_set_new(rootJm, "envelope_attack", envelope_attack_timeJ);
 
-    // Store level slider values
+    // Store level slider values.
     json_t *levelJ = json_array();
     for (int i = 0; i < NR_OF_BANDS; i++) {
        json_array_append_new(levelJ, json_real(slider_level[i]));
     }
     json_object_set_new(rootJm, "level", levelJ);
 
-    // Store pan slider values
+    // Store pan slider values.
     json_t *panJ = json_array();
     for (int i = 0; i < NR_OF_BANDS; i++) {
        json_array_append_new(panJ, json_real(slider_pan[i]));
@@ -497,32 +452,31 @@ struct Vocode_O_Matic_XL : Module {
   }       
           
   void dataFromJson(json_t *rootJm) override {
-
-    // Restore bypass state 
+    // Restore bypass state.
     json_t *bypassJ = json_object_get(rootJm, "fx_bypass");
     if (bypassJ) {
         fx_bypass = json_boolean_value(bypassJ);
     }
 
-    // Restore matrix shift position
+    // Restore matrix shift position.
     json_t *matrix_shift_positionJ = json_object_get(rootJm, "matrix_shift_position");
     if (matrix_shift_positionJ) {
         matrix_shift_position = (int) json_number_value(matrix_shift_positionJ);
     }
 
-    // Restore matrix type 
+    // Restore matrix type.
     json_t *matrix_modeJ = json_object_get(rootJm, "matrix_mode");
     if (matrix_modeJ) {
         matrix_mode = (int) json_number_value(matrix_modeJ);
     }
 
-    // Restore matrix_hold_button_pressed button status
+    // Restore matrix_hold_button_pressed button status.
     json_t *matrix_hold_button_pressedJ = json_object_get(rootJm, "matrix_hold_button_pressed");
     if (matrix_hold_button_pressedJ) {
         matrix_hold_button_pressed = json_boolean_value(matrix_hold_button_pressedJ);
     }
 
-    // Restore p_cnt
+    // Restore p_cnt.
     json_t *p_cntJ = json_object_get(rootJm, "p_cnt");
     if (p_cntJ) {
         for (int i = 0; i < NR_OF_BANDS; i++) {
@@ -533,7 +487,7 @@ struct Vocode_O_Matic_XL : Module {
         }
     }
 
-    // Restore button_values
+    // Restore button_values.
     int cnt = 0;
     json_t *button_valuesJ = json_object_get(rootJm, "button_values");
     if (button_valuesJ) {
@@ -553,19 +507,19 @@ struct Vocode_O_Matic_XL : Module {
         refresh_led_matrix(lights_offset, p_cnt, button_value, led_state);
     } 
 
-    // Restore mute_output
-    json_t *mute_outputJ = json_object_get(rootJm, "mute_output");
-    if (mute_outputJ) {
+    // Restore mute_modulator.
+    json_t *mute_modulatorJ = json_object_get(rootJm, "mute_modulator");
+    if (mute_modulatorJ) {
         for (int i = 0; i < NR_OF_BANDS; i++) {
-            json_t *elementJ = json_array_get(mute_outputJ, i);
+            json_t *elementJ = json_array_get(mute_modulatorJ, i);
             if (elementJ) {
-                mute_output[i] = json_boolean_value(elementJ);
+                mute_modulator[i] = json_boolean_value(elementJ);
             }
         }
-        refresh_mute_output_leds(mute_output_lights_offset, mute_output);
+        refresh_mute_modulator_leds(mute_modulator_lights_offset, mute_modulator);
     }
 
-    // Restore envelope attack time slider
+    // Restore envelope attack time slider.
     json_t *envelope_attack_timeJ = json_object_get(rootJm, "envelope_attack_time");
     if (envelope_attack_timeJ) {
         for (int i = 0; i < NR_OF_BANDS; i++) {
@@ -576,7 +530,7 @@ struct Vocode_O_Matic_XL : Module {
         }
     }
 
-    // Restore envelope release time slider
+    // Restore envelope release time slider.
     json_t *envelope_release_timeJ = json_object_get(rootJm, "envelope_release_time");
     if (envelope_release_timeJ) {
         for (int i = 0; i < NR_OF_BANDS; i++) {
@@ -587,7 +541,7 @@ struct Vocode_O_Matic_XL : Module {
         }
     }
 
-    // Restore level slider
+    // Restore level slider.
     json_t *levelJ = json_object_get(rootJm, "level");
     if (levelJ) {
         for (int i = 0; i < NR_OF_BANDS; i++) {
@@ -598,7 +552,7 @@ struct Vocode_O_Matic_XL : Module {
         }
     }
 
-    // Restore envelope pan slider
+    // Restore envelope pan slider.
     json_t *panJ = json_object_get(rootJm, "pan");
     if (panJ) {
         for (int i = 0; i < NR_OF_BANDS; i++) {
@@ -610,8 +564,57 @@ struct Vocode_O_Matic_XL : Module {
     }
 
   } 
+  // Increase / decrease envelope attack / release times in small steps.
+  void increase_attack_time() {
+    for (int i = 0; i < NR_OF_BANDS; i++) {
+        float f_c = ((float) freq[i+1] + (float) freq[i]) / 2.0;
+        float increment = ((2.0 * PI) / f_c) * LOWER_ENVELOPE_ATTACK_TEMPERATURE;
+        envelope_attack_time[i] += increment;
+        if (envelope_attack_time[i] > envelope_attack_time_upper_range[i]) 
+            envelope_attack_time[i] = envelope_attack_time_upper_range[i];
+        params[ATTACK_TIME_PARAM + i].value = envelope_attack_time[i];
+    }
+    comp_attack_factors(envelope_attack_factor, envelope_attack_time);
+  }
+
+  void decrease_attack_time() {
+    for (int i = 0; i < NR_OF_BANDS; i++) {
+        float f_c = ((float) freq[i+1] + (float) freq[i]) / 2.0;
+        float increment = ((2.0 * PI) / f_c) * LOWER_ENVELOPE_ATTACK_TEMPERATURE;
+        envelope_attack_time[i] -= increment;
+        if (envelope_attack_time[i] < envelope_attack_time_lower_range[i]) 
+            envelope_attack_time[i] = envelope_attack_time_lower_range[i];
+        params[ATTACK_TIME_PARAM + i].value = envelope_attack_time[i];
+    }
+    comp_attack_factors(envelope_attack_factor, envelope_attack_time);
+  }
+
+  void increase_release_time() {
+    for (int i = 0; i < NR_OF_BANDS; i++) {
+        float f_c = ((float) freq[i+1] + (float) freq[i]) / 2.0;
+        float increment = ((2.0 * PI) / f_c) * LOWER_ENVELOPE_RELEASE_TEMPERATURE;
+        envelope_release_time[i] += increment;
+        if (envelope_release_time[i] > envelope_release_time_upper_range[i]) 
+            envelope_release_time[i] = envelope_release_time_upper_range[i];
+        params[RELEASE_TIME_PARAM + i].value = envelope_release_time[i];
+    }
+    comp_release_factors(envelope_release_factor, envelope_release_time);
+  }
+
+  void decrease_release_time() {
+    for (int i = 0; i < NR_OF_BANDS; i++) {
+        float f_c = ((float) freq[i+1] + (float) freq[i]) / 2.0;
+        float increment = ((2.0 * PI) / f_c) * LOWER_ENVELOPE_RELEASE_TEMPERATURE;
+        envelope_release_time[i] -= increment;
+        if (envelope_release_time[i] < envelope_release_time_lower_range[i]) 
+            envelope_release_time[i] = envelope_release_time_lower_range[i];
+        params[RELEASE_TIME_PARAM + i].value = envelope_release_time[i];
+    }
+    comp_release_factors(envelope_release_factor, envelope_release_time);
+  }
 
   Vocode_O_Matic_XL() {
+    // Define parameters and initialize them.
     char message[255];
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
     configParam(Vocode_O_Matic_XL::CARRIER_GAIN_PARAM, MIN_CARRIER_GAIN, MAX_CARRIER_GAIN, INITIAL_CARRIER_GAIN, "Gain factor for carrier signal (default=1).", "");
@@ -623,7 +626,7 @@ struct Vocode_O_Matic_XL : Module {
     configParam(Vocode_O_Matic_XL::MATRIX_HOLD_TOGGLE_PARAM, 0.0f, 1.0f, 0.0f, "Prevent the matrix from shifting.", "");
     for (int offset = 0; offset < NR_OF_BANDS; offset++) {
       sprintf(message, "Mute %d Hz band.", freq[offset + 1]);
-      configParam(Vocode_O_Matic_XL::MUTE_OUTPUT_PARAM + offset, 0.0, 1.0f, 0.0f, message, "");
+      configParam(Vocode_O_Matic_XL::MUTE_MODULATOR_PARAM + offset, 0.0, 1.0f, 0.0f, message, "");
     }
 
     // Add tooltips to the buttons.
@@ -646,8 +649,6 @@ struct Vocode_O_Matic_XL : Module {
         sprintf(message, "Release time @ %d Hz", freq[i + 1]);
         configParam(Vocode_O_Matic_XL::RELEASE_TIME_PARAM + i, envelope_release_time_lower_range[i], envelope_release_time_upper_range[i], envelope_release_time[i], message, " s");
     }
-
-    // ToDo: add tooltips to the sliders.
 
     // Initialize the filter coefficients.
     comp_all_coeffs(freq, mod_bandwidth, fsamp, mod_alpha1, mod_alpha2, mod_beta);
@@ -672,7 +673,6 @@ struct Vocode_O_Matic_XL : Module {
         float max_level = INITIAL_LEVEL + MAX_LEVEL * (equal_loudness_value(i) / minimum_equal_loudness_level);
         float min_level = INITIAL_LEVEL + MIN_LEVEL * (equal_loudness_value(i) / minimum_equal_loudness_level);
         configParam(Vocode_O_Matic_XL::LEVEL_PARAM + i, min_level, max_level, slider_level[i], message, " dB");
-        //configParam(Vocode_O_Matic_XL::LEVEL_PARAM + i, MIN_LEVEL, MAX_LEVEL, slider_level[i], message, " dB");
         sprintf(message, "Pan @ %d Hz", freq[i + 1]);
         if ((i % 2) != 0) {
             configParam(Vocode_O_Matic_XL::PAN_PARAM + i, MIN_PAN, MAX_PAN, INITIAL_PAN + INITIAL_PAN_OFFSET, message, "");
@@ -682,14 +682,14 @@ struct Vocode_O_Matic_XL : Module {
     }
     if (!matrix_mode_read_from_settings) {
         choose_matrix(4, button_value, p_cnt); // Initialize linear filter coupling.
-        initialize_mute_output(mute_output);   // Initialize all mute buttons (to be not pressed).
+        initialize_mute_modulator(mute_modulator);   // Initialize all mute buttons (to be not pressed).
     }
 
     // Show leds in button matrix.
     refresh_led_matrix(lights_offset, p_cnt, button_value, led_state);
 
     // Show leds in mute output column.
-    refresh_mute_output_leds(MUTE_OUTPUT_LIGHT, mute_output);
+    refresh_mute_modulator_leds(MUTE_MODULATOR_LIGHT, mute_modulator);
 
     blinkPhase = -1.0f;
     // Reset lights.

@@ -22,7 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "Sculpt-O-Sound.hpp"
 #include "comp_coeffs.hpp"
 #include "pan_and_level.hpp"
-#include "sliders.hpp"
+#include "level_sliders.hpp"
 
 struct Vocode_O_Matic : Module {
 
@@ -46,10 +46,10 @@ struct Vocode_O_Matic : Module {
      }
   }
 
-  void refresh_mute_output_leds(int offset, bool mute_output[NR_OF_BANDS]) {
+  void refresh_mute_modulator_leds(int offset, bool mute_modulator[NR_OF_BANDS]) {
     for (int i = 0; i < NR_OF_BANDS; i++) {
-        // Switch led off if mute_output is true.
-        lights[offset + i].setBrightness((mute_output[i] == true) ? 0.0: 1.0);
+        // Switch led off if mute_modulator is true.
+        lights[offset + i].setBrightness((mute_modulator[i] == true) ? 0.0: 1.0);
     }
   }
 
@@ -77,17 +77,17 @@ struct Vocode_O_Matic : Module {
         *matrix_shift_position = NR_OF_BANDS - 1;
   }
 
-  void initialize_mute_output(bool mute_output[NR_OF_BANDS]) {
+  void initialize_mute_modulator(bool mute_modulator[NR_OF_BANDS]) {
     for (int i = 0; i < NR_OF_BANDS; i++) {
-        mute_output[i] = false;
+        mute_modulator[i] = false;
     }
   }
 
-  void print_mute_buttons(bool mute_output[NR_OF_BANDS]) {
+  void print_mute_buttons(bool mute_modulator[NR_OF_BANDS]) {
     for (int i = 0; i <  NR_OF_BANDS - 1; i++) {
-        printf("%02d: %d ", i, mute_output[i] == true ? 1: 0);
+        printf("%02d: %d ", i, mute_modulator[i] == true ? 1: 0);
     }
-    printf("%02d %d\n", NR_OF_BANDS - 1, mute_output[NR_OF_BANDS - 1] == true ? 1: 0);
+    printf("%02d %d\n", NR_OF_BANDS - 1, mute_modulator[NR_OF_BANDS - 1] == true ? 1: 0);
   }
 
   void handle_single_button(int x, int y, int set) {
@@ -129,7 +129,7 @@ struct Vocode_O_Matic : Module {
     CARRIER_GAIN_PARAM,
     MODULATOR_GAIN_PARAM,
     PANNING_PARAM,
-    ENUMS(MUTE_OUTPUT_PARAM, NR_OF_BANDS),
+    ENUMS(MUTE_MODULATOR_PARAM, NR_OF_BANDS),
     ENUMS(MOD_MATRIX_PARAM, NR_OF_BANDS * NR_OF_BANDS),
     NUM_PARAMS
   };
@@ -160,7 +160,7 @@ struct Vocode_O_Matic : Module {
     // Step toggle to set shift by hand
     MATRIX_ONE_STEP_RIGHT_LIGHT,
     MATRIX_ONE_STEP_LEFT_LIGHT,
-    ENUMS(MUTE_OUTPUT_LIGHT, NR_OF_BANDS),
+    ENUMS(MUTE_MODULATOR_LIGHT, NR_OF_BANDS),
     ENUMS(MOD_MATRIX_LIGHT, NR_OF_BANDS * NR_OF_BANDS),
     NUM_LIGHTS
   };
@@ -190,7 +190,6 @@ struct Vocode_O_Matic : Module {
                315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500,
                3150, 4000, 5000, 6300, 8000, 10000,
                12500, 16000, 20000, 22025};
-  int i = 0;
   double carr_bandwidth = INITIAL_CARR_BW_IN_SEMITONES;
   double mod_bandwidth = INITIAL_MOD_BW_IN_SEMITONES;
   double fsamp = FFSAMP;
@@ -215,14 +214,12 @@ struct Vocode_O_Matic : Module {
   dsp::SchmittTrigger matrix_one_step_left_button_trig;
   bool matrix_one_step_left_button_pressed = false;
 
-  dsp::SchmittTrigger mute_output_trig;
-
   int wait = 1;
   int wait2 = 1;
   int p_cnt[NR_OF_BANDS];
   int button_value[NR_OF_BANDS][NR_OF_BANDS];
-  bool mute_output[NR_OF_BANDS];
-  bool mute_output_old[NR_OF_BANDS];
+  bool mute_modulator[NR_OF_BANDS];
+  bool mute_modulator_old[NR_OF_BANDS];
   float mod_alpha1[NR_OF_BANDS];
   float mod_alpha2[NR_OF_BANDS];
   float mod_beta[NR_OF_BANDS];
@@ -239,10 +236,10 @@ struct Vocode_O_Matic : Module {
   float width = 1.0;
   float width_old = width;
   bool led_state[1024] = {};
-  bool mute_output_led_state[NR_OF_BANDS] = {};
+  bool mute_modulator_led_state[NR_OF_BANDS] = {};
   bool matrix_mode_read_from_settings = false;
   int lights_offset = MOD_MATRIX_LIGHT;
-  int mute_output_lights_offset = MUTE_OUTPUT_LIGHT;
+  int mute_modulator_lights_offset = MUTE_MODULATOR_LIGHT;
 
   int  button_left_clicked_val = 0;
   int  button_right_clicked_val = 0;
@@ -270,28 +267,28 @@ struct Vocode_O_Matic : Module {
 
     // Store p_cnt
     json_t *p_cntJ = json_array();
-    for (int i = 0; i < NR_OF_BANDS; i++) {
-       json_array_append_new(p_cntJ, json_real(p_cnt[i]));
+    for (int bandNr = 0; bandNr < NR_OF_BANDS; bandNr++) {
+       json_array_append_new(p_cntJ, json_real(p_cnt[bandNr]));
     }
     json_object_set_new(rootJm, "p_cnt", p_cntJ);
 
     // Store matrix button values to patch settings.
     int cnt = 0;
    	json_t *button_valuesJ = json_array();
-	for (int i = 0; i < NR_OF_BANDS; i++) {
-		for (int j = 0; j < p_cnt[i]; j++) {
-			json_array_append_new(button_valuesJ, json_real(button_value[i][j]));
+	for (int bandNr = 0; bandNr < NR_OF_BANDS; bandNr++) {
+		for (int j = 0; j < p_cnt[bandNr]; j++) {
+			json_array_append_new(button_valuesJ, json_real(button_value[bandNr][j]));
             cnt++;
 		}
     }
 	json_object_set_new(rootJm, "button_values", button_valuesJ);
 
-    // Store mute_output button values
-    json_t *mute_outputJ = json_array();
-    for (int i = 0; i < NR_OF_BANDS; i++) {
-       json_array_append_new(mute_outputJ, json_boolean(mute_output[i]));
+    // Store mute_modulator button values
+    json_t *mute_modulatorJ = json_array();
+    for (int bandNr = 0; bandNr < NR_OF_BANDS; bandNr++) {
+       json_array_append_new(mute_modulatorJ, json_boolean(mute_modulator[bandNr]));
     }
-    json_object_set_new(rootJm, "mute_output", mute_outputJ);
+    json_object_set_new(rootJm, "mute_modulator", mute_modulatorJ);
 
     return rootJm;
   }
@@ -327,10 +324,10 @@ struct Vocode_O_Matic : Module {
     // Restore p_cnt
     json_t *p_cntJ = json_object_get(rootJm, "p_cnt");
     if (p_cntJ) {
-        for (int i = 0; i < NR_OF_BANDS; i++) {
-            json_t *elementJ = json_array_get(p_cntJ, i);
+        for (int bandNr = 0; bandNr < NR_OF_BANDS; bandNr++) {
+            json_t *elementJ = json_array_get(p_cntJ, bandNr);
             if (elementJ) {
-                p_cnt[i] = (int) json_number_value(elementJ);
+                p_cnt[bandNr] = (int) json_number_value(elementJ);
             }
         }
     }
@@ -340,31 +337,31 @@ struct Vocode_O_Matic : Module {
     json_t *button_valuesJ = json_object_get(rootJm, "button_values");
     if (button_valuesJ) {
         int index = 0;
-        for (int i = 0; i < NR_OF_BANDS; i++) {
-            for (int j = 0; j < p_cnt[i]; j++) {
+        for (int bandNr = 0; bandNr < NR_OF_BANDS; bandNr++) {
+            for (int j = 0; j < p_cnt[bandNr]; j++) {
                 json_t *elementJ = json_array_get(button_valuesJ, index + j);
                 if (elementJ) {
-                    button_value[i][j] = (int) json_number_value(elementJ);
+                    button_value[bandNr][j] = (int) json_number_value(elementJ);
                     cnt++;
                 } else {
                 }
             }
-            index += p_cnt[i];
+            index += p_cnt[bandNr];
         }
         matrix_mode_read_from_settings = true;
         refresh_led_matrix(lights_offset, p_cnt, button_value, led_state);
     }
 
-    // Restore mute_output
-    json_t *mute_outputJ = json_object_get(rootJm, "mute_output");
-    if (mute_outputJ) {
-        for (int i = 0; i < NR_OF_BANDS; i++) {
-            json_t *elementJ = json_array_get(mute_outputJ, i);
+    // Restore mute_modulator
+    json_t *mute_modulatorJ = json_object_get(rootJm, "mute_modulator");
+    if (mute_modulatorJ) {
+        for (int bandNr = 0; bandNr < NR_OF_BANDS; bandNr++) {
+            json_t *elementJ = json_array_get(mute_modulatorJ, bandNr);
             if (elementJ) {
-                mute_output[i] = json_boolean_value(elementJ);
+                mute_modulator[bandNr] = json_boolean_value(elementJ);
             }
         }
-        refresh_mute_output_leds(mute_output_lights_offset, mute_output);
+        refresh_mute_modulator_leds(mute_modulator_lights_offset, mute_modulator);
     }
 
   }
@@ -382,7 +379,7 @@ struct Vocode_O_Matic : Module {
     char message[255];
     for (int offset = 0; offset < NR_OF_BANDS; offset++) {
       sprintf(message, "Mute %d Hz band.", freq[offset + 1]);
-      configParam(Vocode_O_Matic::MUTE_OUTPUT_PARAM + offset, 0.0, 1.0f, 0.0f, message, "");
+      configParam(Vocode_O_Matic::MUTE_MODULATOR_PARAM + offset, 0.0, 1.0f, 0.0f, message, "");
     }
 
     // Add tooltips to the buttons.
@@ -398,27 +395,27 @@ struct Vocode_O_Matic : Module {
     comp_all_coeffs(freq, carr_bandwidth, fsamp, carr_alpha1, carr_alpha2, carr_beta);
 
     // Initialize all filter taps.
-    for (int i = 0; i < NR_OF_BANDS; i++) {
+    for (int bandNr = 0; bandNr < NR_OF_BANDS; bandNr++) {
      for (int j = 0; j < 3; j++) {
-          ym[i][j] = 0.0;
-          yc[i][j] = 0.0;
+          ym[bandNr][j] = 0.0;
+          yc[bandNr][j] = 0.0;
       }
-      ym_env[i][0] = 0.0; // Envelope of modulator.
-      ym_env[i][1] = 0.0;
+      ym_env[bandNr][0] = 0.0; // Envelope of modulator.
+      ym_env[bandNr][1] = 0.0;
     }
     // Initialize the levels and pans.
     initialize_slider_levels(slider_level);
     init_pan_and_level(slider_level, left_pan, right_pan, left_level, right_level);
     if (!matrix_mode_read_from_settings) {
         choose_matrix(4, button_value, p_cnt); // Initialize linear filter coupling.
-        initialize_mute_output(mute_output); // initialize all mute buttons (to be not pressed).
+        initialize_mute_modulator(mute_modulator); // initialize all mute buttons (to be not pressed).
     }
 
     // Show leds in button matrix.
     refresh_led_matrix(lights_offset, p_cnt, button_value, led_state);
 
     // Show leds in mute output column.
-    refresh_mute_output_leds(MUTE_OUTPUT_LIGHT, mute_output);
+    refresh_mute_modulator_leds(MUTE_MODULATOR_LIGHT, mute_modulator);
 
 
     blinkPhase = -1.0f;

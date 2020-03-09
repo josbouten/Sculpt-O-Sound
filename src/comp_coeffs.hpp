@@ -17,8 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef _COMP_COEFFS_HPP
-#define _COMP_COEFFS_HPP
+#pragma once
 
 #include "std.hpp"
 #include <string.h>
@@ -44,5 +43,3 @@ void print_times(const std::string s, float times[NR_OF_BANDS]);
 void print_array(float elements[NR_OF_BANDS]);
 
 void comp_attack_and_release_time_ranges(float min_attack_time[NR_OF_BANDS], float max_attack_time[NR_OF_BANDS], float min_release_time[NR_OF_BANDS], float max_release_time[NR_OF_BANDS]);
-
-#endif

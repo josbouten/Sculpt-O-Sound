@@ -1,5 +1,3 @@
-#ifndef _STD_H
-#define _STD_H
 float fl_abs(float a)
 {
   if (a < 0) return(-a);
@@ -17,4 +15,3 @@ float fl_min(float a, float b)
    if (a < b) return(a);
    return(b);
 }
-#endif

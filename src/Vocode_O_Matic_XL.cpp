@@ -32,13 +32,13 @@ void Vocode_O_Matic_XL::onReset() {
 
   // Set mute output buttons to not mute.
   for (int i = 0; i < NR_OF_BANDS; i++) {
-    mute_output_old[i] = false;
-    mute_output[i] = false;
-    params[MUTE_OUTPUT_PARAM + i].setValue(0.0);
-    lights[MUTE_OUTPUT_LIGHT + i].setBrightness(1.0);
+    mute_modulator_old[i] = false;
+    mute_modulator[i] = false;
+    params[MUTE_MODULATOR_PARAM + i].setValue(0.0);
+    lights[MUTE_MODULATOR_LIGHT + i].setBrightness(1.0);
   }
   // Show mute led values.
-  refresh_mute_output_leds(MUTE_OUTPUT_LIGHT, mute_output);
+  refresh_mute_modulator_leds(MUTE_MODULATOR_LIGHT, mute_modulator);
 
   blinkPhase = -1.0f;
   oneStepBlinkPhase = 0.0f;
@@ -79,15 +79,15 @@ void Vocode_O_Matic_XL::onRandomize() {
   // Set some mute output buttons to mute.
   for (int i = 0; i < NR_OF_BANDS; i++) {
     if ((rand() / (RAND_MAX + 1.0)) > 0.5) {
-        mute_output[i] = false;
-        lights[MUTE_OUTPUT_LIGHT + i].setBrightness(1.0);
+        mute_modulator[i] = false;
+        lights[MUTE_MODULATOR_LIGHT + i].setBrightness(1.0);
     } else {
-        mute_output[i] = true;
-        lights[MUTE_OUTPUT_LIGHT + i].setBrightness(0.0);
+        mute_modulator[i] = true;
+        lights[MUTE_MODULATOR_LIGHT + i].setBrightness(0.0);
     }
   }
   // Show mute led values.
-  refresh_mute_output_leds(MUTE_OUTPUT_LIGHT, mute_output);
+  refresh_mute_modulator_leds(MUTE_MODULATOR_LIGHT, mute_modulator);
 
   // Set gain to initial value. This will not work. The param values are set
   // in the library where they can not be reached?
@@ -137,7 +137,7 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
   // while checking all buttons, dials and sliders.
   float deltaTime = APP->engine->getSampleTime();
   float oneStepDeltaTime = APP->engine->getSampleTime();
-             
+
   xc[0] = inputs[CARR_INPUT].getVoltage() * params[CARRIER_GAIN_PARAM].getValue();
   xm[0] = inputs[MOD_INPUT].getVoltage() * params[MODULATOR_GAIN_PARAM].getValue();
   float smoothing_factor = 1.0;
@@ -145,10 +145,10 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
   for (int i = 0; i < NR_OF_BANDS; i++) {
     //
     // CARRIER
-    //  
+    // 
     // Direct Form I topology is used for filtering. Direct Form II would in this case cost as many multiplications and shifts.
     yc[i][0] = carr_alpha1[i] * (xc[0] - xc[2] - carr_alpha2[i] * yc[i][1] - carr_beta[i] * yc[i][2]);
-    //  
+    // 
     // Shift all carrier filter taps.
     yc[i][2] = yc[i][1]; yc[i][1] = yc[i][0];
 
@@ -156,11 +156,11 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
     // MODULATOR
     //
     ym[i][0] = mod_alpha1[i] * (xm[0] - xm[2] - mod_alpha2[i] * ym[i][1] - mod_beta[i] * ym[i][2]);
-    // 
+    //
     // Shift modulator filter taps.
     ym[i][2] = ym[i][1]; ym[i][1] = ym[i][0];
 
-    //  
+    // 
     // Compute input for envelope for this band.
     // Use only positive values so that energy levels are zero or positive.
     xm_env = fabs(ym[i][0]);
@@ -178,13 +178,13 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
 
   // Shift modulator input taps.
   xm[2] = xm[1]; xm[1] = xm[0];
-   
+
   // Shift carrier input taps.
   xc[2] = xc[1]; xc[1] = xc[0];
 
   // Blink light at 2Hz.
   blinkPhase += deltaTime;
-  if (blinkPhase >= 1.0f) 
+  if (blinkPhase >= 1.0f)
     blinkPhase -= 1.0f;
   oneStepBlinkPhase += oneStepDeltaTime;
   if (oneStepBlinkPhase >= 0.1f) { // light will be on for a very short time.
@@ -192,7 +192,7 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
     lights[MATRIX_ONE_STEP_LEFT_LIGHT].setBrightness(0.0f);
   }
 
-  // Process trigger signal on matrix shift input. 
+  // Process trigger signal on matrix shift input.
   float shiftRightTriggerIn = inputs[SHIFT_RIGHT_INPUT].getVoltage();
   cv_right->update(shiftRightTriggerIn);
   float shiftLeftTriggerIn = inputs[SHIFT_LEFT_INPUT].getVoltage();
@@ -224,7 +224,7 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
     shift_buttons_right(button_value, p_cnt, led_state, &matrix_shift_position);
   }
 
-  // Shift the matrix if there is a new trigger on the shift right input and the 
+  // Shift the matrix if there is a new trigger on the shift right input and the
   // hold button is not pressed and we are not in bypass mode.
   if (not fx_bypass && cv_right->newTrigger() and not matrix_hold_button_pressed) {
     // Shift the buttons one step.
@@ -241,7 +241,7 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
     shift_buttons_left(button_value, p_cnt, led_state, &matrix_shift_position);
   }
 
-  // Shift the matrix if there is a new trigger on the shift left input and the 
+  // Shift the matrix if there is a new trigger on the shift left input and the
   // hold button is not pressed and we are not in bypass mode.
   if (not fx_bypass && cv_left->newTrigger() and not matrix_hold_button_pressed) {
     // Shift the buttons one step.
@@ -252,7 +252,7 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
   if (matrix_mode_button_trig.process(params[MATRIX_MODE_TOGGLE_PARAM].getValue())) {
     matrix_mode_button_pressed = false;
     lights[MATRIX_MODE_TOGGLE_PARAM].setBrightness(matrix_mode_button_pressed ? 1.00 : 0.0);
-    matrix_mode++; 
+    matrix_mode++;
     if (matrix_mode > NR_MATRIX_MODES - 1) { matrix_mode = 0; }
     choose_matrix(matrix_mode, button_value, p_cnt);
 
@@ -266,7 +266,7 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
   if (pan_width_increase_button_trig.process(params[PAN_WIDTH_INCREASE_PARAM].getValue())) {
       pan_width_increase();
   }
- 
+
   if (pan_width_decrease_button_trig.process(params[PAN_WIDTH_DECREASE_PARAM].getValue())) {
       pan_width_decrease();
   }
@@ -274,41 +274,40 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
   if (pan_left_button_trig.process(params[PAN_LEFT_PARAM].getValue())) {
       pan_left();
   }
- 
+
   if (pan_right_button_trig.process(params[PAN_RIGHT_PARAM].getValue())) {
       pan_right();
   }
- 
- 
+
+
   if (pan_center_button_trig.process(params[PAN_CENTER_PARAM].getValue())) {
       pan_center();
   }
- 
+
   if (level_increase_button_trig.process(params[LEVEL_INCREASE_PARAM].getValue())) {
       level_increase();
   }
- 
+
   if (level_decrease_button_trig.process(params[LEVEL_DECREASE_PARAM].getValue())) {
       level_decrease();
   }
- 
-  if (envelope_attack_time_increase_button_trig.process(params[ATTACK_TIME_INCREASE_PARAM].getValue())) {
-      increase_attack_time_level();
-  }
- 
-  if (envelope_attack_time_decrease_button_trig.process(params[ATTACK_TIME_DECREASE_PARAM].getValue())) {
-      decrease_attack_time_level();
-  }
- 
-  if (envelope_release_time_increase_button_trig.process(params[RELEASE_TIME_INCREASE_PARAM].getValue())) {
-      increase_release_time_level();
-  }
- 
-  if (envelope_release_time_decrease_button_trig.process(params[RELEASE_TIME_DECREASE_PARAM].getValue())) {
-      decrease_release_time_level();
-  }
-  
 
+  if (envelope_attack_time_increase_button_trig.process(params[ATTACK_TIME_INCREASE_PARAM].getValue())) {
+      increase_attack_time();
+  }
+
+  if (envelope_attack_time_decrease_button_trig.process(params[ATTACK_TIME_DECREASE_PARAM].getValue())) {
+      decrease_attack_time();
+  }
+
+  if (envelope_release_time_increase_button_trig.process(params[RELEASE_TIME_INCREASE_PARAM].getValue())) {
+      increase_release_time();
+  }
+
+  if (envelope_release_time_decrease_button_trig.process(params[RELEASE_TIME_DECREASE_PARAM].getValue())) {
+      decrease_release_time();
+  }
+ 
   if (button_left_clicked_val > 0) {
     if (button_left_clicked_val >= MOD_MATRIX_PARAM && button_left_clicked_val < MOD_MATRIX_PARAM + NR_OF_BANDS * NR_OF_BANDS) { // There was a left click in the button matrix.
       int buttonNr = button_left_clicked_val - MOD_MATRIX_PARAM;
@@ -335,19 +334,19 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
           p_cnt[chosen_row]++;
       }
     } else { // A mute button was left clicked.
-      int buttonNr = button_left_clicked_val - MUTE_OUTPUT_PARAM;
-      mute_output[buttonNr] = !mute_output[buttonNr];
-      lights[MUTE_OUTPUT_LIGHT + buttonNr].setBrightness(1.0 - lights[MUTE_OUTPUT_LIGHT + buttonNr].getBrightness());
+      int buttonNr = button_left_clicked_val - MUTE_MODULATOR_PARAM;
+      mute_modulator[buttonNr] = !mute_modulator[buttonNr];
+      lights[MUTE_MODULATOR_LIGHT + buttonNr].setBrightness(1.0 - lights[MUTE_MODULATOR_LIGHT + buttonNr].getBrightness());
 #ifdef DEBUGMSG
       refresh = true;
 #endif
     }
     button_left_clicked_val = 0;
   }
-  if (button_right_clicked_val > 0) 
+  if (button_right_clicked_val > 0)
   {
     // Right button was clicked in the button matrix.
-    if (button_right_clicked_val >= MOD_MATRIX_PARAM && button_right_clicked_val < MOD_MATRIX_PARAM + NR_OF_BANDS * NR_OF_BANDS) 
+    if (button_right_clicked_val >= MOD_MATRIX_PARAM && button_right_clicked_val < MOD_MATRIX_PARAM + NR_OF_BANDS * NR_OF_BANDS)
     { // There was a richt click in the button matrix.
         right_click_state = !right_click_state;
         int buttonNr = button_right_clicked_val - MOD_MATRIX_PARAM;
@@ -357,7 +356,7 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
         handle_single_button(x, y, 1.0);
         if (x1 >= 0) { x2 = x; y2 = y; }
         else { x1 = x; y1 = y; }
-        if ((x1 >= 0) && (x2 >= 0)) 
+        if ((x1 >= 0) && (x2 >= 0))
         {
             if (x1 != x2) { rc = ((float) y2 - (float) y1 ) / ((float) x2 - (float) x1); }
             else rc = -1.0;
@@ -368,10 +367,10 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
                     handle_single_button(x1, y, 1.0);
                 }
             }
-            else 
+            else
             {
                 if (x1 > x2) { std::swap(x1, x2); std::swap(y1, y2); }
-                for (x = x1 + 1; x < x2; x++) 
+                for (x = x1 + 1; x < x2; x++)
                 {
                     y = (int) (y1 + rc * ((float) (x - x1)));
                     if (y >= NR_OF_BANDS) {
@@ -384,23 +383,23 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
             x1 = x2 = -1;
         }
         refresh_led_matrix(lights_offset, p_cnt, button_value, led_state);
-    } 
-    else 
+    }
+    else
     {   // A mute button was right clicked.
         right_click_state = !right_click_state;
-        int buttonNr = button_right_clicked_val - MUTE_OUTPUT_PARAM;
+        int buttonNr = button_right_clicked_val - MUTE_MODULATOR_PARAM;
         if (right_click_state) { // This is solo mode, so we mute everything except the clicked button.
             for (int i = 0; i < NR_OF_BANDS; i++) {
-                mute_output_old[i] = mute_output[i];
-                lights[MUTE_OUTPUT_LIGHT + i].setBrightness(0.0);   
-                mute_output[i] = true;
+                mute_modulator_old[i] = mute_modulator[i];
+                lights[MUTE_MODULATOR_LIGHT + i].setBrightness(0.0);
+                mute_modulator[i] = true;
             }
-            mute_output[buttonNr] = false;
-            lights[MUTE_OUTPUT_LIGHT + buttonNr].setBrightness(1.0);
+            mute_modulator[buttonNr] = false;
+            lights[MUTE_MODULATOR_LIGHT + buttonNr].setBrightness(1.0);
         } else { // This is the unmute state, so we restore the pre mute knob settings.
             for (int i = 0; i < NR_OF_BANDS; i++) {
-                mute_output[i] = mute_output_old[i];
-                lights[MUTE_OUTPUT_LIGHT + i].setBrightness(mute_output[i] == true ? 0.0: 1.0);
+                mute_modulator[i] = mute_modulator_old[i];
+                lights[MUTE_MODULATOR_LIGHT + i].setBrightness(mute_modulator[i] == true ? 0.0: 1.0);
             }
         }
     }
@@ -408,8 +407,8 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
   }
 #ifdef DEBUGMSG
   if (refresh) {
-      print_mute_buttons(mute_output);
-      refresh_mute_output_leds(MUTE_OUTPUT_LIGHT, mute_output);
+      print_mute_buttons(mute_modulator);
+      refresh_mute_modulator_leds(MUTE_MODULATOR_LIGHT, mute_modulator);
       refresh = false;
   }
 #endif
@@ -455,7 +454,7 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
         print_array(envelope_release_factor);
 #endif
     }
- 
+
     // Handle pan and level slider changes here.
     // First process pan slider changes.
     change = false;
@@ -509,7 +508,7 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
         float fl_tmp0 = yc[ind][0] * ym_env[i][0];
         //
         // Only the non muted channels are added to the output signal.
-        if (mute_output[i] == false) {
+        if (mute_modulator[i] == false) {
           //
           // Left channel.
           float fl_tmp = fl_tmp0 * left_level[i];
@@ -542,7 +541,7 @@ struct Vocode_O_Matic_XL_Widget : ModuleWidget,  Vocode_O_Matic_XL {
     // Dial for carrier gain.
     // Dial for modulator gain.
     // Note: format is Vec(x-pos, y-pos)
-    addParam(createParam<RoundSmallBlackKnob>(Vec(10,  25), module, Vocode_O_Matic_XL::CARRIER_GAIN_PARAM)); 
+    addParam(createParam<RoundSmallBlackKnob>(Vec(10,  25), module, Vocode_O_Matic_XL::CARRIER_GAIN_PARAM));
     addParam(createParam<RoundSmallBlackKnob>(Vec(40,  25), module, Vocode_O_Matic_XL::MODULATOR_GAIN_PARAM));
 
     // INTPUTS (SIGNAL AND PARAMS)
@@ -572,23 +571,23 @@ struct Vocode_O_Matic_XL_Widget : ModuleWidget,  Vocode_O_Matic_XL {
     addParam(createParam<LEDBezel>(Vec(12, 142), module, Vocode_O_Matic_XL::MATRIX_HOLD_TOGGLE_PARAM));
     addChild(createLight<LedLight<RedLight>>(Vec(14.2, 144), module, Vocode_O_Matic_XL::MATRIX_HOLD_TOGGLE_LIGHT));
 
-    // Matrix Mode Display
-    MsDisplayWidget *matrix_mode_display = new MsDisplayWidget();                            
-    matrix_mode_display->box.pos = Vec(38, 105);                                               
-    matrix_mode_display->box.size = Vec(30, 20);                                             
+    // Matrix Mode Display.
+    MsDisplayWidget *matrix_mode_display = new MsDisplayWidget(); 
+    matrix_mode_display->box.pos = Vec(38, 105); 
+    matrix_mode_display->box.size = Vec(30, 20); 
     if (module) {
         matrix_mode_display->value = &module->matrix_mode;
     }
-    addChild(matrix_mode_display);                                                           
+    addChild(matrix_mode_display); 
 
-    // Matrix Shift Position Display 
-    MsDisplayWidget *matrix_shift_position_display = new MsDisplayWidget();           
+    // Matrix Shift Position Display.
+    MsDisplayWidget *matrix_shift_position_display = new MsDisplayWidget();
     matrix_shift_position_display->box.pos = Vec(38, 143);
-    matrix_shift_position_display->box.size = Vec(30, 20);                                             
+    matrix_shift_position_display->box.size = Vec(30, 20); 
     if (module) {
         matrix_shift_position_display->value = &module->matrix_shift_position;
     }
-    addChild(matrix_shift_position_display);                                                           
+    addChild(matrix_shift_position_display);
 
     // Output of vocoded signal.
     addOutput(createOutput<PJ301MPort>(Vec(10, 219), module, Vocode_O_Matic_XL::LEFT_OUTPUT));
@@ -622,59 +621,59 @@ struct Vocode_O_Matic_XL_Widget : ModuleWidget,  Vocode_O_Matic_XL {
                 lb->module = module;
                 lb->box.pos = Vec(x, y);
                 if (module) {
-                    lb->paramQuantity = module->paramQuantities[Vocode_O_Matic_XL::MUTE_OUTPUT_PARAM + offset];
+                    lb->paramQuantity = module->paramQuantities[Vocode_O_Matic_XL::MUTE_MODULATOR_PARAM + offset];
                 }
                 addChild(lb);
             }
-            addChild(createLight<MediumLight<GreenLight>>(Vec(x, y), module, Vocode_O_Matic_XL::MUTE_OUTPUT_LIGHT + offset));
+            addChild(createLight<MediumLight<GreenLight>>(Vec(x, y), module, Vocode_O_Matic_XL::MUTE_MODULATOR_LIGHT + offset));
     }
 
     // Add 4 rows of sliders (from bottom to top of module) for
     for (int i = 0; i < NR_OF_BANDS; i++) {
         // panning,
-        pan_slider[i] = createParam<SliderWithId>(Vec(SLIDERS_X_OFFSET + i * 12, 280), module, Vocode_O_Matic_XL::PAN_PARAM + i); 
+        pan_slider[i] = createParam<SliderWithId>(Vec(SLIDERS_X_OFFSET + i * 12, 280), module, Vocode_O_Matic_XL::PAN_PARAM + i);
         pan_slider[i]->id = i;
         pan_slider[i]->type = SliderWithId::PAN;
         addParam(pan_slider[i]);
 
         // level,
-        level_slider[i] = createParam<SliderWithId>(Vec(SLIDERS_X_OFFSET + i * 12, 190), module, Vocode_O_Matic_XL::LEVEL_PARAM + i); 
+        level_slider[i] = createParam<SliderWithId>(Vec(SLIDERS_X_OFFSET + i * 12, 190), module, Vocode_O_Matic_XL::LEVEL_PARAM + i);
         level_slider[i]->id = i;
         level_slider[i]->type = SliderWithId::LEVEL;
         addParam(level_slider[i]);
 
         // envelope attack time and
-        attack_time_slider[i] = createParam<SliderWithId>(Vec(SLIDERS_X_OFFSET + i * 12,  100), module, Vocode_O_Matic_XL::ATTACK_TIME_PARAM + i); 
+        attack_time_slider[i] = createParam<SliderWithId>(Vec(SLIDERS_X_OFFSET + i * 12,  100), module, Vocode_O_Matic_XL::ATTACK_TIME_PARAM + i);
         attack_time_slider[i]->id = i;
         attack_time_slider[i]->type = SliderWithId::ATTACK_TIME;
         addParam(attack_time_slider[i]);
 
         // envelope release time.
-        release_time_slider[i] = createParam<SliderWithId>(Vec(SLIDERS_X_OFFSET + i * 12,  10), module, Vocode_O_Matic_XL::RELEASE_TIME_PARAM + i); 
+        release_time_slider[i] = createParam<SliderWithId>(Vec(SLIDERS_X_OFFSET + i * 12,  10), module, Vocode_O_Matic_XL::RELEASE_TIME_PARAM + i);
         release_time_slider[i]->id = i;
         release_time_slider[i]->type = SliderWithId::RELEASE_TIME;
         addParam(release_time_slider[i]);
 
     }
 
-    // Push buttons for panning.  
+    // Push buttons for panning. 
     addParam(createParam<ButtonUp>(Vec(863, 285), module, Vocode_O_Matic_XL::PAN_LEFT_PARAM));
     addParam(createParam<ButtonCenter>(Vec(863, 310), module, Vocode_O_Matic_XL::PAN_CENTER_PARAM));
     addParam(createParam<ButtonDown>(Vec(863, 335), module, Vocode_O_Matic_XL::PAN_RIGHT_PARAM));
 
     addParam(createParam<ButtonUp>(Vec(SLIDERS_X_OFFSET - 16, 285), module, Vocode_O_Matic_XL::PAN_WIDTH_INCREASE_PARAM));
-    addParam(createParam<ButtonCenter>(Vec(SLIDERS_X_OFFSET - 16, 315), module, Vocode_O_Matic_XL::PAN_CENTER_PARAM));
+    addParam(createParam<ButtonCenter>(Vec(SLIDERS_X_OFFSET - 16, 310), module, Vocode_O_Matic_XL::PAN_CENTER_PARAM));
     addParam(createParam<ButtonDown>(Vec(SLIDERS_X_OFFSET - 16, 335), module, Vocode_O_Matic_XL::PAN_WIDTH_DECREASE_PARAM));
 
-    // Push buttons for level sliders increase / decrease
+    // Push buttons for level sliders increase / decrease.
     addParam(createParam<ButtonUp>(Vec(863, 195), module, Vocode_O_Matic_XL::LEVEL_INCREASE_PARAM));
     addParam(createParam<ButtonDown>(Vec(863, 245), module, Vocode_O_Matic_XL::LEVEL_DECREASE_PARAM));
 
-    // Push buttons for attack time sliders increase / decrease
+    // Push buttons for attack time sliders increase / decrease.
     addParam(createParam<ButtonUp>(Vec(863, 105), module, Vocode_O_Matic_XL::ATTACK_TIME_INCREASE_PARAM));
     addParam(createParam<ButtonDown>(Vec(863, 160), module, Vocode_O_Matic_XL::ATTACK_TIME_DECREASE_PARAM));
 
-    // Push buttons for release time sliders increase / decrease
+    // Push buttons for release time sliders increase / decrease.
     addParam(createParam<ButtonUp>(Vec(863,  15), module, Vocode_O_Matic_XL::RELEASE_TIME_INCREASE_PARAM));
     addParam(createParam<ButtonDown>(Vec(863,  70), module, Vocode_O_Matic_XL::RELEASE_TIME_DECREASE_PARAM));
   };

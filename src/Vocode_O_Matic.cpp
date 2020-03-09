@@ -50,12 +50,12 @@ void Vocode_O_Matic::onReset() {
 
   // Set mute output buttons to not mute.
   for (int i = 0; i < NR_OF_BANDS; i++) {
-    mute_output[i] = false;
-    params[MUTE_OUTPUT_PARAM + i].setValue(0.0);
-    lights[MUTE_OUTPUT_LIGHT + i].setBrightness(1.0);
+    mute_modulator[i] = false;
+    params[MUTE_MODULATOR_PARAM + i].setValue(0.0);
+    lights[MUTE_MODULATOR_LIGHT + i].setBrightness(1.0);
   }
   // Show mute led values.
-  refresh_mute_output_leds(MUTE_OUTPUT_LIGHT, mute_output);
+  refresh_mute_modulator_leds(MUTE_MODULATOR_LIGHT, mute_modulator);
 
   blinkPhase = -1.0f;
   oneStepBlinkPhase = 0.0f;
@@ -83,16 +83,16 @@ void Vocode_O_Matic::onRandomize() {
   // Set mute output buttons to not mute.
   for (int i = 0; i < NR_OF_BANDS; i++) {
     if ((rand() / (RAND_MAX + 1.0)) > 0.5) {
-        mute_output[i] = false;
-        lights[MUTE_OUTPUT_LIGHT + i].setBrightness(1.0);
+        mute_modulator[i] = false;
+        lights[MUTE_MODULATOR_LIGHT + i].setBrightness(1.0);
     } else {
-        mute_output[i] = true;
-        lights[MUTE_OUTPUT_LIGHT + i].setBrightness(0.0);
+        mute_modulator[i] = true;
+        lights[MUTE_MODULATOR_LIGHT + i].setBrightness(0.0);
     }
   }
 
   // Show mute led values.
-  refresh_mute_output_leds(MUTE_OUTPUT_LIGHT, mute_output);
+  refresh_mute_modulator_leds(MUTE_MODULATOR_LIGHT, mute_modulator);
 
   // Set gain to initial value.
   params[CARRIER_GAIN_PARAM].setValue(INITIAL_CARRIER_GAIN);
@@ -293,9 +293,9 @@ void Vocode_O_Matic::process(const ProcessArgs &args) {
           p_cnt[chosen_row]++;
       }
     } else { // A mute button was left clicked.
-      int buttonNr = button_left_clicked_val - MUTE_OUTPUT_PARAM;
-      mute_output[buttonNr] = !mute_output[buttonNr];
-      lights[MUTE_OUTPUT_LIGHT + buttonNr].setBrightness(1.0 - lights[MUTE_OUTPUT_LIGHT + buttonNr].getBrightness());
+      int buttonNr = button_left_clicked_val - MUTE_MODULATOR_PARAM;
+      mute_modulator[buttonNr] = !mute_modulator[buttonNr];
+      lights[MUTE_MODULATOR_LIGHT + buttonNr].setBrightness(1.0 - lights[MUTE_MODULATOR_LIGHT + buttonNr].getBrightness());
 #ifdef DEBUGMSG
       refresh = true;
 #endif
@@ -346,19 +346,19 @@ void Vocode_O_Matic::process(const ProcessArgs &args) {
     else
     {   // A mute button was right clicked.
         right_click_state = !right_click_state;
-        int buttonNr = button_right_clicked_val - MUTE_OUTPUT_PARAM;
+        int buttonNr = button_right_clicked_val - MUTE_MODULATOR_PARAM;
         if (right_click_state) { // This is solo mode, so we mute everything except the clicked button.
             for (int i = 0; i < NR_OF_BANDS; i++) {
-                mute_output_old[i] = mute_output[i];
-                lights[MUTE_OUTPUT_LIGHT + i].setBrightness(0.0);
-                mute_output[i] = true;
+                mute_modulator_old[i] = mute_modulator[i];
+                lights[MUTE_MODULATOR_LIGHT + i].setBrightness(0.0);
+                mute_modulator[i] = true;
             }
-            mute_output[buttonNr] = false;
-            lights[MUTE_OUTPUT_LIGHT + buttonNr].setBrightness(1.0);
+            mute_modulator[buttonNr] = false;
+            lights[MUTE_MODULATOR_LIGHT + buttonNr].setBrightness(1.0);
         } else { // This is the unmute state, so we restore the pre mute knob settings.
             for (int i = 0; i < NR_OF_BANDS; i++) {
-                mute_output[i] = mute_output_old[i];
-                lights[MUTE_OUTPUT_LIGHT + i].setBrightness(mute_output[i] == true ? 0.0: 1.0);
+                mute_modulator[i] = mute_modulator_old[i];
+                lights[MUTE_MODULATOR_LIGHT + i].setBrightness(mute_modulator[i] == true ? 0.0: 1.0);
             }
         }
     }
@@ -366,8 +366,8 @@ void Vocode_O_Matic::process(const ProcessArgs &args) {
   }
 #ifdef DEBUGMSG
   if (refresh) {
-      print_mute_buttons(mute_output);
-      refresh_mute_output_leds(MUTE_OUTPUT_LIGHT, mute_output);
+      print_mute_buttons(mute_modulator);
+      refresh_mute_modulator_leds(MUTE_MODULATOR_LIGHT, mute_modulator);
       refresh = false;
   }
 #endif
@@ -393,7 +393,7 @@ void Vocode_O_Matic::process(const ProcessArgs &args) {
         float fl_tmp0 = yc[ind][0] * ym_env[i][0];
         //
         // Only the non muted channels are added to the output signal.
-        if (mute_output[i] == false) {
+        if (mute_modulator[i] == false) {
           //
           // Left channel.
           float fl_tmp = fl_tmp0 * left_level[i];
@@ -511,11 +511,11 @@ struct Vocode_O_MaticWidget : ModuleWidget {
         lb->module = module;
         lb->box.pos = Vec(x, y);
         if (module) {
-          lb->paramQuantity = module->paramQuantities[Vocode_O_Matic::MUTE_OUTPUT_PARAM + offset];
+          lb->paramQuantity = module->paramQuantities[Vocode_O_Matic::MUTE_MODULATOR_PARAM + offset];
         }
         addChild(lb);
       }
-      addChild(createLight<MediumLight<GreenLight>>(Vec(x, y), module, Vocode_O_Matic::MUTE_OUTPUT_LIGHT + offset));
+      addChild(createLight<MediumLight<GreenLight>>(Vec(x, y), module, Vocode_O_Matic::MUTE_MODULATOR_LIGHT + offset));
     }
   };
 };

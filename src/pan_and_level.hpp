@@ -17,8 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#ifndef PAN_AND_LEVEL_HPP
-#define PAN_AND_LEVEL_HPP
+#pragma once
 
 // Literature: https://www.cs.cmu.edu/~music/icm-online/readings/panlaws
 
@@ -28,5 +27,3 @@ float right_pan_factor(float slider_value);
 void init_pan_and_level(float slider_level[NR_OF_BANDS], float left_pan[NR_OF_BANDS], float right_pan[NR_OF_BANDS], float left_level[NR_OF_BANDS], float right_level[NR_OF_BANDS]);
 
 void set_pan_and_level(float slider_level[NR_OF_BANDS], float pan_level[NR_OF_BANDS], float left_pan[NR_OF_BANDS], float right_pan[NR_OF_BANDS], float left_level[NR_OF_BANDS], float right_level[NR_OF_BANDS], float width);
-
-#endif
