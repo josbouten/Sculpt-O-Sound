@@ -1,8 +1,29 @@
-#ifndef PAN_AND_LEVEL_HPP
-#define PAN_AND_LEVEL_HPP
+/*
+This is Vocode-O-Matic, a vocoder plugin for VCV Rack v1.x
+Copyright (C) 2018, Jos Bouten aka Zaphod B.
+You can contact me here: josbouten at gmail dot com
 
-void init_pan_and_level(float startLevel[NR_OF_BANDS], float left_pan[NR_OF_BANDS], float right_pan[NR_OF_BANDS], float left_level[NR_OF_BANDS], float right_level[NR_OF_BANDS]);
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-void set_pan_and_level(float startLevel[NR_OF_BANDS], float left_pan[NR_OF_BANDS], float right_pan[NR_OF_BANDS], float left_level[NR_OF_BANDS], float right_level[NR_OF_BANDS], float width);
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-#endif
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+
+#pragma once
+
+// Literature: https://www.cs.cmu.edu/~music/icm-online/readings/panlaws
+
+float left_pan_factor(float slider_value);
+float right_pan_factor(float slider_value);
+
+void init_pan_and_level(float slider_level[NR_OF_BANDS], float left_pan[NR_OF_BANDS], float right_pan[NR_OF_BANDS], float left_level[NR_OF_BANDS], float right_level[NR_OF_BANDS]);
+
+void set_pan_and_level(float slider_level[NR_OF_BANDS], float pan_level[NR_OF_BANDS], float left_pan[NR_OF_BANDS], float right_pan[NR_OF_BANDS], float left_level[NR_OF_BANDS], float right_level[NR_OF_BANDS], float width);

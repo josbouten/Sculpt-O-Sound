@@ -1,18 +1,11 @@
 #include "Sculpt-O-Sound.hpp"
 
-Plugin *plugin;
-
+Plugin *thePlugin;
 
 void init(rack::Plugin *p) {
-	plugin = p;
-	p->slug = TOSTRING(SLUG);
-	p->version = TOSTRING(VERSION);
-    p->website = "https://hithub.com/josbouten/Sculpt-O-Sound";
-    p->manual = "https://hithub.com/josbouten/Sculpt-O-Sound/README.md";
+    thePlugin = p;
 
-	// Add all Models defined throughout the plugin
-	p->addModel(modelVocode_O_Matic);
-
-	// Any other plugin initialization may go here.
-	// As an alternative, consider lazy-loading assets and lookup tables when your module is created to reduce startup times of Rack.
+    // Add all Models defined throughout the plugin
+    p->addModel(modelVocode_O_Matic_XL); // Vocoder version allowing a lot more control by the user.
+    p->addModel(modelVocode_O_Matic);    // Basic vocoder version
 }
