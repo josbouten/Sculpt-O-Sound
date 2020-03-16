@@ -482,6 +482,14 @@ void Vocode_O_Matic_XL::process(const ProcessArgs &args) {
         int width = 1;
         set_pan_and_level(slider_level, slider_pan, left_pan, right_pan, left_level, right_level, width);
     }
+    if (params[CARR_BW_PARAM].value != carr_bandwidth) {
+        carr_bandwidth = params[CARR_BW_PARAM].value;
+        comp_all_coeffs(freq, carr_bandwidth, fsamp, carr_alpha1, carr_alpha2, carr_beta);
+    }
+    if (params[MOD_BW_PARAM].value != mod_bandwidth) {
+        mod_bandwidth = params[MOD_BW_PARAM].value;
+        comp_all_coeffs(freq, mod_bandwidth, fsamp, mod_alpha1, mod_alpha2, mod_beta);
+    }
   } else {
     wait_all_sliders -= 1;
   }
@@ -627,6 +635,12 @@ struct Vocode_O_Matic_XL_Widget : ModuleWidget,  Vocode_O_Matic_XL {
             }
             addChild(createLight<MediumLight<GreenLight>>(Vec(x, y), module, Vocode_O_Matic_XL::MUTE_MODULATOR_LIGHT + offset));
     }
+    // Add slider for carrier filter bandwidth.
+    carr_bw_slider = createParam<SliderWithId>(Vec(84, 180), module, Vocode_O_Matic_XL::CARR_BW_PARAM);
+    addParam(carr_bw_slider);
+    // Add slider for modulator filter bandwidth.
+    mod_bw_slider = createParam<SliderWithId>(Vec(112, 180), module, Vocode_O_Matic_XL::MOD_BW_PARAM);
+    addParam(mod_bw_slider);
 
     // Add 4 rows of sliders (from bottom to top of module) for
     for (int i = 0; i < NR_OF_BANDS; i++) {
@@ -656,7 +670,7 @@ struct Vocode_O_Matic_XL_Widget : ModuleWidget,  Vocode_O_Matic_XL {
 
     }
 
-    // Push buttons for panning. 
+    // Add push buttons for panning. 
     addParam(createParam<ButtonUp>(Vec(863, 285), module, Vocode_O_Matic_XL::PAN_LEFT_PARAM));
     addParam(createParam<ButtonCenter>(Vec(863, 310), module, Vocode_O_Matic_XL::PAN_CENTER_PARAM));
     addParam(createParam<ButtonDown>(Vec(863, 335), module, Vocode_O_Matic_XL::PAN_RIGHT_PARAM));
@@ -665,15 +679,15 @@ struct Vocode_O_Matic_XL_Widget : ModuleWidget,  Vocode_O_Matic_XL {
     addParam(createParam<ButtonCenter>(Vec(SLIDERS_X_OFFSET - 16, 310), module, Vocode_O_Matic_XL::PAN_CENTER_PARAM));
     addParam(createParam<ButtonDown>(Vec(SLIDERS_X_OFFSET - 16, 335), module, Vocode_O_Matic_XL::PAN_WIDTH_DECREASE_PARAM));
 
-    // Push buttons for level sliders increase / decrease.
+    // Add push buttons for level sliders increase / decrease.
     addParam(createParam<ButtonUp>(Vec(863, 195), module, Vocode_O_Matic_XL::LEVEL_INCREASE_PARAM));
     addParam(createParam<ButtonDown>(Vec(863, 245), module, Vocode_O_Matic_XL::LEVEL_DECREASE_PARAM));
 
-    // Push buttons for attack time sliders increase / decrease.
+    // Add push buttons for attack time sliders increase / decrease.
     addParam(createParam<ButtonUp>(Vec(863, 105), module, Vocode_O_Matic_XL::ATTACK_TIME_INCREASE_PARAM));
     addParam(createParam<ButtonDown>(Vec(863, 160), module, Vocode_O_Matic_XL::ATTACK_TIME_DECREASE_PARAM));
 
-    // Push buttons for release time sliders increase / decrease.
+    // Add push buttons for release time sliders increase / decrease.
     addParam(createParam<ButtonUp>(Vec(863,  15), module, Vocode_O_Matic_XL::RELEASE_TIME_INCREASE_PARAM));
     addParam(createParam<ButtonDown>(Vec(863,  70), module, Vocode_O_Matic_XL::RELEASE_TIME_DECREASE_PARAM));
   };

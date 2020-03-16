@@ -23,8 +23,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #define INITIAL_BW_IN_SEMITONES 4.0
 
+#define MIN_CARR_BW_IN_SEMITONES 0.1
 #define INITIAL_CARR_BW_IN_SEMITONES 4.0
+#define MAX_CARR_BW_IN_SEMITONES 12.0
+
+#define MIN_MOD_BW_IN_SEMITONES 0.1
 #define INITIAL_MOD_BW_IN_SEMITONES 4.0
+#define MAX_MOD_BW_IN_SEMITONES 12.0
+
 #define INITIAL_GAIN 1.0
 
 // ENVELOPE FOLLOWER

@@ -227,6 +227,8 @@ struct Vocode_O_Matic_XL : Module {
     ATTACK_TIME_DECREASE_PARAM,
     RELEASE_TIME_INCREASE_PARAM,
     RELEASE_TIME_DECREASE_PARAM,
+    CARR_BW_PARAM,
+    MOD_BW_PARAM,
     NUM_PARAMS
   };
 
@@ -375,6 +377,8 @@ struct Vocode_O_Matic_XL : Module {
   SliderWithId *attack_time_slider[NR_OF_BANDS]; 
   SliderWithId *pan_slider[NR_OF_BANDS]; 
   SliderWithId *level_slider[NR_OF_BANDS]; 
+  SliderWithId *carr_bw_slider;
+  SliderWithId *mod_bw_slider;
 
   // Some code to read/save state of bypass button.
   json_t *dataToJson() override {
@@ -448,6 +452,11 @@ struct Vocode_O_Matic_XL : Module {
        json_array_append_new(panJ, json_real(slider_pan[i]));
     }
     json_object_set_new(rootJm, "pan", panJ);
+
+    // Store carrier bandwidth value.
+    json_t *carr_bwJ = json_real(carr_bandwidth);
+    json_object_set_new(rootJm, "carrier_bandwidth", carr_bwJ);
+
     return rootJm;
   }       
           
@@ -562,8 +571,13 @@ struct Vocode_O_Matic_XL : Module {
             }
         }
     }
+    // Restore carrier bandwidth value.
+    json_t *carr_bwJ = json_object_get(rootJm, "carrier_bandwidth");
+    if (carr_bwJ) {
+        carr_bandwidth = (float) json_number_value(carr_bwJ);
+    }
+  }  // end restore params from json 
 
-  } 
   // Increase / decrease envelope attack / release times in small steps.
   void increase_attack_time() {
     for (int i = 0; i < NR_OF_BANDS; i++) {
@@ -653,7 +667,7 @@ struct Vocode_O_Matic_XL : Module {
     // Initialize the filter coefficients.
     comp_all_coeffs(freq, mod_bandwidth, fsamp, mod_alpha1, mod_alpha2, mod_beta);
     comp_all_coeffs(freq, carr_bandwidth, fsamp, carr_alpha1, carr_alpha2, carr_beta);
-  
+   
     // Initialize all filter taps. 
     for (int i = 0; i < NR_OF_BANDS; i++) {
         for (int j = 0; j < 3; j++) { 
@@ -680,6 +694,15 @@ struct Vocode_O_Matic_XL : Module {
             configParam(Vocode_O_Matic_XL::PAN_PARAM + i, MIN_PAN, MAX_PAN, INITIAL_PAN - INITIAL_PAN_OFFSET, message, "");
         }
     }
+
+    // Initialize the bandwidth for all carrier filters.
+    sprintf(message, "Carr BW [semi tones]");
+    configParam(Vocode_O_Matic_XL::CARR_BW_PARAM, MIN_CARR_BW_IN_SEMITONES, MAX_CARR_BW_IN_SEMITONES, INITIAL_CARR_BW_IN_SEMITONES, message, "");
+    // Initialize the bandwidth for all modulator filters.
+    sprintf(message, "Mod BW [semi tones]");
+    configParam(Vocode_O_Matic_XL::MOD_BW_PARAM, MIN_MOD_BW_IN_SEMITONES, MAX_MOD_BW_IN_SEMITONES, INITIAL_MOD_BW_IN_SEMITONES, message, "");
+
+    // Initialize mute buttons and button matrix.
     if (!matrix_mode_read_from_settings) {
         choose_matrix(4, button_value, p_cnt); // Initialize linear filter coupling.
         initialize_mute_modulator(mute_modulator);   // Initialize all mute buttons (to be not pressed).

@@ -1,3 +1,6 @@
+Mon 16. March 2020
+- added sliders for bandwidth of carrier filters and modulator filters. The carrier and modulator bandwidth sliders will set the bandwidth of all respective bandpass filters. The sliders can be set from 0.1 to 12 semitones. The initial bandwidth is 1 terts ( 4 semitones ).
+
 Nov 2019
 - added Vocode-O-Matic-XL which is basically the same as Vocode-O-Matic but it has sliders
   for the level of the modulator bands, sliders for panning the vocoded carrier bands to either left or right

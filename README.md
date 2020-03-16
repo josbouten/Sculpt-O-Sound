@@ -82,6 +82,8 @@ The two macro buttons on the right hand side of the sliders operate on all slide
 Release: allows you to choose the release time of the envelope follower for the corresponding modulator band.
 The two macro buttons on the left hand side of the sliders operate on all sliders at once. They can be used to increase or decrease the release time.
 
+The bandwidth of the filters can be set using the Modulator Bandwidth slider and the Carrier Bandwidth slider. All modulator and all carrier filters will always be set to the same bandwidth. The bandwidth can be chosen from 0.1 semitones to 12 semitones. The initial value is 1 terts (4 semitones).
+
 Sources
 =======
 All filters are based on the series of tutorial papers about Effect Design by Jon Dattorro published in the Journal of the Audio Engineering Society (https://ccrma.stanford.edu/~dattorro/EffectDesignPart1.pdf).
