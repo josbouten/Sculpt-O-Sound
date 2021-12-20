@@ -138,10 +138,12 @@ struct Vocode_O_Matic_XL : Module {
           if (slider_pan[i] < MIN_PAN) slider_pan[i] = MIN_PAN;
           if (slider_pan[i] > MAX_PAN) slider_pan[i] = MAX_PAN;
           params[PAN_PARAM + i].value = slider_pan[i];
-          slider_pan[i + 1] -= increment;
-          if (slider_pan[i + 1] < MIN_PAN) slider_pan[i + 1] = MIN_PAN;
-          if (slider_pan[i + 1] > MAX_PAN) slider_pan[i + 1] = MAX_PAN;
-          params[PAN_PARAM + i + 1].value = slider_pan[i + 1];
+          if (i < (NR_OF_BANDS - 1)) {
+            slider_pan[i + 1] -= increment;
+            if (slider_pan[i + 1] < MIN_PAN) slider_pan[i + 1] = MIN_PAN;
+            if (slider_pan[i + 1] > MAX_PAN) slider_pan[i + 1] = MAX_PAN;
+            params[PAN_PARAM + i + 1].value = slider_pan[i + 1];
+          }
       }
       set_pan_and_level(slider_level, slider_pan, left_pan, right_pan, left_level, right_level, width);
   }
@@ -154,21 +156,21 @@ struct Vocode_O_Matic_XL : Module {
           if (slider_pan[i] > MAX_PAN) slider_pan[i] = MAX_PAN;
           if (slider_pan[i] < MIN_PAN) slider_pan[i] = MIN_PAN;
           params[PAN_PARAM + i].value = slider_pan[i];
-          slider_pan[i + 1] += increment;
-          if (slider_pan[i + 1] > MAX_PAN) slider_pan[i + 1] = MAX_PAN;
-          if (slider_pan[i + 1] < MIN_PAN) slider_pan[i + 1] = MIN_PAN;
-          params[PAN_PARAM + i + 1].value = slider_pan[i + 1];
+          if (i < (NR_OF_BANDS - 1)) {
+            slider_pan[i + 1] += increment;
+            if (slider_pan[i + 1] > MAX_PAN) slider_pan[i + 1] = MAX_PAN;
+            if (slider_pan[i + 1] < MIN_PAN) slider_pan[i + 1] = MIN_PAN;
+            params[PAN_PARAM + i + 1].value = slider_pan[i + 1];
+          }
       }
       set_pan_and_level(slider_level, slider_pan, left_pan, right_pan, left_level, right_level, width);
   }
  
   // Set pan to center position. 
   void pan_center() {
-      for (int i = 0; i < NR_OF_BANDS; i += 2) {
+      for (int i = 0; i < NR_OF_BANDS; i += 1) {
           slider_pan[i] = 0;
-          slider_pan[i + 1] = 0;
           params[PAN_PARAM + i].value = 0.0;
-          params[PAN_PARAM + i + 1].value = 0.0;
       }
       set_pan_and_level(slider_level, slider_pan, left_pan, right_pan, left_level, right_level, width);
   }
@@ -710,13 +712,13 @@ struct LButton_XL : SvgSwitch {
 
   void onButton(const event::Button &e) override {
     if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
-      if (paramQuantity && module) {
-        module->button_left_clicked_val = paramQuantity->paramId;
+      if (module) {
+        module->button_left_clicked_val = paramId;
       }
     }
     if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
-      if (paramQuantity && module) {
-        module->button_right_clicked_val = paramQuantity->paramId;
+      if (module) {
+        module->button_right_clicked_val = paramId;
       }
     }
     e.consume(this);

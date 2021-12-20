@@ -603,12 +603,11 @@ struct Vocode_O_Matic_XL_Widget : ModuleWidget,  Vocode_O_Matic_XL {
                 LButton_XL *lb = new LButton_XL();
                 lb->module = module;
                 lb->box.pos = Vec(x, y);
-                if (module) {
-                    lb->paramQuantity = module->paramQuantities[Vocode_O_Matic_XL::MOD_MATRIX_PARAM + offset];
-                }
+                lb->paramId = Vocode_O_Matic_XL::MOD_MATRIX_PARAM + offset;
+                lb->initParamQuantity();
                 addChild(lb);
             }
-            addChild(createLight<MediumLight<BlueLight>>(Vec(x, y), module, Vocode_O_Matic_XL::MOD_MATRIX_LIGHT + offset));
+                addChild(createLight<MediumLight<BlueLight>>(Vec(x, y), module, Vocode_O_Matic_XL::MOD_MATRIX_LIGHT + offset));
         }
     }
     // Add mute output buttons on the RHS of the matrix.
@@ -620,9 +619,8 @@ struct Vocode_O_Matic_XL_Widget : ModuleWidget,  Vocode_O_Matic_XL {
                 LButton_XL *lb = new LButton_XL();
                 lb->module = module;
                 lb->box.pos = Vec(x, y);
-                if (module) {
-                    lb->paramQuantity = module->paramQuantities[Vocode_O_Matic_XL::MUTE_MODULATOR_PARAM + offset];
-                }
+                lb->paramId = Vocode_O_Matic_XL::MUTE_MODULATOR_PARAM + offset;
+                lb->initParamQuantity();
                 addChild(lb);
             }
             addChild(createLight<MediumLight<GreenLight>>(Vec(x, y), module, Vocode_O_Matic_XL::MUTE_MODULATOR_LIGHT + offset));

@@ -492,9 +492,8 @@ struct Vocode_O_MaticWidget : ModuleWidget {
           LButton *lb = new LButton();
           lb->module = module;
           lb->box.pos = Vec(x, y);
-          if (module) {
-            lb->paramQuantity = module->paramQuantities[Vocode_O_Matic::MOD_MATRIX_PARAM + offset];
-          }
+          lb->paramId = Vocode_O_Matic::MOD_MATRIX_PARAM + offset;
+          lb->initParamQuantity();
           addChild(lb);
         }
         addChild(createLight<MediumLight<BlueLight>>(Vec(x, y), module, Vocode_O_Matic::MOD_MATRIX_LIGHT + offset));
@@ -510,9 +509,8 @@ struct Vocode_O_MaticWidget : ModuleWidget {
         LButton *lb = new LButton();
         lb->module = module;
         lb->box.pos = Vec(x, y);
-        if (module) {
-          lb->paramQuantity = module->paramQuantities[Vocode_O_Matic::MUTE_MODULATOR_PARAM + offset];
-        }
+        lb->paramId = Vocode_O_Matic::MUTE_MODULATOR_PARAM + offset;
+        lb->initParamQuantity();
         addChild(lb);
       }
       addChild(createLight<MediumLight<GreenLight>>(Vec(x, y), module, Vocode_O_Matic::MUTE_MODULATOR_LIGHT + offset));
