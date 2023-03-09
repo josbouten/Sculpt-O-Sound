@@ -55,6 +55,7 @@ void init_pan_and_level(float slider_level[NR_OF_BANDS], float left_pan[NR_OF_BA
 }
 
 void set_pan_and_level(float slider_level[NR_OF_BANDS], float slider_pan[NR_OF_BANDS], float left_pan[NR_OF_BANDS], float right_pan[NR_OF_BANDS], float left_level[NR_OF_BANDS], float right_level[NR_OF_BANDS], float width) {
+	// Set stereo width symmetrically.
     for (int i = 0; i < NR_OF_BANDS; i++) {
        float p = pow(10, slider_level[i] / 20);
        left_pan[i] = left_pan_factor(slider_pan[i]) * width;
