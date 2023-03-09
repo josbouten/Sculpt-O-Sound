@@ -442,13 +442,13 @@ struct LButton : SvgSwitch {
 
   void onButton(const event::Button &e) override {
     if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
-      if (paramQuantity && module) {
-        module->button_left_clicked_val = paramQuantity->paramId;
+      if (module) {
+        module->button_left_clicked_val = paramId;
       }
     }
     if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT && (e.mods & RACK_MOD_MASK) == 0) {
-      if (paramQuantity && module) {
-        module->button_right_clicked_val = paramQuantity->paramId;
+      if (module) {
+        module->button_right_clicked_val = paramId;
       }
     }
     e.consume(this);
